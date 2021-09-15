@@ -30,6 +30,7 @@ def normalvariate(mu, sigma=2):
 def retain_decimal(value, n=3):
     """
     保留n位小数
+    用法：float(utils.retain_decimal(value))
     :param value: 数
     :param n: 保留小数位数
     :return: 保留n位小数后的数
@@ -91,5 +92,3 @@ def plus_dict(a: dict, b: dict) -> dict:
         else:
             a[key] = value
     return a
-
-

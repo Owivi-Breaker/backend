@@ -1,20 +1,20 @@
 from typing import List
 from fastapi import APIRouter
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-
 import schemas
 import models
-from core.db import SessionLocal, engine, get_db
+from core.db import get_db
 import crud
+from utils import logger
 
 router = APIRouter()
 
 
 @router.get('/{club_id}/players', response_model=List[schemas.Player],
-            response_model_exclude={"game_data"}, tags=['get players'])
-async def get_players_by_club(club_id: int, db: Session = Depends(get_db)) -> list:
+            response_model_exclude={"game_data"})
+def get_players_by_club(club_id: int, db: Session = Depends(get_db)) -> list:
     """
     获取全部球员
     :param club_id: 俱乐部 id

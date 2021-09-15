@@ -1,8 +1,10 @@
 import pandas as pd
 from typing import List
-import config
-from sql_app import crud, models, database
+import crud
 from utils import utils
+from core.db import get_db
+from fastapi import Depends
+from core.db import engine
 
 
 class Info:
@@ -21,7 +23,7 @@ class Info:
         :return: df
         """
         query_str = "and_(models.Game.season=='{}', models.Game.type=='{}')".format(year, game_type)
-        games = crud.get_games_by_attri(query_str=query_str)
+        games = crud.get_games_by_attri(db=Depends(get_db), query_str=query_str)
         points_dict = dict()
         for game in games:
             team1 = game.teams[0]
@@ -136,22 +138,11 @@ class Info:
     @staticmethod
     def save_in_db(df, filename: str):
         # df.to_csv(path + '/' + filename)
-        df.to_sql(filename, database.engine)
+        df.to_sql(filename, engine)
 
-    @staticmethod
-    def save(df, filename: str, file_format: str = 'json', path: str = config.CWD_URL):
-        if file_format == 'json':
-            df.to_json(path + '/' + filename)
-        elif file_format == 'csv':
-            df.to_csv(path + '/' + filename)
-
-
-if __name__ == '__main__':
-    info = Info()
-    # print(info.get_season_player_chart('2022'))
-    # print(info.get_points_table('2022'))
-    start_year = '2022'
-    info.save_in_db(info.get_season_player_chart(str(start_year)),
-                    '{}赛季球员数据榜'.format(str(start_year)))
-    info.save_in_db(info.get_points_table(str(start_year)),
-                    '{}赛季积分榜'.format(str(start_year)))
+    # @staticmethod
+    # def save(df, filename: str, file_format: str = 'json', path: str = config.CWD_URL):
+    #     if file_format == 'json':
+    #         df.to_json(path + '/' + filename)
+    #     elif file_format == 'csv':
+    #         df.to_csv(path + '/' + filename)

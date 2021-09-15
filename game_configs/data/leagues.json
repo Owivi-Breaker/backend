@@ -1,0 +1,172 @@
+[
+  {
+    "name": "世界超级联赛",
+    "clubs": [
+      {
+        "name": "巴塞罗那",
+        "finance": 50000
+      },
+      {
+        "name": "皇家马德里",
+        "finance": 43000
+      },
+      {
+        "name": "曼彻斯特联",
+        "finance": 45000
+      },
+      {
+        "name": "曼彻斯特城",
+        "finance": 45000
+      },
+      {
+        "name": "AC米兰",
+        "finance": 38000
+      },
+      {
+        "name": "国际米兰",
+        "finance": 38000
+      },
+      {
+        "name": "巴黎圣日尔曼",
+        "finance": 42000
+      },
+      {
+        "name": "阿贾克斯",
+        "finance": 34000
+      },
+      {
+        "name": "切尔西",
+        "finance": 41000
+      },
+      {
+        "name": "利物浦",
+        "finance": 38000
+      },
+      {
+        "name": "马德里竞技",
+        "finance": 32000
+      },
+      {
+        "name": "阿森纳",
+        "finance": 30000
+      },
+      {
+        "name": "托特纳姆热刺",
+        "finance": 28000
+      },
+      {
+        "name": "尤文图斯",
+        "finance": 32000
+      },
+      {
+        "name": "多特蒙德",
+        "finance": 31000
+      },
+      {
+        "name": "拜仁慕尼黑",
+        "finance": 37000
+      },
+      {
+        "name": "上海申花",
+        "finance": 20000
+      },
+      {
+        "name": "上海上港",
+        "finance": 20000
+      },
+      {
+        "name": "莱斯特城",
+        "finance": 16000
+      },
+      {
+        "name": "塞维利亚",
+        "finance": 16000
+      }
+    ]
+  },
+  {
+    "name": "世界冠军联赛",
+    "clubs": [
+      {
+        "name": "里昂",
+        "finance": 14000
+      },
+      {
+        "name": "里斯本竞技",
+        "finance": 14000
+      },
+      {
+        "name": "莱比锡",
+        "finance": 16000
+      },
+      {
+        "name": "浙江绿城",
+        "finance": 25000
+      },
+      {
+        "name": "勒沃库森",
+        "finance": 15000
+      },
+      {
+        "name": "西汉姆联",
+        "finance": 18000
+      },
+      {
+        "name": "狼队",
+        "finance": 13000
+      },
+      {
+        "name": "罗马",
+        "finance": 13000
+      },
+      {
+        "name": "摩纳哥",
+        "finance": 14000
+      },
+      {
+        "name": "广州恒大",
+        "finance": 21000
+      },
+      {
+        "name": "马赛",
+        "finance": 15000
+      },
+      {
+        "name": "波尔图",
+        "finance": 14000
+      },
+      {
+        "name": "本菲卡",
+        "finance": 15000
+      },
+      {
+        "name": "博卡",
+        "finance": 19000
+      },
+      {
+        "name": "河床",
+        "finance": 19000
+      },
+      {
+        "name": "川崎前锋",
+        "finance": 14000
+      },
+      {
+        "name": "北京国安",
+        "finance": 14000
+      },
+      {
+        "name": "江苏苏宁",
+        "finance": 14000
+      },
+      {
+        "name": "埃因霍温",
+        "finance": 14000
+      },
+      {
+        "name": "桑托斯",
+        "finance": 14000
+      }
+    ]
+  }
+]

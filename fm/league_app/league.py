@@ -1,11 +1,12 @@
-import config
 import random
 import datetime
 from utils.date import Date
-from sql_app import schemas, crud, models
-from club_app import Club
-from game_app import Game
-from info_app import Info
+import schemas
+import models
+import crud
+from fm import Club
+from fm import Game
+from fm import Info
 
 
 class League:

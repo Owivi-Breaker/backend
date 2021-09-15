@@ -1,22 +1,23 @@
-import random
-from config import *
-from player_app import PlayerGenerator
 import datetime
-from sql_app import schemas, crud, models
-from utils import utils
+import random
+import crud
+import schemas
+from fm.player_app import PlayerGenerator
+from game_configs import rating_potential
+from utils import utils, logger
 
 
 class Player:
-    def __init__(self, init_type: int = 1, generator: PlayerGenerator = None, player_id: int = 0):
+    def __init__(self, gen_type: str = "init", generator: PlayerGenerator = None, player_id: int = 0):
         self.id = player_id
         self.player_model = None
         self.data = dict()  # 初始化或待修改的数据
         self.generator = generator  # 从外部导入生成器以加快运行速度
-        if init_type == 1:
+        if gen_type == "init":
             # 随机生成
             self.generate()
             self.import_data()
-        elif init_type == 2:
+        elif gen_type == "db":
             # 导入数据
             self.import_data()
         else:
@@ -24,18 +25,15 @@ class Player:
 
     def generate(self):
         self.data['created_time'] = datetime.datetime.now()
-        # self.data['name'] = generator.get_name()
         nation, self.data['name'], self.data['translated_name'] = self.generator.get_name()
+        # 判断国籍
         if nation == 'cn':
             self.data['nationality'], self.data['translated_nationality'] = 'China', '中国'
         elif nation == 'jp':
             self.data['nationality'], self.data['translated_nationality'] = 'Japan', '日本'
         else:
             self.data['nationality'], self.data['translated_nationality'] = self.generator.get_nationality()
-        # self.data['translated_name'] = generator.translate(self.data['name'])
-        # self.data['nationality'] = generator.get_nationality() \
-        #     if self.data['name'] != self.data['translated_name'] else 'China'
-        # self.data['translated_nationality'] = generator.translate(self.data['nationality'])
+
         self.data['height'] = self.generator.get_height()
         self.data['weight'] = self.generator.get_weight()
         self.data['birth_date'] = self.generator.get_birthday()

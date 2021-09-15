@@ -1,36 +1,33 @@
-import config
-from utils import utils
-from player_app import PlayerGenerator
+from utils import utils, logger
+from fm.player_app import PlayerGenerator
 import datetime
-from sql_app import schemas, crud, models
+import schemas
+import models
+import crud
 from typing import List
 import random
+from game_configs import tactics, location_selector
 
 
 class Coach:
-    def __init__(self, init_type: int = 1, generator: PlayerGenerator = None, coach_id: int = 0):
+    def __init__(self, gen_type: str = "init", generator: PlayerGenerator = None, coach_id: int = 0):
         self.id = coach_id
         self.coach_model = None
         self.data = dict()
         self.generator = generator  # 从外部导入生成器以加快运行速度
-        if init_type == 1:
+        if gen_type == "init":
             # 随机生成
             self.generate()
             self.import_data()
-        elif init_type == 2:
+        elif gen_type == "db":
             # 导入数据
             self.import_data()
         else:
-            config.logger.error('球员初始化错误！')
+            logger.error('教练初始化错误！')
 
     def generate(self):
         self.data['created_time'] = datetime.datetime.now()
 
-        # self.data['name'] = generator.get_name()
-        # self.data['translated_name'] = generator.translate(self.data['name'])
-        # self.data['nationality'] = generator.get_nationality() \
-        #     if self.data['name'] != self.data['translated_name'] else 'China'
-        # self.data['translated_nationality'] = generator.translate(self.data['nationality'])
         nation, self.data['name'], self.data['translated_name'] = self.generator.get_name()
         if nation == 'cn':
             self.data['nationality'], self.data['translated_nationality'] = 'China', '中国'
@@ -41,7 +38,7 @@ class Coach:
 
         self.data['birth_date'] = self.generator.get_birthday()
         # tactic
-        self.data['tactic'] = random.choice([x for x in config.tactic_config.keys()])
+        self.data['tactic'] = random.choice([x for x in tactics.keys()])
         self.data['wing_cross'] = utils.get_mean_range(50, per_range=0.9)
         self.data['under_cutting'] = utils.get_mean_range(50, per_range=0.9)
         self.data['pull_back'] = utils.get_mean_range(50, per_range=0.9)
@@ -80,28 +77,11 @@ class Coach:
         crud.update_coach(coach_id=self.id, attri={'club_id': club_id})
 
     def select_players(self, players: List[models.Player]):
-        # 依据位置选人
-        # final_players = []
-        # final_locations = []
-        # players_copy = players.copy()
-        # location_dict = config.tactic_config[self.coach_model.tactic]
-        # location_list = [[name, num] for name, num in location_dict.items()]
-        # while location_list:
-        #     location = random.choice(location_list)
-        #     location_list.remove(location)
-        #     for _ in range(location[1]):
-        #         lo_name = location[0]
-        #         fittest_player = self.get_fittest_player(players_copy, lo_name)
-        #         players_copy.remove(fittest_player)
-        #         final_players.append(fittest_player)
-        #         final_locations.append(lo_name)
 
         # 依据球员擅长位置选人
         final_players = []
         final_locations = []
-        players_copy = players.copy()
-        location_dict = config.tactic_config[self.coach_model.tactic].copy()  # 这里一定要copy()！因为涉及变量的改变
-        # location_list = [[name, num] for name, num in location_dict.items()]
+        location_dict = tactics[self.coach_model.tactic].copy()  # 这里一定要copy()！因为涉及变量的改变
 
         players_location_rating_dict = {
             player: self.get_tactical_sorted_location_rating(player, self.coach_model.tactic) for player in players}
@@ -142,13 +122,13 @@ class Coach:
     def get_location_rating(player: models.Player, lo_name: str):
         weight_dict = dict()
         player_dict = player.__dict__
-        for lo in config.select_location:
+        for lo in location_selector:
             if lo['name'] == lo_name:
                 weight_dict = lo['weight']
                 break
         location_rating = 0
         if not weight_dict:
-            config.logger.error('没有找到对应位置！')
+            logger.error('没有找到对应位置！')
         for lo, weight in weight_dict.items():
             location_rating += player_dict[lo] * weight
         return location_rating
@@ -156,7 +136,7 @@ class Coach:
     #  TODO 应该放在Player类中
     def get_sorted_location_rating(self, player):
         location_rating_list = []
-        for location in config.select_location:
+        for location in location_selector:
             location_rating_list.append([location['name'], self.get_location_rating(player, location['name'])])
         location_rating_list = sorted(location_rating_list, key=lambda x: -x[1])
         return location_rating_list
@@ -166,7 +146,7 @@ class Coach:
         获取指定位置的球员综合能力信息
         """
         # 这代码越来越怪了。。。
-        location_dict = config.tactic_config[lo_name]
+        location_dict = tactics[lo_name]
         location_list = [name for name in location_dict.keys()]
 
         location_rating_list = self.get_sorted_location_rating(player)
@@ -185,7 +165,7 @@ class Coach:
         best_rating_list = []
         for player, rating_list in players_location_rating_dict.items():
             if not rating_list:
-                config.logger.error('球员能力列表为空！')
+                logger.error('球员能力列表为空！')
                 continue
             if not best_player or rating_list[0][1] > best_rating_list[0][1]:
                 best_player = player

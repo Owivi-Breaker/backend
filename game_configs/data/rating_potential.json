@@ -1,0 +1,97 @@
+[
+  {
+    "name": "ST",
+    "offset": {
+      "shooting": 0.6,
+      "anticipation": 0.2,
+      "strength": 0.2
+    }
+  },
+  {
+    "name": "LW",
+    "offset": {
+      "dribbling": 0.4,
+      "pace": 0.4,
+      "passing": 0.1,
+      "shooting": 0.1
+    }
+  },
+  {
+    "name": "RW",
+    "offset": {
+      "dribbling": 0.4,
+      "pace": 0.4,
+      "passing": 0.1,
+      "shooting": 0.1
+    }
+  },
+  {
+    "name": "CM",
+    "offset": {
+      "passing": 0.6,
+      "stamina": 0.3,
+      "shooting": 0.1
+    }
+  },
+  {
+    "name": "CB",
+    "offset": {
+      "interception": 0.5,
+      "anticipation": 0.2,
+      "strength": 0.2,
+      "passing": 0.1
+    }
+  },
+  {
+    "name": "LB",
+    "offset": {
+      "interception": 0.3,
+      "shooting": 0.4,
+      "dribbling": 0.1,
+      "passing": 0.2
+    }
+  },
+  {
+    "name": "RB",
+    "offset": {
+      "interception": 0.3,
+      "shooting": 0.4,
+      "dribbling": 0.1,
+      "passing": 0.2
+    }
+  },
+  {
+    "name": "GK",
+    "offset": {
+      "goalkeeping": 1.5
+    }
+  },
+  {
+    "name": "CAM",
+    "offset": {
+      "passing": 0.3,
+      "shooting": 0.3,
+      "anticipation": 0.2,
+      "strength": 0.2
+    }
+  },
+  {
+    "name": "LM",
+    "offset": {
+      "passing": 0.5,
+      "shooting": 0.2,
+      "dribbling": 0.1,
+      "pace": 0.1,
+      "stamina": 0.1
+    }
+  },
+  {
+    "name": "RM",
+    "offset": {
+      "passing": 0.5,
+      "shooting": 0.2, "dribbling": 0.1, "pace": 0.1, "stamina": 0.1}},
+    {
+      "name": "CDM",
+     "offset": {
+       "passing": 0.4, "interception": 0.4, "anticipation": 0.1, "strength": 0.1}}
+]

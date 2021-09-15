@@ -1,11 +1,12 @@
 from pydantic import AnyHttpUrl
 from typing import List
-from loguru import logger
 import time
+from pathlib import Path
 import os
 
 
 class Settings:
+    CWD_URL = str(Path.cwd())  # 根目录
     ENV = os.environ.get("fast_env", "DEV")  # 本次启动环境
     APP_NAME = "Test~~~"
     # api前缀

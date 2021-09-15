@@ -48,8 +48,7 @@ def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDat
     return db_game_player_data
 
 
-# region 比赛操作
-# TODO 需要重构
+# region 比赛操作 TODO 需要重构
 def crud_create_game(game: schemas.Game, db: Session):
     """
     创建比赛表
@@ -107,7 +106,7 @@ def crud_create_game_player_data(game_team_info_id: int, game_player_data: schem
 
 # endregion
 
-def get_games_by_attri(query_str: str, db: Session, only_one: bool = False):
+def get_games_by_attri(db: Session, query_str: str, only_one: bool = False):
     if only_one:
         db_game = db.query(models.Game).filter(eval(query_str)).first()
         return db_game
@@ -116,7 +115,7 @@ def get_games_by_attri(query_str: str, db: Session, only_one: bool = False):
         return db_games
 
 
-def delete_game_by_attri(query_str: str, db: Session):
+def delete_game_by_attri(db: Session, query_str: str):
     db_games = db.query(models.Game).filter(eval(query_str)).all()
     if not db_games:
         logger.info('无比赛表可删！')
