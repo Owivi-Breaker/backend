@@ -15,9 +15,7 @@ class Game(Base):
     season = Column(String)
     mvp = Column(Integer, ForeignKey('player.id'))
     script = Column(String)
-    teams = relationship("GameTeamInfo", backref="game", lazy='subquery')
-
-
+    teams = relationship("GameTeamInfo", backref="game")
 
 
 class GameTeamInfo(Base):
@@ -29,10 +27,8 @@ class GameTeamInfo(Base):
     created_time = Column(DateTime)
     name = Column(String)  # TODO 临时
     score = Column(Integer)
-    team_data = relationship("GameTeamData", uselist=False, backref="game_team_info", lazy='subquery')
-    player_data = relationship("GamePlayerData", backref="game_team_info", lazy='subquery')
-
-
+    team_data = relationship("GameTeamData", uselist=False, backref="game_team_info")
+    player_data = relationship("GamePlayerData", backref="game_team_info")
 
 
 class GameTeamData(Base):
@@ -57,8 +53,6 @@ class GameTeamData(Base):
     # 防反
     counter_attack = Column(Integer)
     counter_attack_success = Column(Integer)
-
-
 
 
 class GamePlayerData(Base):
@@ -94,7 +88,5 @@ class GamePlayerData(Base):
     # 体力
     original_stamina = Column(Integer)
     final_stamina = Column(Integer)
-
-
 
 # endregion

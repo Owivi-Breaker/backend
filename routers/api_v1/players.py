@@ -7,12 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import schemas
 import models
 from core.db import SessionLocal, engine, get_db
-from crud.player import *
+import crud
 
 router = APIRouter()
 
 
-@router.get('/', response_model=List[schemas.Player], response_model_exclude={"game_data"},tags=['get players'])
+@router.get('/', response_model=List[schemas.Player], response_model_exclude={"game_data"}, tags=['get players'])
 async def get_players(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)) -> list:
     """
     获取全部球员
@@ -22,4 +22,4 @@ async def get_players(skip: int = 0, limit: int = 100, db: Session = Depends(get
     :return: list of schemas.player
     """
 
-    return crud_get_player(db, skip, limit)
+    return crud.get_player(db, skip, limit)

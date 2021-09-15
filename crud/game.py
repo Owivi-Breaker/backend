@@ -4,6 +4,50 @@ import schemas
 from utils import logger
 
 
+def create_game(db: Session, game: schemas.Game):
+    """
+    创建比赛表
+    """
+    db_game = models.Game(**game.dict())
+    db.add(db_game)
+    db.commit()
+    db.refresh(db_game)
+    return db_game
+
+
+def create_game_team_info(db: Session, game_team_info: schemas.GameTeamInfo):
+    """
+    创建比赛队伍信息表
+    """
+    db_game_team_info = models.GameTeamInfo(**game_team_info.dict())
+    db.add(db_game_team_info)
+    db.commit()
+    db.refresh(db_game_team_info)
+    return db_game_team_info
+
+
+def create_game_team_data(db: Session, game_team_data: schemas.GameTeamData):
+    """
+    创建比赛队伍数据表
+    """
+    db_game_team_data = models.GameTeamInfo(**game_team_data.dict())
+    db.add(db_game_team_data)
+    db.commit()
+    db.refresh(db_game_team_data)
+    return db_game_team_data
+
+
+def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerData):
+    """
+    创建比赛球员信息表
+    """
+    db_game_player_data = models.GameTeamInfo(**game_player_data.dict())
+    db.add(db_game_player_data)
+    db.commit()
+    db.refresh(db_game_player_data)
+    return db_game_player_data
+
+
 # region 比赛操作
 # TODO 需要重构
 def crud_create_game(game: schemas.Game, db: Session):
@@ -61,7 +105,9 @@ def crud_create_game_player_data(game_team_info_id: int, game_player_data: schem
     return db_game_player_data
 
 
-def crud_get_games_by_attri(query_str: str, db: Session, only_one: bool = False):
+# endregion
+
+def get_games_by_attri(query_str: str, db: Session, only_one: bool = False):
     if only_one:
         db_game = db.query(models.Game).filter(eval(query_str)).first()
         return db_game
@@ -70,7 +116,7 @@ def crud_get_games_by_attri(query_str: str, db: Session, only_one: bool = False)
         return db_games
 
 
-def crud_delete_game_by_attri(query_str: str, db: Session):
+def delete_game_by_attri(query_str: str, db: Session):
     db_games = db.query(models.Game).filter(eval(query_str)).all()
     if not db_games:
         logger.info('无比赛表可删！')
@@ -88,5 +134,3 @@ def crud_delete_game_by_attri(query_str: str, db: Session):
             db.delete(db_game_team_info)
         db.delete(db_game)
         db.commit()
-
-# endregion
