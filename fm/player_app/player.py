@@ -5,6 +5,8 @@ import schemas
 from fm.player_app import PlayerGenerator
 from game_configs import rating_potential
 from utils import utils, logger
+from core.db import get_db
+from fastapi import Depends
 
 
 class Player:
@@ -87,7 +89,7 @@ class Player:
         self.save_in_db(init=False)
 
     def import_data(self):
-        self.player_model = crud.get_player_by_id(self.id)
+        self.player_model = crud.get_player_by_id(db=Depends(get_db), player_id=self.id)
 
     def export_data(self) -> schemas.Player:
         """
@@ -103,16 +105,16 @@ class Player:
         """
         if init:
             data_schemas = self.export_data()
-            player_model = crud.create_player(data_schemas)
+            player_model = crud.create_player(db=Depends(get_db), player=data_schemas)
             self.id = player_model.id
 
         else:
             # 更新
-            crud.update_player(player_id=self.id, attri=self.data)
+            crud.update_player(db=Depends(get_db), player_id=self.id, attri=self.data)
         print('成功导出球员数据！')
 
     def switch_club(self, club_id: int):
-        crud.update_player(player_id=self.id, attri={'club_id': club_id})
+        crud.update_player(db=Depends(get_db), player_id=self.id, attri={'club_id': club_id})
 
     @staticmethod
     def adjust_rating(rating: int, rating_limit: int):

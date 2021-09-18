@@ -7,6 +7,8 @@ import crud
 from typing import List
 import random
 from game_configs import tactics, location_selector
+from core.db import get_db
+from fastapi import Depends
 
 
 class Coach:
@@ -47,7 +49,7 @@ class Coach:
         self.save_in_db(init=True)
 
     def import_data(self):
-        self.coach_model = crud.get_coach_by_id(self.id)
+        self.coach_model = crud.get_coach_by_id(db=Depends(get_db), coach_id=self.id)
 
     def update_coach(self):
         """
@@ -66,15 +68,15 @@ class Coach:
         """
         if init:
             data_schemas = self.export_data()
-            coach_model = crud.create_coach(data_schemas)
+            coach_model = crud.create_coach(db=Depends(get_db), coach=data_schemas)
             self.id = coach_model.id
         else:
             # 更新
-            crud.update_coach(coach_id=self.id, attri=self.data)
+            crud.update_coach(db=Depends(get_db), coach_id=self.id, attri=self.data)
         print('成功导出教练数据！')
 
     def switch_club(self, club_id: int):
-        crud.update_coach(coach_id=self.id, attri={'club_id': club_id})
+        crud.update_coach(db=Depends(get_db), coach_id=self.id, attri={'club_id': club_id})
 
     def select_players(self, players: List[models.Player]):
 

@@ -1,7 +1,8 @@
-from league_app import League
-import config
-from info_app import Info
-from sql_app import crud
+from fm import League, Info
+from game_configs import leagues
+import crud
+from core.db import get_db
+from fastapi import Depends
 
 
 class LeagueSystem:
@@ -12,13 +13,13 @@ class LeagueSystem:
     def __init__(self, init_leagues=False):
         if init_leagues:
             self.init_leagues()
-        self.l1 = League(init_type=2, league_id=1)
-        self.l2 = League(init_type=2, league_id=2)
+        self.l1 = League(gen_type='import', league_id=1)
+        self.l2 = League(gen_type='import', league_id=2)
 
     @staticmethod
     def init_leagues():
-        for league in config.leagues:
-            c = League(league_data=league, init_type=1)
+        for league in leagues:
+            c = League(league_data=league, gen_type='init')
 
     def start_season(self, start_year, years=1):
         for _ in range(years):
@@ -42,9 +43,9 @@ class LeagueSystem:
         relegate_club_id = relegate_df[-4:]['id'].to_list()
         for club_id in relegate_club_id:
             # 降级
-            crud.update_club(club_id=club_id, attri={'league_id': 2})
+            crud.update_club(db=Depends(get_db), club_id=club_id, attri={'league_id': 2})
         promote_df = df2.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
         promote_club_id = promote_df[:4]['id'].to_list()
         for club_id in promote_club_id:
             # 升级
-            crud.update_club(club_id=club_id, attri={'league_id': 1})
+            crud.update_club(db=Depends(get_db), club_id=club_id, attri={'league_id': 1})

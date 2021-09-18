@@ -16,7 +16,7 @@ router = APIRouter()
             response_model_exclude={"game_data"})
 def get_players_by_club(club_id: int, db: Session = Depends(get_db)) -> list:
     """
-    获取全部球员
+    获取指定俱乐部的全部球员
     :param club_id: 俱乐部 id
     :param db: 数据库
     :return: list of schemas.player

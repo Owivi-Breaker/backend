@@ -1,16 +1,15 @@
 from game_configs.game_config import Location
 import random
-from utils.date import Date
-# from utils.utils import *
+from utils import Date, utils
 from typing import Dict, List, Sequence, Set, Tuple, Optional
-import json
-import os
-import time
 from utils import logger
 import datetime
-from sql_app import crud
-from sql_app import models, schemas
-from club_app import Club
+import crud
+import models
+import schemas
+from fm import Club
+from fastapi import Depends
+from core.db import get_db
 
 # 球员标准能力，DEBUG用
 DEFAULT_RATING = {
@@ -105,7 +104,7 @@ class Player:
                 or data_name == 'tackles' \
                 or data_name == 'saves' or data_name == 'aerials':
             self.data['actions'] += 1
-            if select_by_pro(
+            if utils.select_by_pro(
                     {False: self.get_rating('stamina'), True: average_stamina}
             ) and average_stamina:
                 self.stamina -= 2.5
@@ -113,7 +112,7 @@ class Player:
                     self.stamina = 0
         elif data_name == 'passes':
             self.data['actions'] += 1
-            if select_by_pro(
+            if utils.select_by_pro(
                     {False: self.get_rating('stamina'), True: average_stamina}
             ) and average_stamina:
                 self.stamina -= 1
@@ -127,32 +126,32 @@ class Player:
         TODO 将概率值抽离出来作为可更改的全局变量
         """
         if self.location == Location.CAM:
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.ST: 40, Location.CM: 60}
             )
         elif self.location == Location.LM:
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.LW: 40, Location.CM: 60}
             )
         elif self.location == Location.RM:
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.RW: 40, Location.CM: 60}
             )
         elif self.location == Location.CDM:
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.CB: 40, Location.CM: 60}
             )
         elif self.location == Location.CM:
             # 中场有概率前压或后撤
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.ST: 10, Location.CB: 10, Location.CM: 80}
             )
         elif self.location == Location.LB:
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.LW: 20, Location.LB: 80}
             )
         elif self.location == Location.RB:
-            self.real_location = select_by_pro(
+            self.real_location = utils.select_by_pro(
                 {Location.RW: 20, Location.RB: 80}
             )
         else:
@@ -236,7 +235,7 @@ class Team:
             player.rating[capa_name] = num
 
     def init_players(self):
-        club = Club(init_type=2, club_id=self.team_model.id)
+        club = Club(gen_type="db", club_id=self.team_model.id)
         players_model, locations_list = club.select_players()
         for player_model, location in zip(players_model, locations_list):
             self.players.append(Player(player_model, location))
@@ -263,7 +262,8 @@ class Team:
         tactic_pro = self.tactic.copy()
         tactic_pro.pop("counter_attack")
         while True:
-            tactic_name = select_by_pro(tactic_pro_total) if counter_attack_permitted else select_by_pro(tactic_pro)
+            tactic_name = utils.select_by_pro(tactic_pro_total) if counter_attack_permitted else utils.select_by_pro(
+                tactic_pro)
             if tactic_name == 'wing_cross' and not self.get_location_players(
                     (Location.LW, Location.RW, Location.LB, Location.RB)):
                 continue
@@ -339,7 +339,7 @@ class Team:
         average_stamina = self.get_rival_team().get_average_capability('stamina')
         attacker.plus_data('shots', average_stamina)
         defender.plus_data('saves', average_stamina)
-        win_player = select_by_pro(
+        win_player = utils.select_by_pro(
             {attacker: attacker.get_rating('shooting'), defender: defender.get_rating('goalkeeping')})
         if win_player == attacker:
             self.score += 1
@@ -371,7 +371,7 @@ class Team:
         attacker.plus_data('dribbles', average_stamina)
         defender.plus_data('tackles', average_stamina)
 
-        win_player = select_by_pro(
+        win_player = utils.select_by_pro(
             {attacker: attacker.get_rating('dribbling'),
              defender: defender.get_rating('interception')})
         if win_player == attacker:
@@ -401,7 +401,7 @@ class Team:
             defender = random.choice(defenders)
             attacker.plus_data('dribbles', average_stamina)
             defender.plus_data('tackles', average_stamina)
-            win_player = select_by_pro(
+            win_player = utils.select_by_pro(
                 {attacker: attacker.get_rating('dribbling') + attacker.get_rating('pace'),
                  defender: defender.get_rating('interception') + defender.get_rating('pace')})
             if win_player == attacker:
@@ -433,7 +433,7 @@ class Team:
             defender = random.choice(defenders)
             attacker.plus_data('aerials', average_stamina)
             defender.plus_data('aerials', average_stamina)
-            win_player = select_by_pro(
+            win_player = utils.select_by_pro(
                 {attacker: attacker.get_rating('anticipation') + attacker.get_rating('strength'),
                  defender: defender.get_rating('anticipation') + defender.get_rating('strength')})
             win_player.plus_data('aerial_success')
@@ -460,11 +460,11 @@ class Team:
         average_stamina = self.get_rival_team().get_average_capability('stamina')
         attacker.plus_data('passes', average_stamina)
         if is_long_pass:
-            win_player = select_by_pro(
+            win_player = utils.select_by_pro(
                 {attacker: attacker.get_rating('passing') / 2,
                  defender_average: defender_average / 2})
         else:
-            win_player = select_by_pro(
+            win_player = utils.select_by_pro(
                 {attacker: attacker.get_rating('passing'),
                  defender_average: defender_average / 2})
         if win_player == attacker:
@@ -489,7 +489,7 @@ class Team:
         self.add_script('\n{}尝试下底传中'.format(self.name))
         # 边锋或边卫过边卫
         while True:
-            flag = is_happened_by_pro(0.5)
+            flag = utils.is_happened_by_pro(0.5)
             if flag:
                 wings = self.get_location_players((Location.LW, Location.LB))
                 wing_backs = rival_team.get_location_players((Location.LB,))
@@ -742,47 +742,59 @@ class Game:
         lo = player.location
         # region 记录场上位置数
         if lo == 'ST':
-            crud.update_player(player_id, {'ST_num': player.player_model.ST_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'ST_num': player.player_model.ST_num + 1})
         elif lo == 'CM':
-            crud.update_player(player_id, {'CM_num': player.player_model.CM_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'CM_num': player.player_model.CM_num + 1})
         elif lo == 'LW':
-            crud.update_player(player_id, {'LW_num': player.player_model.LW_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'LW_num': player.player_model.LW_num + 1})
         elif lo == 'RW':
-            crud.update_player(player_id, {'RW_num': player.player_model.RW_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'RW_num': player.player_model.RW_num + 1})
         elif lo == 'CB':
-            crud.update_player(player_id, {'CB_num': player.player_model.CB_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'CB_num': player.player_model.CB_num + 1})
         elif lo == 'LB':
-            crud.update_player(player_id, {'LB_num': player.player_model.LB_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'LB_num': player.player_model.LB_num + 1})
         elif lo == 'RB':
-            crud.update_player(player_id, {'RB_num': player.player_model.RB_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'RB_num': player.player_model.RB_num + 1})
         elif lo == 'GK':
-            crud.update_player(player_id, {'GK_num': player.player_model.GK_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'GK_num': player.player_model.GK_num + 1})
         elif lo == 'CAM':
-            crud.update_player(player_id, {'CAM_num': player.player_model.CAM_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'CAM_num': player.player_model.CAM_num + 1})
         elif lo == 'LM':
-            crud.update_player(player_id, {'LM_num': player.player_model.LM_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'LM_num': player.player_model.LM_num + 1})
         elif lo == 'RM':
-            crud.update_player(player_id, {'RM_num': player.player_model.RM_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'RM_num': player.player_model.RM_num + 1})
         elif lo == 'CDM':
-            crud.update_player(player_id, {'CDM_num': player.player_model.CDM_num + 1})
+            crud.update_player(db=Depends(get_db), player_id=player_id,
+                               attri={'CDM_num': player.player_model.CDM_num + 1})
         else:
             logger.warning('没有球员对应的位置！')
         # endregion
         # region 能力成长
         if player.data['final_rating'] < 4:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.05))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.05))
         elif 4 <= player.data['final_rating'] < 5:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.1))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.1))
         elif 5 <= player.data['final_rating'] < 6:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.15))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.15))
         elif 6 <= player.data['final_rating'] < 7:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.2))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.2))
         elif 7 <= player.data['final_rating'] < 8:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.25))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.25))
         elif 8 <= player.data['final_rating'] < 9:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.3))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.3))
         elif player.data['final_rating'] >= 9:
-            crud.update_player(player_id, self.get_cap_improvement(player, 0.35))
+            crud.update_player(Depends(get_db), player_id, self.get_cap_improvement(player, 0.35))
         else:
             logger.error('没有球员相对应的评分！')
         # endregion
@@ -821,7 +833,7 @@ class Game:
         for capa in improvement:
             limit = eval('player.player_model.{}_limit'.format(capa))
             if player.rating[capa] + rating <= limit:
-                result[capa] = float(retain_decimal(player.rating[capa] + rating))
+                result[capa] = float(utils.retain_decimal(player.rating[capa] + rating))
             else:
                 result[capa] = limit
         return result
@@ -1062,7 +1074,7 @@ class Game:
             rating = 0
         if rating > 10:
             rating = 10
-        player.data['final_rating'] = float(retain_decimal(rating))
+        player.data['final_rating'] = float(utils.retain_decimal(rating))
 
     def get_highest_rating_player(self):
         """

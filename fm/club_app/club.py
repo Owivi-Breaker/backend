@@ -5,24 +5,30 @@ import models
 import crud
 from fm import Coach, Player, PlayerGenerator
 from utils import logger
+from core.db import get_db
+from fastapi import Depends
 
 
 class Club:
-    def __init__(self, init_type=1, club_data: dict = None, club_id: int = 0):
+    def __init__(self, gen_type="init", club_data: dict = None, club_id: int = 0):
         self.id = club_id
         self.club_model = None
         self.data = dict()
-        if init_type == 1:
+        if gen_type == "init":
             # 新建
             self.generate(club_data)
             self.import_data()
-        elif init_type == 2:
+        elif gen_type == "import":
             # 导入数据
             self.import_data()
         else:
             logger.error('球员初始化错误！')
 
     def generate(self, club_data: dict):
+        """
+        初始化俱乐部
+        :param club_data: 俱乐部基本信息
+        """
         self.data['created_time'] = datetime.datetime.now()
         self.data['name'] = club_data['name']
         self.data['finance'] = club_data['finance']
@@ -36,7 +42,7 @@ class Club:
             player.switch_club(self.id)
 
     def import_data(self):
-        self.club_model = crud.get_club_by_id(self.id)
+        self.club_model = crud.get_club_by_id(db=Depends(get_db), club_id=self.id)
 
     def update_club(self):
         """
@@ -59,15 +65,15 @@ class Club:
         """
         if init:
             data_schemas = self.export_data()
-            club_model = crud.create_club(data_schemas)
+            club_model = crud.create_club(db=Depends(get_db), club=data_schemas)
             self.id = club_model.id
         else:
             # 更新
-            crud.update_club(club_id=self.id, attri=self.data)
+            crud.update_club(db=Depends(get_db), club_id=self.id, attri=self.data)
         print('成功导出俱乐部数据！')
 
     def switch_league(self, league_id: int):
-        crud.update_club(club_id=self.id, attri={'league_id': league_id})
+        crud.update_club(db=Depends(get_db), club_id=self.id, attri={'league_id': league_id})
 
     # def get_game_data(self):
     #     data = dict()

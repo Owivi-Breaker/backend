@@ -82,7 +82,7 @@ class Info:
         :return: df
         """
         query_str = "and_(models.Game.season=='{}', models.Game.type=='{}')".format(year, game_type)
-        games = crud.get_games_by_attri(query_str=query_str)
+        games = crud.get_games_by_attri(db=Depends(get_db), query_str=query_str)
         player_data_list = [player_data for game in games for game_team_info in game.teams for player_data in
                             game_team_info.player_data]
         filtered_list = []

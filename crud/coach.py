@@ -20,6 +20,6 @@ def update_coach(coach_id: int, attri: dict, db: Session):
     return db_coach
 
 
-def get_coach_by_id(coach_id: int, db: Session):
+def get_coach_by_id(db: Session, coach_id: int):
     db_coach = db.query(models.Coach).filter(models.Coach.id == coach_id).first()
     return db_coach

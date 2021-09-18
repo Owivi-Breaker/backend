@@ -1,35 +1,35 @@
 import random
 import datetime
-from utils.date import Date
+from utils import Date, logger
 import schemas
 import models
 import crud
-from fm import Club
-from fm import Game
-from fm import Info
+from fm import Club, Game, Info
+from core.db import get_db
+from fastapi import Depends
 
 
 class League:
-    def __init__(self, init_type=1, league_data: dict = None, league_id: int = 0):
+    def __init__(self, gen_type="init", league_data: dict = None, league_id: int = 0):
         self.id = league_id
         self.league_model = None
         self.data = dict()
-        if init_type == 1:
+        if gen_type == "init":
             # 新建
             self.generate(league_data)
             self.import_data()
-        elif init_type == 2:
+        elif gen_type == "import":
             # 导入数据
             self.import_data()
         else:
-            config.logger.error('球员初始化错误！')
+            logger.error('球员初始化错误！')
 
     def generate(self, league_data: dict):
         self.data['created_time'] = datetime.datetime.now()
         self.data['name'] = league_data['name']
         self.save_in_db(init=True)
         for club_data in league_data['clubs']:
-            club = Club(init_type=1, club_data=club_data)
+            club = Club(gen_type="init", club_data=club_data)
             club.switch_league(self.id)
 
     def update_league(self):
@@ -43,7 +43,7 @@ class League:
         """
         导入league_model类，一旦实例对应的联赛类发生改变，都应该调用此函数以刷新数据
         """
-        self.league_model = crud.get_league_by_id(self.id)
+        self.league_model = crud.get_league_by_id(db=Depends(get_db), league_id=self.id)
 
     def export_data(self) -> schemas.League:
         """
@@ -59,11 +59,11 @@ class League:
         """
         if init:
             data_schemas = self.export_data()
-            league_model = crud.create_league(data_schemas)
+            league_model = crud.create_league(db=Depends(get_db), league=data_schemas)
             self.id = league_model.id
         else:
             # 更新
-            crud.update_league(league_id=self.id, attri=self.data)
+            crud.update_league(db=Depends(get_db), league_id=self.id, attri=self.data)
         print('成功导出联赛数据！')
 
     def play_game(self, club_model1: models.Club, club_model2: models.Club, date: Date):
@@ -77,9 +77,9 @@ class League:
         :param date: 赛季时间
         """
         # 删除数据库中同赛季的数据
-        crud.delete_game_by_attri(
-            query_str='and_(models.Game.season=="{}", models.Game.type=="{}")'.format(date.year,
-                                                                                      self.league_model.name))
+        crud.delete_game_by_attri(db=Depends(get_db),
+                                  query_str='and_(models.Game.season=="{}", models.Game.type=="{}")'.format(
+                                      date.year, self.league_model.name))
 
         clubs = self.league_model.clubs
 
@@ -112,13 +112,6 @@ class League:
         info = Info()
         # 比赛
         self.play_games(Date(start_year, 2, random.randint(1, 28)))
-        # 保存数据
-        info.save(info.get_season_player_chart(
-            str(start_year), self.league_model.name), filename='output_data/{}{}赛季球员数据榜.csv'.format(
-            self.league_model.name, str(start_year)), file_format='csv')
-        info.save(info.get_points_table(
-            str(start_year), self.league_model.name), filename='output_data/{}{}赛季积分榜.csv'.format(
-            self.league_model.name, str(start_year)), file_format='csv')
         if save_in_db:
             info.save_in_db(info.get_season_player_chart(str(start_year), self.league_model.name),
                             '{}{}赛季球员数据榜'.format(
