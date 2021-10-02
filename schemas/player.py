@@ -15,8 +15,10 @@ class PlayerCreate(BaseModel):
     height: int
     weight: int
     birth_date: str
-    values: int = 0
-    wages: int = 0
+    values: float = 0  # 身价
+    wages: float = 0  # 周薪
+
+    real_stamina: float = 100  # 实时体力
     # Location num
     ST_num: int = 0
     CM_num: int = 0
@@ -30,7 +32,7 @@ class PlayerCreate(BaseModel):
     LM_num: int = 0
     RM_num: int = 0
     CDM_num: int = 0
-    # rating
+    # capability
     shooting: float  # 射门
     passing: float  # 传球
     dribbling: float  # 盘带
@@ -42,7 +44,7 @@ class PlayerCreate(BaseModel):
     free_kick: float  # 任意球/点球
     stamina: float  # 体能
     goalkeeping: float  # 守门
-    # rating limit
+    # capability limit
     shooting_limit: int
     passing_limit: int
     dribbling_limit: int
@@ -64,7 +66,5 @@ class PlayerCreate(BaseModel):
 class Player(PlayerCreate):
     id: int
     club_id: int
-
-
 
 # endregion

@@ -1,10 +1,12 @@
+from typing import List
 from sqlalchemy.orm import Session
+
 import models
 import schemas
 from utils import logger
 
 
-def create_game(db: Session, game: schemas.Game):
+def create_game(db: Session, game: schemas.GameCreate):
     """
     创建比赛表
     """
@@ -15,7 +17,7 @@ def create_game(db: Session, game: schemas.Game):
     return db_game
 
 
-def create_game_team_info(db: Session, game_team_info: schemas.GameTeamInfo):
+def create_game_team_info(db: Session, game_team_info: schemas.GameTeamInfoCreate):
     """
     创建比赛队伍信息表
     """
@@ -26,7 +28,7 @@ def create_game_team_info(db: Session, game_team_info: schemas.GameTeamInfo):
     return db_game_team_info
 
 
-def create_game_team_data(db: Session, game_team_data: schemas.GameTeamData):
+def create_game_team_data(db: Session, game_team_data: schemas.GameTeamDataCreate) -> models.GameTeamData:
     """
     创建比赛队伍数据表
     """
@@ -37,7 +39,7 @@ def create_game_team_data(db: Session, game_team_data: schemas.GameTeamData):
     return db_game_team_data
 
 
-def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerData):
+def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDataCreate) -> models.GamePlayerData:
     """
     创建比赛球员信息表
     """
@@ -48,65 +50,32 @@ def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDat
     return db_game_player_data
 
 
-# region 比赛操作 TODO 需要重构
-def crud_create_game(game: schemas.Game, db: Session):
-    """
-    创建比赛表
-    """
-    db_game = models.Game(created_time=game.created_time, date=game.date, script=game.script, season=game.season,
-                          mvp=game.mvp, type=game.type)
-    # 提交数据库，生成id
-    db.add(db_game)
+def update_game_team_info(db: Session, game_team_info_id: int, attri: dict) -> models.GameTeamInfo:
+    db_game_team_info = db.query(models.GameTeamInfo).filter(models.GameTeamInfo.id == game_team_info_id).first()
+    for key, value in attri.items():
+        setattr(db_game_team_info, key, value)
     db.commit()
-
-    for team_info in game.teams:
-        crud_create_game_team_info(db_game.id, team_info)
-    db.add(db_game)
-    db.commit()
-    db.refresh(db_game)
-    return db_game
-
-
-def crud_create_game_team_info(game_id: int, game_team_info: schemas.GameTeamInfo, db: Session):
-    db_game_team_info = models.GameTeamInfo(
-        game_id=game_id,
-        club_id=game_team_info.club_id,
-        created_time=game_team_info.created_time,
-        name=game_team_info.name,
-        score=game_team_info.score)
-    # 提交数据库，生成id
-    db.add(db_game_team_info)
-    db.commit()
-
-    crud_create_game_team_data(db_game_team_info.id, game_team_info.team_data)
-    for player_datum in game_team_info.player_data:
-        crud_create_game_player_data(db_game_team_info.id, player_datum)
-
-    db.add(db_game_team_info)
-    db.commit()
-    db.refresh(db_game_team_info)
     return db_game_team_info
 
 
-def crud_create_game_team_data(game_team_info_id: int, game_team_data: schemas.GameTeamData, db: Session):
-    db_game_team_data = models.GameTeamData(game_team_info_id=game_team_info_id, **game_team_data.dict())
-    db.add(db_game_team_data)
+def update_game_team_data(db: Session, game_team_data_id: int, attri: dict) -> models.GameTeamData:
+    db_game_team_data = db.query(models.GameTeamData).filter(models.GameTeamData.id == game_team_data_id).first()
+    for key, value in attri.items():
+        setattr(db_game_team_data, key, value)
     db.commit()
-    db.refresh(db_game_team_data)
     return db_game_team_data
 
 
-def crud_create_game_player_data(game_team_info_id: int, game_player_data: schemas.GamePlayerData, db: Session):
-    db_game_player_data = models.GamePlayerData(game_team_info_id=game_team_info_id, **game_player_data.dict())
-    db.add(db_game_player_data)
+def update_game_player_data(db: Session, game_player_data_id: int, attri: dict) -> models.GamePlayerData:
+    db_game_player_data = db.query(models.GamePlayerData).filter(
+        models.GamePlayerData.id == game_player_data_id).first()
+    for key, value in attri.items():
+        setattr(db_game_player_data, key, value)
     db.commit()
-    db.refresh(db_game_player_data)
     return db_game_player_data
 
 
-# endregion
-
-def get_games_by_attri(db: Session, query_str: str, only_one: bool = False):
+def get_games_by_attri(db: Session, query_str: str, only_one: bool = False) -> List[models.Game]:
     if only_one:
         db_game = db.query(models.Game).filter(eval(query_str)).first()
         return db_game

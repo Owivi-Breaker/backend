@@ -20,8 +20,10 @@ class Player(Base):
     weight = Column(Integer)
     birth_date = Column(String)
 
-    values = Column(Integer)
-    wages = Column(Integer)
+    values = Column(Float)
+    wages = Column(Float)
+
+    real_stamina=Column(Float)
     # Location
     ST_num = Column(Integer)
     CM_num = Column(Integer)
@@ -35,7 +37,7 @@ class Player(Base):
     LM_num = Column(Integer)
     RM_num = Column(Integer)
     CDM_num = Column(Integer)
-    # rating
+    # capability
     shooting = Column(Float)
     passing = Column(Float)
     dribbling = Column(Float)
@@ -47,7 +49,7 @@ class Player(Base):
     free_kick = Column(Float)
     stamina = Column(Float)
     goalkeeping = Column(Float)
-    # rating limit
+    # capability limit
     shooting_limit = Column(Integer)
     passing_limit = Column(Integer)
     dribbling_limit = Column(Integer)

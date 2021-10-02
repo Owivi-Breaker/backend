@@ -693,6 +693,7 @@ class Team:
 
 class Game:
     def __init__(self, team1_model: models.Club, team2_model: models.Club, date: Date, game_type: str):
+        # TODO game_type 改为联赛 id 或杯赛 id
         self.lteam = Team(self, team1_model)
         self.rteam = Team(self, team2_model)
         self.date = str(date)  # TODO 虚拟日期
@@ -820,7 +821,7 @@ class Game:
             improvement = random.sample(['passing', 'dribbling', 'interception', 'pace', 'stamina'], 2)
         elif player.location == Location.GK:
             rating /= 2
-            improvement = random.sample(['goalkeeping', 'stamina'], 2)
+            improvement = random.sample(['goalkeeping', 'stamina','passing'], 2)
         elif player.location == Location.CAM:
             improvement = random.sample(['shooting', 'passing', 'anticipation', 'strength', 'stamina'], 2)
         elif player.location == Location.LM or player.location == Location.RM:
@@ -856,7 +857,7 @@ class Game:
 
     def save_in_db(self):
         game_data = self.export_game()
-        crud.create_game(game_data)
+        crud.create_game(db=Depends(get_db), game=game_data)
 
     def add_script(self, text: str):
         self.script += text + '\n'
@@ -901,6 +902,7 @@ class Game:
         for player in self.lteam.players:
             if player.location != Location.GK:
                 if player.data['passes'] >= 5:
+                    # 动作次数不小于5次，才将其计入评分
                     offset = self.get_offset_per(player.data['pass_success'] / player.data['passes'],
                                                  average_pass_success)
                     self.rate_by_capa(player, offset)
@@ -1011,7 +1013,7 @@ class Game:
         """
         动作数量的评分办法
         :param player: 球员实例
-        :param offset: 与均值的偏移值
+        :param offset: 与均值的偏移百分比
         """
         if 0.1 <= offset < 0.2:
             player.data['final_rating'] += 0.3

@@ -5,15 +5,13 @@ from game_configs.game_config import Location
 
 
 # region 比赛表
-class GamePlayerData(BaseModel):
-    # id: int
-    # game_team_info_id: int
+class GamePlayerDataCreate(BaseModel):
     player_id: int
 
     created_time: datetime
-    name: str  # TODO 临时
     location: Location
 
+    real_rating: float
     final_rating: float
     actions: int
     shots: int
@@ -42,10 +40,12 @@ class GamePlayerData(BaseModel):
         orm_mode = True
 
 
-class GameTeamData(BaseModel):
-    # id: int
-    # game_team_info_id: int
+class GamePlayerData(GamePlayerDataCreate):
+    id: int
+    game_team_info_id: int
 
+
+class GameTeamDataCreate(BaseModel):
     created_time: datetime
     attempts: int
     # 下底传中
@@ -68,25 +68,29 @@ class GameTeamData(BaseModel):
         orm_mode = True
 
 
-class GameTeamInfo(BaseModel):
-    # id: int
-    # game_id: int
+class GameTeamData(GameTeamDataCreate):
+    id: int
+    game_team_info_id: int
+
+
+class GameTeamInfoCreate(BaseModel):
     club_id: int
 
     created_time: datetime
-    name: str  # TODO 临时
     score: int
-
-    team_data: GameTeamData
-    player_data: List[GamePlayerData]
 
     class Config:
         orm_mode = True
 
 
-class Game(BaseModel):
-    # id: int
+class GameTeamInfo(GameTeamInfoCreate):
+    id: int
+    game_id: int
+    team_data: GameTeamData
+    player_data: List[GamePlayerData]
 
+
+class GameCreate(BaseModel):
     created_time: datetime
     date: str
     type: str
@@ -94,7 +98,10 @@ class Game(BaseModel):
     script: str
     mvp: int
 
-    teams: List[GameTeamInfo]
-
     class Config:
         orm_mode = True
+
+
+class Game(BaseModel):
+    id: int
+    teams: List[GameTeamInfo]

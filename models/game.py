@@ -25,7 +25,6 @@ class GameTeamInfo(Base):
     club_id = Column(Integer, ForeignKey('club.id'))  # 与俱乐部类连接的外键
 
     created_time = Column(DateTime)
-    name = Column(String)  # TODO 临时
     score = Column(Integer)
     team_data = relationship("GameTeamData", uselist=False, backref="game_team_info")
     player_data = relationship("GamePlayerData", backref="game_team_info")
@@ -62,9 +61,9 @@ class GamePlayerData(Base):
     player_id = Column(Integer, ForeignKey('player.id'))
 
     created_time = Column(DateTime)
-    name = Column(String)  # TODO 临时
     location = Column(Enum(Location))
 
+    real_rating = Column(Float)
     final_rating = Column(Float)
     actions = Column(Integer)
     shots = Column(Integer)

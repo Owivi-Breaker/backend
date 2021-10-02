@@ -18,7 +18,7 @@ class Coach(BaseModel):
     values: int = 0
     wages: int = 0
     # 战术
-    tactic: str
+    formation: str  # 阵型
     wing_cross: int
     under_cutting: int
     pull_back: int
