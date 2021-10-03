@@ -5,18 +5,23 @@ from schemas import Player
 from schemas.coach import Coach
 
 
-# region 俱乐部表
-
-class Club(BaseModel):
-    # id: int
-    # league_id: int
+class ClubCreate(BaseModel):
     created_time: datetime
     name: str
     finance: float  # 单位：万
-
-    coach: Coach = None
-    players: List[Player] = []
+    reputation: float
+    assistant: int = 0
+    doctor: int = 0
+    scout: int = 0
+    negotiator: int = 0
 
     class Config:
         orm_mode = True
-# endregion
+
+
+class Club(ClubCreate):
+    id: int
+    league_id: int
+
+    coach: Coach = None
+    players: List[Player] = []

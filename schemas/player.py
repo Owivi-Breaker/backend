@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from schemas.game import GamePlayerData
 
 
-# region 球员表
 class PlayerCreate(BaseModel):
     created_time: datetime
     name: str
@@ -69,4 +68,3 @@ class Player(PlayerCreate):
 
 class PlayerShow(Player):
     value: int
-# endregion

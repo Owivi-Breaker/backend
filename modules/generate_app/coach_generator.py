@@ -98,7 +98,11 @@ class CoachGenerator:
         """
         return self.fake.date(pattern='%m-%d')
 
-    def generate(self):
+    def generate(self) -> models.Coach:
+        """
+        随机生成一名教练
+        :return: 教练实例
+        """
         self.data['created_time'] = datetime.datetime.now()
 
         nation, self.data['name'], self.data['translated_name'] = self.get_name()
@@ -117,11 +121,12 @@ class CoachGenerator:
         self.data['pull_back'] = utils.get_mean_range(50, per_range=0.9)
         self.data['middle_attack'] = utils.get_mean_range(50, per_range=0.9)
         self.data['counter_attack'] = utils.get_mean_range(50, per_range=0.9)
-        self.save_in_db()
+        coach_model = self.save_in_db()
+        return coach_model
 
     def save_in_db(self) -> models.Coach:
         """
-        将生成的球员数据存至数据库
+        将生成的教练数据存至数据库
         :return: 教练实例
         """
         data_schemas = schemas.CoachCreate(**self.data)

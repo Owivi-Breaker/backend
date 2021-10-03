@@ -4,3 +4,4 @@ from modules.generate_app.calendar_generator import CalendarGenerator
 from modules.generate_app.save_generator import SaveGenerator
 from modules.generate_app.league_generator import LeagueGenerator
 from modules.generate_app.league_system_generator import LeagueSystemGenerator
+from modules.generate_app.club_generator import ClubGenerator

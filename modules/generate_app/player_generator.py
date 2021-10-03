@@ -141,10 +141,10 @@ class PlayerGenerator:
         else:
             return float(utils.retain_decimal(int(utils.normalvariate(ori_mean_capa, 6))))
 
-    def generate(self):
+    def generate(self) -> models.Player:
         """
         随机生成一名球员
-        :return:
+        :return: 球员实例
         """
         self.data['created_time'] = datetime.datetime.now()
         nation, self.data['name'], self.data['translated_name'] = self.get_name()
@@ -199,7 +199,8 @@ class PlayerGenerator:
         self.data[original_location['name'] + '_num'] = 1
         for key, value in original_location['offset'].items():
             self.data[key] = utils.get_offset(self.data[key], value)
-        self.save_in_db()
+        player_model = self.save_in_db()
+        return player_model
 
     def save_in_db(self) -> models.Player:
         """

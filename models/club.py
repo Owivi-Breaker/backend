@@ -11,10 +11,16 @@ class Club(Base):
 
     created_time = Column(DateTime)
     name = Column(String)
+
     finance = Column(Float)
+    reputation = Column(Float)
+
+    assistant = Column(Integer)
+    doctor = Column(Integer)
+    scout = Column(Integer)
+    negotiator = Column(Integer)
 
     coach = relationship("Coach", uselist=False, backref="club", lazy='subquery')
     players = relationship("Player", backref="club", lazy='subquery')
-
 
 # endregion

@@ -4,7 +4,7 @@ import schemas
 from utils import logger
 
 
-def create_club(db: Session, club: schemas.Club):
+def create_club(db: Session, club: schemas.ClubCreate):
     db_club = models.Club(**club.dict())
     db.add(db_club)
     db.commit()
