@@ -1,6 +1,5 @@
 from typing import List
-from fastapi import APIRouter
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from core.db import SessionLocal, engine, get_db
@@ -107,14 +106,7 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
     return crud.get_save_by_id(db=db, save_id=save_model.id)
 
 
-@router.get('/imitate_game_season')
-def imitate_game_season(league_id: int, db: Session = Depends(get_db)):
-    """
-    模拟指定联赛一个赛季的比赛
-    :param league_id: 联赛id
-    :param db: database
-    :return:
-    """
+def start_game(test_num: int, league_id: int, db: Session):
     league_model = crud.get_league_by_id(db=db, league_id=league_id)
     clubs = league_model.clubs
 
@@ -136,7 +128,20 @@ def imitate_game_season(league_id: int, db: Session = Depends(get_db)):
         # 进行每一轮比赛
         logger.info('{} 的比赛'.format(str(date)))
         for game in games:
-            logger.info("{}对{}".format(game[0].name, game[1].name))
+            logger.info("{}: {}对{}".format(test_num, game[0].name, game[1].name))
             game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, 'test')
             game_eve.start()
         date.plus_days(7)
+
+
+@router.get('/imitate_game_season')
+async def imitate_game_season(test_num: str, league_id: int, background_tasks: BackgroundTasks,
+                              db: Session = Depends(get_db), ):
+    """
+    模拟指定联赛一个赛季的比赛
+    :param league_id: 联赛id
+    :param db: database
+    :return:
+    """
+    background_tasks.add_task(start_game, test_num=test_num, league_id=league_id, db=db)
+    return {"message": "正在比赛..."}
