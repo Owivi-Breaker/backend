@@ -5,7 +5,7 @@ from utils import logger
 
 
 # region 球员操作
-def create_player(player: schemas.PlayerCreate, db: Session):
+def create_player(db: Session, player: schemas.PlayerCreate):
     db_player = models.Player(**player.dict())
     db.add(db_player)
     db.commit()

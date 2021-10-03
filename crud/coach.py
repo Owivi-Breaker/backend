@@ -4,7 +4,7 @@ import schemas
 from utils import logger
 
 
-def create_coach(coach: schemas.Coach, db: Session):
+def create_coach(db: Session, coach: schemas.CoachCreate):
     db_coach = models.Coach(**coach.dict())
     db.add(db_coach)
     db.commit()
@@ -12,7 +12,7 @@ def create_coach(coach: schemas.Coach, db: Session):
     return db_coach
 
 
-def update_coach(coach_id: int, attri: dict, db: Session):
+def update_coach(db: Session, coach_id: int, attri: dict):
     db_coach = db.query(models.Coach).filter(models.Coach.id == coach_id).first()
     for key, value in attri.items():
         setattr(db_coach, key, value)

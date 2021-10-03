@@ -1,3 +1,4 @@
+import models
 from utils import utils
 import game_configs
 import crud
@@ -200,12 +201,14 @@ class PlayerGenerator:
             self.data[key] = utils.get_offset(self.data[key], value)
         self.save_in_db()
 
-    def save_in_db(self):
+    def save_in_db(self) -> models.Player:
         """
         将生成的球员数据存至数据库
+        :return: 球员实例
         """
-        data_schemas = schemas.Player(**self.data)
+        data_schemas = schemas.PlayerCreate(**self.data)
         player_model = crud.create_player(db=self.db, player=data_schemas)
+        return player_model
 
     @staticmethod
     def adjust_capa(capa: int, capa_limit: int) -> int:

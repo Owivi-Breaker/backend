@@ -3,10 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-# region 教练表
-class Coach(BaseModel):
-    # id: int
-    # club_id: int
+class CoachCreate(BaseModel):
     # 基本信息
     created_time: datetime
     name: str
@@ -27,4 +24,8 @@ class Coach(BaseModel):
 
     class Config:
         orm_mode = True
-# endregion
+
+
+class Coach(CoachCreate):
+    id: int
+    club_id: int
