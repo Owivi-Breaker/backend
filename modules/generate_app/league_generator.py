@@ -16,7 +16,7 @@ class LeagueGenerator:
         :param league_data: 联赛信息
         :return: 联赛实例
         """
-        self.data = league_data
+        self.data = dict(league_data)
         league_model = self.save_in_db()
         return league_model
 

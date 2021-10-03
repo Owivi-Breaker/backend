@@ -7,9 +7,11 @@ from models.base import Base
 class League(Base):
     __tablename__ = 'league'
     id = Column(Integer, primary_key=True, index=True)
+    save_id = Column(Integer, ForeignKey('save.id'))
 
     created_time = Column(DateTime)
     name = Column(String)
+    points = Column(Float)
 
     upper_league = Column(Integer)
     lower_league = Column(Integer)

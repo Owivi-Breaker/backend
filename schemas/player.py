@@ -10,7 +10,7 @@ class PlayerCreate(BaseModel):
     translated_name: str
     nationality: str
     translated_nationality: str
-    age: int = 14
+    age: int
     height: int
     weight: int
     birth_date: str

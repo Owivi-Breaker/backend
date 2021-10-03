@@ -16,7 +16,7 @@ class ClubGenerator:
         :param club_data: 俱乐部基本信息
         :return: 俱乐部实例
         """
-        self.data = club_data
+        self.data = dict(club_data)
         club_model = self.save_in_db()
         return club_model
 

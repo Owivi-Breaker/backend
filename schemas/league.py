@@ -5,7 +5,7 @@ from schemas.club import Club
 
 
 class LeagueCreate(BaseModel):
-    created_time: datetime = datetime.now()
+    created_time: datetime
 
     name: str
     points: float

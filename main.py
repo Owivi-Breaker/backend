@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers.apis import api_router
 from core.config import settings
 from utils import logger
-from game_configs import leagues
 
 app = FastAPI(title=settings.APP_NAME)
 # 注册路由

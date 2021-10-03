@@ -24,6 +24,9 @@ class PlayerGenerator:
         self.import_names()
         self.fake = Faker()
 
+        self.ori_mean_capa = game_configs.ori_mean_capa
+        self.ori_mean_potential_capa = game_configs.ori_mean_potential_capa
+
     def import_names(self):
         """
         导入人名文件
@@ -114,38 +117,94 @@ class PlayerGenerator:
         """
         return int(utils.normalvariate(75, 5))
 
-    @staticmethod
-    def get_capa_potential(local_nationality: str = '') -> int:
+    def get_capa_potential(self, local_nationality: str = '', ) -> int:
         """
         获能力属性的潜力值
         :param local_nationality: 国籍
         :return: 潜力值
         """
-        ori_mean_potential_capa = game_configs.ori_mean_potential_capa
+        ori_mean_potential_capa = self.ori_mean_potential_capa
         if local_nationality in game_configs.country_potential.keys():
             return int(
                 utils.normalvariate(ori_mean_potential_capa + game_configs.country_potential[local_nationality], 5))
         else:
             return int(utils.normalvariate(ori_mean_potential_capa, 5))
 
-    @staticmethod
-    def get_capa(local_nationality: str = ''):
+    def get_capa(self, local_nationality: str = ''):
         """
         获取初始能力值
         :param local_nationality: 国籍
         :return: 初始能力值
         """
-        ori_mean_capa = game_configs.ori_mean_capa
+        ori_mean_capa = self.ori_mean_capa
         if local_nationality in game_configs.country_potential.keys():
             return int(utils.normalvariate(ori_mean_capa + game_configs.country_potential[local_nationality], 6))
         else:
             return float(utils.retain_decimal(int(utils.normalvariate(ori_mean_capa, 6))))
 
-    def generate(self) -> models.Player:
+    def generate(self, ori_mean_capa: int = None, ori_mean_potential_capa: int = None,
+                 average_age: int = None, location: str = '') -> models.Player:
         """
         随机生成一名球员
+        若传入除location外的三个参数，则生成随机位置的成年球员
+        若传入四个参数，则生成指定位置的成年球员
+        若不传入参数，则生成年轻球员
+        :param ori_mean_capa: 指定的平均能力
+        :param ori_mean_potential_capa: 指定的平均潜力
+        :param average_age: 指定的平均年龄
+        :param location: 指定位置，若未指定位置，随机指定
         :return: 球员实例
         """
+
+        if ori_mean_capa and ori_mean_potential_capa and average_age:
+            # 若在generate函数中传入平均值，则生成成年球员
+            self.generate_data(average_age)
+            # 生成初级能力值后，再修改平均能力和潜力值，这样可以避免出现全能球员
+            self.ori_mean_capa = ori_mean_capa
+            self.ori_mean_potential_capa = ori_mean_potential_capa
+            # 选择一个位置
+            original_location = dict()
+            if location:
+                for x in game_configs.capa_potential:
+                    if x['name'] == location:
+                        original_location = x
+                        break
+            else:
+                original_location = random.choice(game_configs.capa_potential)
+            self.data[original_location['name'] + '_num'] = 1
+            # 重写一遍位置对应的能力与潜力
+
+            # ps: 其实这样不是最好的办法。。因为每个能力对位置的影响力是不同的。。。不过再说啦
+            for capa in original_location['offset'].keys():
+                # 把这个位置相应的潜力设置以ori_mean_potential_capa正态分布的值
+                self.data[capa + '_limit'] = self.get_capa_potential(
+                    self.data['translated_nationality'])
+                # 把这个位置相应的能力力设置以ori_mean_capa正态分布的值
+                self.data[capa] = self.adjust_capa(
+                    self.get_capa(self.data['translated_nationality']),
+                    self.data[capa + '_limit'])
+        else:
+            # 生成年轻球员
+            self.generate_data()
+            # 为球员选择先天位置，并增强相应能力
+            original_location = random.choice(game_configs.capa_potential)
+            self.data[original_location['name'] + '_num'] = 1
+            for key, value in original_location['offset'].items():
+                # 先把相应能力值+5，再乘上偏移量
+                self.data[key] = self.adjust_capa(
+                    utils.get_offset(self.data[key] + 5, value), self.data[key + '_limit'])
+        player_model = self.save_in_db()
+        return player_model
+
+    def generate_data(self, average_age: int = None):
+        """
+        随机生成一例球员数据，保存在self.data中
+        :param average_age: 指定的平均年龄
+        """
+        # 保证在这个函数里，球员生成的能力是年轻球员的能力
+        self.ori_mean_capa = game_configs.ori_mean_capa
+        self.ori_mean_potential_capa = game_configs.ori_mean_potential_capa
+
         self.data['created_time'] = datetime.datetime.now()
         nation, self.data['name'], self.data['translated_name'] = self.get_name()
         # 判断国籍
@@ -155,7 +214,11 @@ class PlayerGenerator:
             self.data['nationality'], self.data['translated_nationality'] = 'Japan', '日本'
         else:
             self.data['nationality'], self.data['translated_nationality'] = self.get_nationality()
-
+        # 年龄
+        if average_age:
+            self.data['age'] = utils.get_mean_range(average_age, per_range=0.3)
+        else:
+            self.data['age'] = 15
         self.data['height'] = self.get_height()
         self.data['weight'] = self.get_weight()
         self.data['birth_date'] = self.get_birthday()
@@ -194,13 +257,6 @@ class PlayerGenerator:
             self.get_capa(self.data['translated_nationality']), self.data['stamina_limit'])
         self.data['goalkeeping'] = self.adjust_capa(
             self.get_capa(self.data['translated_nationality']), self.data['goalkeeping_limit'])
-        # 为球员选择先天位置，并增强相应能力
-        original_location = random.choice(game_configs.capa_potential)
-        self.data[original_location['name'] + '_num'] = 1
-        for key, value in original_location['offset'].items():
-            self.data[key] = utils.get_offset(self.data[key], value)
-        player_model = self.save_in_db()
-        return player_model
 
     def save_in_db(self) -> models.Player:
         """
@@ -212,7 +268,7 @@ class PlayerGenerator:
         return player_model
 
     @staticmethod
-    def adjust_capa(capa: int, capa_limit: int) -> int:
+    def adjust_capa(capa: float, capa_limit: int) -> int:
         """
         调整能力值至正确的范围
         :param capa: 待调整的能力值

@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from models.base import Base
 
 
-# region 俱乐部数据
 class Club(Base):
     __tablename__ = 'club'
     id = Column(Integer, primary_key=True, index=True)
@@ -22,5 +21,3 @@ class Club(Base):
 
     coach = relationship("Coach", uselist=False, backref="club", lazy='subquery')
     players = relationship("Player", backref="club", lazy='subquery')
-
-# endregion

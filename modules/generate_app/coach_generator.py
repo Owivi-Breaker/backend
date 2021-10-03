@@ -115,7 +115,7 @@ class CoachGenerator:
 
         self.data['birth_date'] = self.get_birthday()
         # tactic
-        self.data['tactic'] = random.choice([x for x in game_configs.formations.keys()])
+        self.data['formation'] = random.choice([x for x in game_configs.formations.keys()])
         self.data['wing_cross'] = utils.get_mean_range(50, per_range=0.9)
         self.data['under_cutting'] = utils.get_mean_range(50, per_range=0.9)
         self.data['pull_back'] = utils.get_mean_range(50, per_range=0.9)
