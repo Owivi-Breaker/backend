@@ -6,7 +6,7 @@ import crud
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from core.db import get_db
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 
 class ComputedPlayer:
@@ -38,7 +38,7 @@ class ComputedPlayer:
     def get_sorted_location_capa(self) -> List[List[str, float]]:
         """
         获取各个位置能力的降序列表
-        :return: List[lo_name, lo_capa]
+        :return: List[List[lo_name, lo_capa]]
         """
         location_capa = []
         for location in game_configs.location_capability:
@@ -47,3 +47,18 @@ class ComputedPlayer:
             )
             location_capa = sorted(location_capa, key=lambda x: -x[1])
         return location_capa
+
+    def get_top_capa_n_location(self) -> Tuple[float, str]:
+        """
+        获取最佳位置的综合能力以及该位置
+        :return: (能力值, 位置名)
+        """
+        top_capa, lo_name = self.get_sorted_location_capa()[0]
+        return top_capa, lo_name
+
+    def get_value(self) -> int:
+        """
+        获取球员身价
+        :return: 身价
+        """
+        pass

@@ -15,7 +15,6 @@ class PlayerCreate(BaseModel):
     height: int
     weight: int
     birth_date: str
-    values: float = 0  # 身价
     wages: float = 0  # 周薪
 
     real_stamina: float = 100  # 实时体力
@@ -56,8 +55,6 @@ class PlayerCreate(BaseModel):
     free_kick_limit: int
     stamina_limit: int
     goalkeeping_limit: int
-    # 生涯数据
-    game_data: List[GamePlayerData] = []
 
     class Config:
         orm_mode = True
@@ -66,5 +63,10 @@ class PlayerCreate(BaseModel):
 class Player(PlayerCreate):
     id: int
     club_id: int
+    # 生涯数据
+    game_data: List[GamePlayerData] = []
 
+
+class PlayerShow(Player):
+    value: int
 # endregion
