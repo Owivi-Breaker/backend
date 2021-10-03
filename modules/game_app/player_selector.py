@@ -1,3 +1,7 @@
+"""
+选人算法
+"""
+
 import models
 import crud
 import game_configs

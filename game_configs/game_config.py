@@ -15,3 +15,7 @@ class Location(str, enum.Enum):
     LM = 'LM'
     RM = 'RM'
     CDM = 'CDM'
+
+
+ori_mean_potential_capa = 80  # 初始潜力均值
+ori_mean_capa = 15  # 初始能力均值

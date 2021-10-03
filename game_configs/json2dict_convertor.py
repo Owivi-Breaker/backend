@@ -12,5 +12,5 @@ with open("./game_configs/data/location_capability.json") as f_obj:
 with open("./game_configs/data/formations.json") as f_obj:
     formations = json.load(f_obj)
 
-with open("./game_configs/data/rating_potential.json") as f_obj:
-    rating_potential = json.load(f_obj)
+with open("./game_configs/data/capa_potential.json") as f_obj:
+    capa_potential = json.load(f_obj)
