@@ -36,15 +36,15 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
     club_generator = generate_app.ClubGenerator(db)
     player_generator = generate_app.PlayerGenerator(db)
     coach_generator = generate_app.CoachGenerator(db)
+    calendar_generator = generate_app.CalendarGenerator(db)
     # 生成存档
     save_create_schemas = schemas.SaveCreate(created_time=datetime.datetime.now(),
                                              time='2021-08-01')
     save_model = save_generator.generate(save_create_schemas)
     logger.info("存档生成")
+    # 生成联赛
     league_list = eval("game_configs.{}".format(save_data.type))
-
     for league in league_list:
-        # 生成联赛
         league_create_schemas = schemas.LeagueCreate(created_time=datetime.datetime.now(),
                                                      name=league['name'], points=league['points'])
         league_model = league_generator.generate(league_create_schemas)
@@ -102,6 +102,9 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
                 if target_league['name'] == league['lower_league']:
                     crud.update_league(db=db, league_id=league['id'], attri={"lower_league": target_league['id']})
     logger.info("联赛上下游关系标记完成")
+    # 生成日程表
+    calendar_generator.generate(save_id=save_model.id)
+    logger.info("日程表生成")
 
     return crud.get_save_by_id(db=db, save_id=save_model.id)
 

@@ -57,8 +57,6 @@ class GameTeamData(Base):
 class GamePlayerData(Base):
     __tablename__ = 'game_player_data'
     id = Column(Integer, primary_key=True, index=True)
-    game_team_info_id = Column(Integer, ForeignKey('game_team_info.id'))
-    player_id = Column(Integer, ForeignKey('player.id'))
 
     created_time = Column(DateTime)
     location = Column(Enum(Location))
@@ -87,5 +85,8 @@ class GamePlayerData(Base):
     # 体力
     original_stamina = Column(Integer)
     final_stamina = Column(Integer)
+
+    game_team_info_id = Column(Integer, ForeignKey('game_team_info.id'))
+    player_id = Column(Integer, ForeignKey('player.id'))
 
 # endregion

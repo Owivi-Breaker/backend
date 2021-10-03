@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
-from game_configs.game_config import Location
 
 
 class CalendarCreate(BaseModel):

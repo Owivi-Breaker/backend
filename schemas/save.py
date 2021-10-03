@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
-from schemas.league import League
+import schemas
 
 
 class SaveCreate(BaseModel):
@@ -15,5 +15,5 @@ class SaveCreate(BaseModel):
 
 class Save(SaveCreate):
     id: int
-
-    leagues: List[League] = []
+    calendars: List[schemas.Calendar] = []
+    leagues: List[schemas.League] = []
