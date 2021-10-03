@@ -1,0 +1,130 @@
+[
+  {
+    "name": "英超",
+    "upper_league": "",
+    "lower_league": "英冠",
+    "points": 85,
+    "clubs": [
+      {
+        "name": "曼彻斯特城",
+        "finance": 30000,
+        "reputation": 81,
+        "ori_average_capa": 71
+      },
+      {
+        "name": "曼彻斯特联",
+        "finance": 22000,
+        "reputation": 81,
+        "ori_average_capa": 69
+      },
+      {
+        "name": "利物浦",
+        "finance": 15000,
+        "reputation": 78,
+        "ori_average_capa": 70
+      },
+      {
+        "name": "切尔西",
+        "finance": 28000,
+        "reputation": 76,
+        "ori_average_capa": 68
+      },
+      {
+        "name": "阿森纳",
+        "finance": 10000,
+        "reputation": 75,
+        "ori_average_capa": 63
+      },
+      {
+        "name": "托特纳姆热刺",
+        "finance": 9800,
+        "reputation": 70,
+        "ori_average_capa": 60
+      },
+      {
+        "name": "西汉姆联",
+        "finance": 8500,
+        "reputation": 65,
+        "ori_average_capa": 58
+      },
+      {
+        "name": "莱斯特城",
+        "finance": 8800,
+        "reputation": 63,
+        "ori_average_capa": 58
+      },
+      {
+        "name": "埃弗顿",
+        "finance": 7600,
+        "reputation": 63,
+        "ori_average_capa": 56
+      },
+      {
+        "name": "狼队",
+        "finance": 7500,
+        "reputation": 62,
+        "ori_average_capa": 56
+      },
+      {
+        "name": "阿斯顿维拉",
+        "finance": 8000,
+        "reputation": 61,
+        "ori_average_capa": 55
+      },
+      {
+        "name": "南安普顿",
+        "finance": 7200,
+        "reputation": 61,
+        "ori_average_capa": 55
+      },
+      {
+        "name": "利兹联",
+        "finance": 7000,
+        "reputation": 58,
+        "ori_average_capa": 56
+      },
+      {
+        "name": "布伦特福德",
+        "finance": 6800,
+        "reputation": 60,
+        "ori_average_capa": 54
+      },
+      {
+        "name": "沃特福德",
+        "finance": 6600,
+        "reputation": 59,
+        "ori_average_capa": 54
+      },
+      {
+        "name": "水晶宫",
+        "finance": 6400,
+        "reputation": 57,
+        "ori_average_capa": 53
+      },
+      {
+        "name": "布莱顿",
+        "finance": 6400,
+        "reputation": 56,
+        "ori_average_capa": 54
+      },
+      {
+        "name": "伯恩利",
+        "finance": 6000,
+        "reputation": 54,
+        "ori_average_capa": 52
+      },
+      {
+        "name": "纽卡斯尔联",
+        "finance": 6000,
+        "reputation": 53,
+        "ori_average_capa": 50
+      },
+      {
+        "name": "诺维奇",
+        "finance": 6000,
+        "reputation": 51,
+        "ori_average_capa": 50
+      }
+    ]
+  }
+]

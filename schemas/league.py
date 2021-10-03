@@ -4,16 +4,19 @@ from pydantic import BaseModel
 from schemas.club import Club
 
 
-# region 联赛表
+class LeagueCreate(BaseModel):
+    created_time: datetime = datetime.now()
 
-class League(BaseModel):
-    # id: int
-
-    created_time: datetime
     name: str
-
-    clubs: List[Club] = []
+    points: float
 
     class Config:
         orm_mode = True
-# endregion
+
+
+class League(LeagueCreate):
+    id: int
+    upper_league: int = None
+    lower_league: int = None
+
+    clubs: List[Club] = []

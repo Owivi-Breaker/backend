@@ -10,7 +10,7 @@ class Settings:
     ENV = os.environ.get("fast_env", "DEV")  # 本次启动环境
     APP_NAME = "Test~~~"
     # api前缀
-    API_PREFIX = "/api/v1"
+    API_PREFIX = "/api"
     # jwt密钥,建议随机生成一个
     # SECRET_KEY = "ShsUP9qIP2Xui2GpXRY6y74v2JSVS0Q2YOXJ22VjwkI"
     # token过期时间

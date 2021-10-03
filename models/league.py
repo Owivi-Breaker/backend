@@ -11,7 +11,9 @@ class League(Base):
     created_time = Column(DateTime)
     name = Column(String)
 
-    clubs = relationship("Club", backref='league', lazy='subquery')
+    upper_league = Column(Integer)
+    lower_league = Column(Integer)
 
+    clubs = relationship("Club", backref='league', lazy='subquery')
 
 # endregion

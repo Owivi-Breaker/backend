@@ -4,7 +4,7 @@ import schemas
 from utils import logger
 
 
-def create_league(db: Session, league: schemas.League):
+def create_league(league: schemas.LeagueCreate, db: Session):
     db_league = models.League(**league.dict())
     db.add(db_league)
     db.commit()

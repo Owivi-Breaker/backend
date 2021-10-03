@@ -1,0 +1,254 @@
+[
+  {
+    "name": "世界超级联赛",
+    "points": 99,
+    "clubs": [
+      {
+        "name": "巴塞罗那",
+        "finance": 20000,
+        "reputation": 85,
+        "ori_average_capa": 75
+      },
+      {
+        "name": "皇家马德里",
+        "finance": 20000,
+        "reputation": 85,
+        "ori_average_capa": 75
+      },
+      {
+        "name": "曼彻斯特联",
+        "finance": 23000,
+        "reputation": 81,
+        "ori_average_capa": 70
+      },
+      {
+        "name": "曼彻斯特城",
+        "finance": 30000,
+        "reputation": 81,
+        "ori_average_capa": 70
+      },
+      {
+        "name": "AC米兰",
+        "finance": 10000,
+        "reputation": 75,
+        "ori_average_capa": 60
+      },
+      {
+        "name": "国际米兰",
+        "finance": 10000,
+        "reputation": 73,
+        "ori_average_capa": 62
+      },
+      {
+        "name": "巴黎圣日尔曼",
+        "finance": 30000,
+        "reputation": 77,
+        "ori_average_capa": 68
+      },
+      {
+        "name": "阿贾克斯",
+        "finance": 8000,
+        "reputation": 67,
+        "ori_average_capa": 59
+      },
+      {
+        "name": "切尔西",
+        "finance": 25000,
+        "reputation": 78,
+        "ori_average_capa": 67
+      },
+      {
+        "name": "利物浦",
+        "finance": 12000,
+        "reputation": 79,
+        "ori_average_capa": 68
+      },
+      {
+        "name": "马德里竞技",
+        "finance": 9000,
+        "reputation": 74,
+        "ori_average_capa": 65
+      },
+      {
+        "name": "阿森纳",
+        "finance": 9000,
+        "reputation": 78,
+        "ori_average_capa": 65
+      },
+      {
+        "name": "托特纳姆热刺",
+        "finance": 8000,
+        "reputation": 73,
+        "ori_average_capa": 64
+      },
+      {
+        "name": "尤文图斯",
+        "finance": 9200,
+        "reputation": 75,
+        "ori_average_capa": 66
+      },
+      {
+        "name": "多特蒙德",
+        "finance": 8000,
+        "reputation": 67,
+        "ori_average_capa": 59
+      },
+      {
+        "name": "拜仁慕尼黑",
+        "finance": 10000,
+        "reputation": 80,
+        "ori_average_capa": 70
+      },
+      {
+        "name": "上海申花",
+        "finance": 4000,
+        "reputation": 56,
+        "ori_average_capa": 48
+      },
+      {
+        "name": "上海上港",
+        "finance": 4000,
+        "reputation": 56,
+        "ori_average_capa": 48
+      },
+      {
+        "name": "莱斯特城",
+        "finance": 5000,
+        "reputation": 63,
+        "ori_average_capa": 58
+      },
+      {
+        "name": "塞维利亚",
+        "finance": 4000,
+        "reputation": 63,
+        "ori_average_capa": 58
+      }
+    ]
+  },
+  {
+    "name": "世界冠军联赛",
+    "points": 80,
+    "clubs": [
+      {
+        "name": "里昂",
+        "finance": 3500,
+        "reputation": 59,
+        "ori_average_capa": 55
+      },
+      {
+        "name": "里斯本竞技",
+        "finance": 3000,
+        "reputation": 55,
+        "ori_average_capa": 52
+      },
+      {
+        "name": "莱比锡",
+        "finance": 6000,
+        "reputation": 50,
+        "ori_average_capa": 55
+      },
+      {
+        "name": "浙江绿城",
+        "finance": 3000,
+        "reputation": 45,
+        "ori_average_capa": 40
+      },
+      {
+        "name": "勒沃库森",
+        "finance": 3000,
+        "reputation": 47,
+        "ori_average_capa": 45
+      },
+      {
+        "name": "西汉姆联",
+        "finance": 5000,
+        "reputation": 60,
+        "ori_average_capa": 58
+      },
+      {
+        "name": "狼队",
+        "finance": 4500,
+        "reputation": 58,
+        "ori_average_capa": 56
+      },
+      {
+        "name": "罗马",
+        "finance": 3400,
+        "reputation": 60,
+        "ori_average_capa": 56
+      },
+      {
+        "name": "摩纳哥",
+        "finance": 5000,
+        "reputation": 53,
+        "ori_average_capa": 51
+      },
+      {
+        "name": "广州恒大",
+        "finance": 4000,
+        "reputation": 54,
+        "ori_average_capa": 53
+      },
+      {
+        "name": "马赛",
+        "finance": 3000,
+        "reputation": 50,
+        "ori_average_capa": 50
+      },
+      {
+        "name": "波尔图",
+        "finance": 3500,
+        "reputation": 51,
+        "ori_average_capa": 50
+      },
+      {
+        "name": "本菲卡",
+        "finance": 3000,
+        "reputation": 53,
+        "ori_average_capa": 53
+      },
+      {
+        "name": "博卡",
+        "finance": 3500,
+        "reputation": 56,
+        "ori_average_capa": 55
+      },
+      {
+        "name": "河床",
+        "finance": 3000,
+        "reputation": 56,
+        "ori_average_capa": 56
+      },
+      {
+        "name": "川崎前锋",
+        "finance": 2500,
+        "reputation": 45,
+        "ori_average_capa": 42
+      },
+      {
+        "name": "北京国安",
+        "finance": 3400,
+        "reputation": 50,
+        "ori_average_capa": 51
+      },
+      {
+        "name": "埃弗顿",
+        "finance": 3200,
+        "reputation": 60,
+        "ori_average_capa": 55
+      },
+      {
+        "name": "埃因霍温",
+        "finance": 3000,
+        "reputation": 56,
+        "ori_average_capa": 50
+      },
+      {
+        "name": "桑托斯",
+        "finance": 2800,
+        "reputation": 55,
+        "ori_average_capa": 55
+      }
+    ]
+  }
+]
