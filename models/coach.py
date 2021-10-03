@@ -7,7 +7,6 @@ from models.base import Base
 class Coach(Base):
     __tablename__ = 'coach'
     id = Column(Integer, primary_key=True, index=True)
-    club_id = Column(Integer, ForeignKey('club.id'))
 
     created_time = Column(DateTime)
     name = Column(String)
@@ -26,6 +25,6 @@ class Coach(Base):
     middle_attack = Column(Integer)
     counter_attack = Column(Integer)
 
-
+    club_id = Column(Integer, ForeignKey('club.id'))
 
 # endregion

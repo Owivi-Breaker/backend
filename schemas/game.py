@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from game_configs.game_config import Location
 
 
-# region 比赛表
 class GamePlayerDataCreate(BaseModel):
     player_id: int
 
