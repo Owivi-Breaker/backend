@@ -68,7 +68,7 @@ class PlayerSelector:
             #     self.get_sorted_location_rating(p)
         return final_players, final_locations
 
-    def filter_formation_capa(self, player: models.Player, formation: str) -> List[List[str, float]]:
+    def filter_formation_capa(self, player: models.Player, formation: str) -> List[List]:
         """
         获取球员在各个位置的综合能力值，倒序排列，然后将阵型不包含的位置筛选掉
         :param player: 球员实例
@@ -89,7 +89,7 @@ class PlayerSelector:
         return sorted_location_capa_list_filter_by_formation
 
     @staticmethod
-    def get_highest_capa_player(players_location_capa_dict: Dict[models.Player, List[List[str, float]]]) -> (
+    def get_highest_capa_player(players_location_capa_dict: Dict[models.Player, List[List]]) -> (
             models.Player, str):
         """
         获取队伍中拥有最高位置综合值的球员实例及其位置

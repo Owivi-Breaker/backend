@@ -3,9 +3,7 @@ import game_configs
 import crud
 import models
 import schemas
-from fm import Club
-from modules.game_app import Team, Player
-from modules.game_app.player_selector import PlayerSelector
+from modules.game_app import game_eve_app
 
 import random
 from typing import Dict, List, Sequence, Set, Tuple, Optional
@@ -13,12 +11,12 @@ import datetime
 from sqlalchemy.orm import Session
 
 
-class Game:
+class GameEvE:
     def __init__(self, db: Session, club1_id: int, club2_id: int, date: Date, game_type: str):
         self.db = db
         # TODO game_type 改为联赛 id 或杯赛 id
-        self.lteam = Team(self, club1_id)
-        self.rteam = Team(self, club2_id)
+        self.lteam = game_eve_app.Team(self, club1_id)
+        self.rteam = game_eve_app.Team(self, club2_id)
         self.date = str(date)
         self.script = ''
         self.type = game_type
@@ -62,7 +60,7 @@ class Game:
         for player in self.rteam.players:
             self.update_player_data(player)
 
-    def update_player_data(self, player: Player):
+    def update_player_data(self, player: game_eve_app.Player):
         """
         保存球员数据的改变
         :param player: 球员实例
@@ -129,7 +127,7 @@ class Game:
         # endregion
 
     @staticmethod
-    def get_cap_improvement(player: Player, value: float) -> Dict[str:float]:
+    def get_cap_improvement(player: game_eve_app.Player, value: float) -> Dict[str, float]:
         """
         根据评分，获取能力的提升值
         :param player: 球员实例
@@ -168,8 +166,12 @@ class Game:
                 result[capa] = limit
         return result
 
-    def export_game_schemas(self, created_time=datetime.datetime.now()) -> schemas.Game:
-
+    def export_game_schemas(self, created_time=datetime.datetime.now()) -> schemas.GameCreate:
+        """
+        导出game_schemas
+        :param created_time: 生成时间
+        :return: schemas.GameCreate
+        """
         data = {
             'type': self.type,
             'created_time': created_time,
@@ -178,7 +180,7 @@ class Game:
             'script': self.script,
             'mvp': self.get_highest_rating_player().player_model.id
         }
-        game_data = schemas.Game(**data)
+        game_data = schemas.GameCreate(**data)
         return game_data
 
     def save_in_db(self):
@@ -215,7 +217,7 @@ class Game:
         """
         self.script += text + '\n'
 
-    def init_hold_ball_team(self) -> Tuple[Team, Team]:
+    def init_hold_ball_team(self) -> Tuple[game_eve_app.Team, game_eve_app.Team]:
         """
         比赛开始时，随机选择持球队伍
         :return: 持球队伍，无球队伍
@@ -224,7 +226,7 @@ class Game:
         no_ball_team = self.lteam if hold_ball_team == self.rteam else self.rteam
         return hold_ball_team, no_ball_team
 
-    def exchange_hold_ball_team(self, hold_ball_team: Team) -> Tuple[Team, Team]:
+    def exchange_hold_ball_team(self, hold_ball_team: game_eve_app.Team) -> Tuple[game_eve_app.Team, game_eve_app.Team]:
         """
         球权易位
         :param hold_ball_team: 原先持球的队伍实例
@@ -442,7 +444,7 @@ class Game:
             rating = 10
         player.data['final_rating'] = float(utils.retain_decimal(rating))
 
-    def get_highest_rating_player(self) -> Player:
+    def get_highest_rating_player(self) -> game_eve_app.Player:
         """
         获取全场mvp
         :return: mvp球员实例

@@ -2,7 +2,7 @@ from utils import utils, logger
 import game_configs
 import crud
 import schemas
-from modules.game_app import Game, Player
+from modules.game_app import game_eve_app
 from modules.game_app.player_selector import PlayerSelector
 
 import random
@@ -11,14 +11,14 @@ import datetime
 
 
 class Team:
-    def __init__(self, game: Game, club_id: int):
+    def __init__(self, game, club_id: int):
         self.game = game
         self.club_id = club_id
         self.team_model = crud.get_club_by_id(db=self.game.db, club_id=self.club_id)
         self.name = self.team_model.name  # 解说用
         self.tactic = dict()  # 战术比重字典
         self.init_tactic()
-        self.players: List[Player] = []  # 球员列表
+        self.players: List[game_eve_app.Player] = []  # 球员列表
         self.init_players()
         self.score: int = 0  # 本方比分
 
@@ -55,7 +55,7 @@ class Team:
         player_selector = PlayerSelector(self.club_id, self.game.db)
         players_model, locations_list = player_selector.select_players()
         for player_model, location in zip(players_model, locations_list):
-            self.players.append(Player(player_model, location))
+            self.players.append(game_eve_app.Player(player_model, location))
 
     def export_game_team_data_schemas(self, created_time=datetime.datetime.now()) -> schemas.GameTeamDataCreate:
         """
@@ -67,7 +67,7 @@ class Team:
             'created_time': created_time,
             **self.data
         }
-        game_team_data = schemas.GameTeamData(**data)
+        game_team_data = schemas.GameTeamDataCreate(**data)
         return game_team_data
 
     def export_game_team_info_schemas(self, created_time=datetime.datetime.now()) -> schemas.GameTeamInfoCreate:
@@ -81,7 +81,7 @@ class Team:
             'club_id': self.team_model.id,
             'score': self.score,
         }
-        game_team_info = schemas.GameTeamInfo(**data)
+        game_team_info = schemas.GameTeamInfoCreate(**data)
         return game_team_info
 
     def add_script(self, text: str):
@@ -165,7 +165,7 @@ class Team:
         for player in self.players:
             player.shift_location()
 
-    def get_location_players(self, location_tuple: tuple) -> List[Player]:
+    def get_location_players(self, location_tuple: tuple) -> List[game_eve_app.Player]:
         """
         获取指定位置上的球员
         :param location_tuple: 位置名
@@ -200,8 +200,8 @@ class Team:
             logger.error('战术名称{}错误！'.format(tactic_name))
         return exchange_ball
 
-    def shot_and_save(self, attacker: Player, defender: Player,
-                      assister: Optional[Player] = None) -> bool:
+    def shot_and_save(self, attacker: game_eve_app.Player, defender: game_eve_app.Player,
+                      assister: Optional[game_eve_app.Player] = None) -> bool:
         """
         射门与扑救，一对一
         :param attacker: 进攻球员实例
@@ -235,7 +235,7 @@ class Team:
             self.add_script('{}发挥神勇，扑出这脚劲射'.format(defender.name))
             return False
 
-    def dribble_and_block(self, attacker: Player, defender: Player) -> bool:
+    def dribble_and_block(self, attacker: game_eve_app.Player, defender: game_eve_app.Player) -> bool:
         """
         过人与抢断，一对一，发生在内切时
         :param attacker: 进攻球员（边锋）实例
@@ -259,7 +259,9 @@ class Team:
             self.add_script('{}阻截了{}的进攻'.format(defender.name, attacker.name))
             return False
 
-    def sprint_dribble_and_block(self, attackers: List[Player], defenders: List[Player]) -> Tuple[bool, Player]:
+    def sprint_dribble_and_block(self, attackers: List[game_eve_app.Player], defenders: List[game_eve_app.Player]) -> \
+    Tuple[
+        bool, game_eve_app.Player]:
         """
         冲刺、过人与抢断，多对多
         :param attackers: 进攻球员组
@@ -295,7 +297,8 @@ class Team:
             else:
                 pass
 
-    def drop_ball(self, attackers: List[Player], defenders: List[Player]) -> Tuple[bool, Player]:
+    def drop_ball(self, attackers: List[game_eve_app.Player], defenders: List[game_eve_app.Player]) -> Tuple[
+        bool, game_eve_app.Player]:
         """
         争顶
         :param attackers: 进攻球员组
@@ -330,7 +333,7 @@ class Team:
             else:
                 pass
 
-    def pass_ball(self, attacker: Player, defender_average: float, is_long_pass: bool = False) -> bool:
+    def pass_ball(self, attacker: game_eve_app.Player, defender_average: float, is_long_pass: bool = False) -> bool:
         """
         传球
         :param attacker: 传球球员实例
@@ -355,7 +358,7 @@ class Team:
         else:
             return False
 
-    def corner_kick(self, attacker: List[Player], defender: List[Player]):
+    def corner_kick(self, attacker: List[game_eve_app.Player], defender: List[game_eve_app.Player]):
         """
         TODO 角球
         """

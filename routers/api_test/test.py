@@ -6,13 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.db import SessionLocal, engine, get_db
 from pydantic import BaseModel
 import datetime
+import random
 
 import schemas
 import models
 import crud
 import game_configs
-from modules import generate_app
-from utils import logger
+from modules import generate_app, game_app
+from utils import logger, Date
 
 
 class SaveData(BaseModel):
@@ -104,3 +105,38 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
     logger.info("联赛上下游关系标记完成")
 
     return crud.get_save_by_id(db=db, save_id=save_model.id)
+
+
+@router.get('/imitate_game_season')
+def imitate_game_season(league_id: int, db: Session = Depends(get_db)):
+    """
+    模拟指定联赛一个赛季的比赛
+    :param league_id: 联赛id
+    :param db: database
+    :return:
+    """
+    league_model = crud.get_league_by_id(db=db, league_id=league_id)
+    clubs = league_model.clubs
+
+    clubs_a = random.sample(clubs, len(clubs) // 2)  # 随机挑一半
+    clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
+    schedule = []  # 比赛赛程
+    for _ in range((len(clubs) - 1)):
+        # 前半赛季的比赛
+        schedule.append([game for game in zip(clubs_a, clubs_b)])
+        clubs_a.insert(1, clubs_b.pop(0))
+        clubs_b.append(clubs_a.pop(-1))
+    schedule_reverse = []  # 主客场对调的后半赛季赛程
+    for games in schedule:
+        schedule_reverse.append([tuple(list(x)[::-1]) for x in games])
+    schedule.extend(schedule_reverse)
+
+    date = Date(2021, 8, 14)
+    for games in schedule:
+        # 进行每一轮比赛
+        logger.info('{} 的比赛'.format(str(date)))
+        for game in games:
+            logger.info("{}对{}".format(game[0].name, game[1].name))
+            game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, 'test')
+            game_eve.start()
+        date.plus_days(7)

@@ -35,7 +35,7 @@ class ComputedPlayer:
             location_capa += player_dict[lo] * weight
         return location_capa
 
-    def get_sorted_location_capa(self) -> List[List[str, float]]:
+    def get_sorted_location_capa(self) -> List[List]:
         """
         获取各个位置能力的降序列表
         :return: List[List[lo_name, lo_capa]]

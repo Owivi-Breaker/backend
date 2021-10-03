@@ -58,7 +58,7 @@ class Player:
         """
         导出数据至GamePlayerData
         :param created_time: 创建时间
-        :return: schemas.GamePlayerData
+        :return: schemas.GamePlayerDataCreate
         """
         data = {
             'created_time': created_time,
@@ -67,7 +67,7 @@ class Player:
             **self.data,
             'final_stamina': self.stamina
         }
-        game_player_data = schemas.GamePlayerData(**data)
+        game_player_data = schemas.GamePlayerDataCreate(**data)
         return game_player_data
 
     def get_capa(self, capa_name: str) -> float:

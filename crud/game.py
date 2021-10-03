@@ -32,7 +32,7 @@ def create_game_team_data(db: Session, game_team_data: schemas.GameTeamDataCreat
     """
     创建比赛队伍数据表
     """
-    db_game_team_data = models.GameTeamInfo(**game_team_data.dict())
+    db_game_team_data = models.GameTeamData(**game_team_data.dict())
     db.add(db_game_team_data)
     db.commit()
     db.refresh(db_game_team_data)
@@ -43,7 +43,7 @@ def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDat
     """
     创建比赛球员信息表
     """
-    db_game_player_data = models.GameTeamInfo(**game_player_data.dict())
+    db_game_player_data = models.GamePlayerData(**game_player_data.dict())
     db.add(db_game_player_data)
     db.commit()
     db.refresh(db_game_player_data)
