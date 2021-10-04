@@ -63,7 +63,7 @@ class CalendarGenerator:
             for games in schedule:
                 schedule_reverse.append([tuple(list(x)[::-1]) for x in games])
             schedule.extend(schedule_reverse)
-
+            # 联赛从 8.14 到次年 4.30
             date = Date(int(year), 8, 14)
             for games in schedule:
                 league_game = dict()
@@ -72,6 +72,17 @@ class CalendarGenerator:
                     league_game["eve"].append(','.join([str(game[0].id), str(game[1].id)]))
                 self.add_dict(str(date), league_game)
                 date.plus_days(7)
+
+    def generate_cup_games(self, save_id: int):
+        """
+        生成杯赛赛程
+        :param save_id:
+        :return:
+        """
+        pass
+
+    def generate_champions_League_games(self, save_id: int):
+        pass
 
     def save_in_db(self, save_id: int):
         """

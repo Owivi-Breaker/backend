@@ -12,6 +12,7 @@ class League(Base):
     name = Column(String)
     points = Column(Float)
 
+    cup = Column(String)
     upper_league = Column(Integer)
     lower_league = Column(Integer)
 

@@ -46,7 +46,9 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
     league_list = eval("game_configs.{}".format(save_data.type))
     for league in league_list:
         league_create_schemas = schemas.LeagueCreate(created_time=datetime.datetime.now(),
-                                                     name=league['name'], points=league['points'])
+                                                     name=league['name'],
+                                                     points=league['points'],
+                                                     cup=league['cup'])
         league_model = league_generator.generate(league_create_schemas)
         crud.update_league(db=db, league_id=league_model.id, attri={"save_id": save_model.id})
         league['id'] = league_model.id
