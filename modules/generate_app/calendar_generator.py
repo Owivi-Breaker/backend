@@ -24,6 +24,7 @@ class CalendarGenerator:
         self.generate_league_games(save_id)
         self.turn_dict2str()
 
+        self.data = dict()  # 清空数据
         self.save_in_db(save_id)
 
     def add_dict(self, date: str, target_dict: dict):

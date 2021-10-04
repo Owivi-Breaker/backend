@@ -19,5 +19,5 @@ class Club(Base):
     negotiator = Column(Integer)
 
     league_id = Column(Integer, ForeignKey('league.id'))
-    coach = relationship("Coach", uselist=False, backref="club", lazy='subquery')
-    players = relationship("Player", backref="club", lazy='subquery')
+    coach = relationship("Coach", uselist=False, backref="club", lazy='select')
+    players = relationship("Player", backref="club", lazy='select')

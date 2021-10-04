@@ -18,6 +18,7 @@ class LeagueGenerator:
         """
         self.data = dict(league_data)
         league_model = self.save_in_db()
+        self.data = dict()  # 清空数据
         return league_model
 
     def save_in_db(self) -> models.League:

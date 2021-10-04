@@ -13,11 +13,12 @@ def create_player(db: Session, player: schemas.PlayerCreate):
     return db_player
 
 
-def update_player(db: Session, player_id: int, attri: dict):
+def update_player(db: Session, player_id: int, attri: dict, is_commit: bool = True):
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     for key, value in attri.items():
         setattr(db_player, key, value)
-    db.commit()
+    if is_commit:
+        db.commit()
     return db_player
 
 

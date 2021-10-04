@@ -11,5 +11,5 @@ class Save(Base):
     created_time = Column(DateTime)
     time = Column(String)
 
-    leagues = relationship("League", backref="save", lazy='subquery')
-    calendars = relationship("Calendar", backref="save", lazy='subquery')
+    leagues = relationship("League", backref="save", lazy='select')
+    calendars = relationship("Calendar", backref="save", lazy='select')

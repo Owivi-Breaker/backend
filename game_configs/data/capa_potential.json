@@ -89,9 +89,19 @@
     "name": "RM",
     "offset": {
       "passing": 0.5,
-      "shooting": 0.2, "dribbling": 0.1, "pace": 0.1, "stamina": 0.1}},
-    {
-      "name": "CDM",
-     "offset": {
-       "passing": 0.4, "interception": 0.4, "anticipation": 0.1, "strength": 0.1}}
+      "shooting": 0.2,
+      "dribbling": 0.1,
+      "pace": 0.1,
+      "stamina": 0.1
+    }
+  },
+  {
+    "name": "CDM",
+    "offset": {
+      "passing": 0.4,
+      "interception": 0.4,
+      "anticipation": 0.1,
+      "strength": 0.1
+    }
+  }
 ]

@@ -17,6 +17,6 @@ class League(Base):
     lower_league = Column(Integer)
 
     save_id = Column(Integer, ForeignKey('save.id'))
-    clubs = relationship("Club", backref='league', lazy='subquery')
+    clubs = relationship("Club", backref='league', lazy='select')
 
 # endregion

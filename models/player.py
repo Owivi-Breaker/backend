@@ -62,6 +62,6 @@ class Player(Base):
 
     club_id = Column(Integer, ForeignKey('club.id'))
     # 生涯数据
-    game_data = relationship('GamePlayerData', backref='player', lazy='subquery')
+    game_data = relationship('GamePlayerData', backref='player', lazy='select')
 
 # endregion
