@@ -2,14 +2,17 @@ from utils import utils, logger
 import models
 import schemas
 import game_configs
+from modules import computed_data_app
 
 from typing import Dict, List, Sequence, Set, Tuple, Optional
 import datetime
+from sqlalchemy.orm import Session
 
 
 class Player:
     # 比赛球员类
-    def __init__(self, player_model: models.Player, location: str):
+    def __init__(self, db: Session, player_model: models.Player, location: str):
+        self.db = db
         self.player_model = player_model
         self.name = player_model.translated_name  # 解说用
         self.ori_location = location  # 原本位置
@@ -41,7 +44,10 @@ class Player:
     def init_capa(self):
         """
         将球员的各项能力值读入self.rating中
+        TODO 读入球员经过年龄滤镜后的真实能力
         """
+        computed_player = computed_data_app.ComputedPlayer(player_id=self.player_model.id, db=self.db)
+        self.capa = computed_player.get_all_capa()
         self.capa['shooting'] = self.player_model.shooting
         self.capa['passing'] = self.player_model.passing
         self.capa['dribbling'] = self.player_model.dribbling

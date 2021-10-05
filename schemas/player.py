@@ -68,3 +68,4 @@ class Player(PlayerCreate):
 
 class PlayerShow(Player):
     value: int
+

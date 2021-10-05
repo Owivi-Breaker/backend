@@ -1,4 +1,5 @@
 import game_configs
+import schemas
 from utils import logger
 import models
 import crud
@@ -15,6 +16,47 @@ class ComputedPlayer:
         self.player_id = player_id
         self.player_model = crud.get_player_by_id(db=self.db, player_id=self.player_id)
 
+    def get_show_data(self) -> schemas.PlayerShow:
+        """
+        获取返回给前端的球员信息
+        :return: schemas.PlayerShow
+        """
+        pass
+
+    def get_all_capa(self) -> dict:
+        """
+        获取所有能力值
+        :return: 能力值字典
+        """
+        data = dict()
+        data['shooting'] = self.get_capa('shooting')
+        data['passing'] = self.get_capa('passing')
+        data['dribbling'] = self.get_capa('dribbling')
+        data['interception'] = self.get_capa('interception')
+        data['pace'] = self.get_capa('pace')
+        data['strength'] = self.get_capa('strength')
+        data['aggression'] = self.get_capa('aggression')
+        data['anticipation'] = self.get_capa('anticipation')
+        data['free_kick'] = self.get_capa('free_kick')
+        data['stamina'] = self.get_capa('stamina')  # 注意，这个是体力“能力”，不是真正的体力！
+        data['goalkeeping'] = self.get_capa('goalkeeping')
+        return data
+
+    def get_capa(self, capa_name: str) -> float:
+        """
+        获取年龄滤镜过的能力值
+        :param capa_name: 能力名
+        :return: 能力值
+        """
+        ori_capa = eval("self.player_model.{}".format(capa_name))
+        age = self.player_model.age
+        start_age = 30
+        if age >= start_age:
+            weight = 1 - (age - 30 + 1) * 0.05
+        else:
+            weight = 1
+        return ori_capa * weight
+
     def get_location_capa(self, lo_name: str) -> float:
         """
         获取球员指定位置的综合能力
@@ -22,7 +64,6 @@ class ComputedPlayer:
         :return: 位置能力值
         """
         weight_dict = dict()
-        player_dict = self.player_model.__dict__
         for lo in game_configs.location_capability:
             # 拿到指定位置的能力比重
             if lo['name'] == lo_name:
@@ -32,7 +73,7 @@ class ComputedPlayer:
         if not weight_dict:
             logger.error('没有找到对应位置！')
         for lo, weight in weight_dict.items():
-            location_capa += player_dict[lo] * weight
+            location_capa += self.get_capa(lo) * weight
         return location_capa
 
     def get_sorted_location_capa(self) -> List[List]:

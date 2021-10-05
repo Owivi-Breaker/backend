@@ -54,7 +54,7 @@ class Team:
         player_selector = PlayerSelector(self.club_id, self.game.db)
         players_model, locations_list = player_selector.select_players()
         for player_model, location in zip(players_model, locations_list):
-            self.players.append(game_eve_app.Player(player_model, location))
+            self.players.append(game_eve_app.Player(self.game.db, player_model, location))
         if len(self.players) != 11:
             logger.warning("队伍仅有{}人！".format(len(self.players)))
 
