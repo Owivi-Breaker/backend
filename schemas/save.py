@@ -8,6 +8,8 @@ class SaveCreate(BaseModel):
     created_time: datetime = datetime.now()
 
     time: str
+    player_club_id: int = 1  # TODO 暂时设一个默认值
+    season: int = 1  # 赛季
 
     class Config:
         orm_mode = True

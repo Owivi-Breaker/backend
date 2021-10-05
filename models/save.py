@@ -10,6 +10,8 @@ class Save(Base):
 
     created_time = Column(DateTime)
     time = Column(String)
+    player_club_id = Column(Integer)
+    season = Column(Integer)
 
     leagues = relationship("League", backref="save", lazy='select')
     calendars = relationship("Calendar", backref="save", lazy='select')

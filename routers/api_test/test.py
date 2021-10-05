@@ -36,7 +36,6 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
     club_generator = generate_app.ClubGenerator(db)
     player_generator = generate_app.PlayerGenerator(db)
     coach_generator = generate_app.CoachGenerator(db)
-    calendar_generator = generate_app.CalendarGenerator(db)
     # 生成存档
     save_create_schemas = schemas.SaveCreate(created_time=datetime.datetime.now(),
                                              time='2021-08-01')
@@ -67,32 +66,37 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
             # 随机生成教练
             coach_model = coach_generator.generate()
             crud.update_coach(db=db, coach_id=coach_model.id, attri={"club_id": club_model.id})
-            # logger.info("教练生成")
 
             # 随机生成球员
             # 随机生成11名适配阵型位置的成年球员
             formation_dict = game_configs.formations[coach_model.formation]
+            player_model_list: List[models.Player] = []
             for lo, num in formation_dict.items():
                 for i in range(num):
                     player_model = player_generator.generate(ori_mean_capa=club['ori_mean_capa'],
                                                              ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
                                                              average_age=30, location=lo)
-                    crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
+                    player_model_list.append(player_model)
+                    # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
 
             for _ in range(7):
                 # 随机生成7名任意位置成年球员
                 player_model = player_generator.generate(ori_mean_capa=club['ori_mean_capa'],
                                                          ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
                                                          average_age=30)
-                crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
+                player_model_list.append(player_model)
+                # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
             for _ in range(6):
                 # 随机生成6名年轻球员
                 player_model = player_generator.generate()
-                crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
-                # logger.info("第{}个球员生成".format(_ + 1))
-
-            # logger.info("24个球员生成")
-
+                player_model_list.append(player_model)
+                # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
+            # 统一提交24名球员的修改
+            attri = {"club_id": club_model.id}
+            for player_model in player_model_list:
+                for key, value in attri.items():
+                    setattr(player_model, key, value)
+            db.commit()
     for league in league_list:
         # 标记上下游联赛关系
         if league['upper_league']:
@@ -105,7 +109,8 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
                     crud.update_league(db=db, league_id=league['id'], attri={"lower_league": target_league['id']})
     logger.info("联赛上下游关系标记完成")
     # 生成日程表
-    calendar_generator.generate(save_id=save_model.id)
+    calendar_generator = generate_app.CalendarGenerator(db=db, save_id=save_model.id)
+    calendar_generator.generate()
     logger.info("日程表生成")
 
     return crud.get_save_by_id(db=db, save_id=save_model.id)

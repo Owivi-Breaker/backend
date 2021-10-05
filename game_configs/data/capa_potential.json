@@ -11,18 +11,18 @@
     "name": "LW",
     "offset": {
       "dribbling": 0.4,
-      "pace": 0.4,
-      "passing": 0.1,
-      "shooting": 0.1
+      "pace": 0.2,
+      "passing": 0.2,
+      "shooting": 0.2
     }
   },
   {
     "name": "RW",
     "offset": {
       "dribbling": 0.4,
-      "pace": 0.4,
-      "passing": 0.1,
-      "shooting": 0.1
+      "pace": 0.2,
+      "passing": 0.2,
+      "shooting": 0.2
     }
   },
   {
@@ -46,7 +46,7 @@
     "name": "LB",
     "offset": {
       "interception": 0.3,
-      "shooting": 0.4,
+      "pace": 0.4,
       "dribbling": 0.1,
       "passing": 0.2
     }
@@ -55,7 +55,7 @@
     "name": "RB",
     "offset": {
       "interception": 0.3,
-      "shooting": 0.4,
+      "pace": 0.4,
       "dribbling": 0.1,
       "passing": 0.2
     }
