@@ -4,9 +4,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
-from schemas import *
-from models import *
+import schemas
+import models
+import crud
 from core.db import SessionLocal, engine, get_db
-from crud.game import *
 
 router = APIRouter()

@@ -7,6 +7,7 @@ from schemas.club import Club
 class LeagueCreate(BaseModel):
     created_time: datetime
 
+    cup: str  # 杯赛名称
     name: str
     points: float
 

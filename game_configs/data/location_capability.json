@@ -83,9 +83,9 @@
     "name": "LB",
     "weight": {
       "shooting": 0,
-      "passing": 0.1,
+      "passing": 0.2,
       "dribbling": 0.1,
-      "interception": 0.4,
+      "interception": 0.3,
       "pace": 0.4,
       "strength": 0,
       "aggression": 0,
@@ -99,9 +99,9 @@
     "name": "RB",
     "weight": {
       "shooting": 0,
-      "passing": 0.1,
+      "passing": 0.2,
       "dribbling": 0.1,
-      "interception": 0.4,
+      "interception": 0.3,
       "pace": 0.4,
       "strength": 0,
       "aggression": 0,
@@ -179,6 +179,16 @@
     "name": "CDM",
     "weight": {
       "shooting": 0,
-      "passing": 0.5, "dribbling": 0, "interception": 0.3, "pace": 0, "strength": 0.1,
-                "aggression": 0, "anticipation": 0.1, "free_kick": 0, "stamina": 0, "goalkeeping": 0}}
+      "passing": 0.5,
+      "dribbling": 0,
+      "interception": 0.3,
+      "pace": 0,
+      "strength": 0.1,
+      "aggression": 0,
+      "anticipation": 0.1,
+      "free_kick": 0,
+      "stamina": 0,
+      "goalkeeping": 0
+    }
+  }
 ]

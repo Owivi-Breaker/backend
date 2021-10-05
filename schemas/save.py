@@ -1,13 +1,15 @@
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
-from schemas.league import League
+import schemas
 
 
 class SaveCreate(BaseModel):
     created_time: datetime = datetime.now()
 
     time: str
+    player_club_id: int = 1  # TODO 暂时设一个默认值
+    season: int = 1  # 赛季
 
     class Config:
         orm_mode = True
@@ -15,5 +17,5 @@ class SaveCreate(BaseModel):
 
 class Save(SaveCreate):
     id: int
-
-    leagues: List[League] = []
+    calendars: List[schemas.Calendar] = []
+    leagues: List[schemas.League] = []

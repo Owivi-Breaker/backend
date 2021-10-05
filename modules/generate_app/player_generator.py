@@ -194,6 +194,7 @@ class PlayerGenerator:
                 self.data[key] = self.adjust_capa(
                     utils.get_offset(self.data[key] + 5, value), self.data[key + '_limit'])
         player_model = self.save_in_db()
+        self.data = dict()  # 清空数据
         return player_model
 
     def generate_data(self, average_age: int = None):

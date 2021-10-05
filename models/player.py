@@ -8,7 +8,6 @@ from models.base import Base
 class Player(Base):
     __tablename__ = 'player'
     id = Column(Integer, primary_key=True, index=True)
-    club_id = Column(Integer, ForeignKey('club.id'))
 
     created_time = Column(DateTime)
     name = Column(String)
@@ -60,7 +59,9 @@ class Player(Base):
     free_kick_limit = Column(Integer)
     stamina_limit = Column(Integer)
     goalkeeping_limit = Column(Integer)
+
+    club_id = Column(Integer, ForeignKey('club.id'))
     # 生涯数据
-    game_data = relationship('GamePlayerData', backref='player', lazy='subquery')
+    game_data = relationship('GamePlayerData', backref='player', lazy='select')
 
 # endregion

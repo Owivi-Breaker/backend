@@ -1,6 +1,7 @@
 [
   {
     "name": "英超",
+    "cup": "足总杯",
     "upper_league": "",
     "lower_league": "英冠",
     "points": 85,
@@ -129,6 +130,7 @@
   },
   {
     "name": "英冠",
+    "cup": "足总杯",
     "upper_league": "英超",
     "lower_league": "",
     "points": 65,

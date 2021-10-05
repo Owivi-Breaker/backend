@@ -122,6 +122,7 @@ class CoachGenerator:
         self.data['middle_attack'] = utils.get_mean_range(50, per_range=0.9)
         self.data['counter_attack'] = utils.get_mean_range(50, per_range=0.9)
         coach_model = self.save_in_db()
+        self.data = dict()  # 清空数据
         return coach_model
 
     def save_in_db(self) -> models.Coach:

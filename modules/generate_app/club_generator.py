@@ -18,6 +18,7 @@ class ClubGenerator:
         """
         self.data = dict(club_data)
         club_model = self.save_in_db()
+        self.data = dict()  # 清空数据
         return club_model
 
     def save_in_db(self) -> models.Club:

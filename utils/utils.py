@@ -1,6 +1,8 @@
 import random
 from pathlib import Path
 from decimal import *
+from utils import Date
+from typing import List
 
 
 def get_mean_range(*value, per_range: float = 0.1) -> float:
@@ -92,3 +94,18 @@ def plus_dict(a: dict, b: dict) -> dict:
         else:
             a[key] = value
     return a
+
+
+def date_range(start_year, start_month, start_day, end_year, end_month, end_day) -> List[str]:
+    """
+    生成时间序列
+    """
+    start_date = Date(start_year, start_month, start_day)
+    end_date = Date(end_year, end_month, end_day)
+    date_list = []
+    while True:
+        date_list.append(str(start_date))
+        if str(start_date) == str(end_date):
+            break
+        start_date.plus_days(1)
+    return date_list

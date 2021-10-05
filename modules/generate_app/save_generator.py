@@ -18,6 +18,7 @@ class SaveGenerator:
         """
         self.data = dict(save_data)
         save_model = self.save_in_db()
+        self.data = dict()  # 清空数据
         return save_model
 
     def save_in_db(self) -> models.Save:

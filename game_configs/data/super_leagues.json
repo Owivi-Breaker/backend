@@ -1,6 +1,7 @@
 [
   {
     "name": "世界超级联赛",
+    "cup": "世界足球巅峰赛",
     "upper_league": "",
     "lower_league": "世界冠军联赛",
     "points": 99,
@@ -129,6 +130,7 @@
   },
   {
     "name": "世界冠军联赛",
+    "cup": "世界足球巅峰赛",
     "upper_league": "世界超级联赛",
     "lower_league": "",
     "points": 80,
