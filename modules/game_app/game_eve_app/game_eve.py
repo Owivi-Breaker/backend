@@ -59,72 +59,77 @@ class GameEvE:
             self.update_player_data(player)
         for player in self.rteam.players:
             self.update_player_data(player)
+        self.db.commit()
 
     def update_player_data(self, player: game_eve_app.Player):
         """
         保存球员数据的改变
         :param player: 球员实例
         """
-        player_id = player.player_model.id
         lo = player.ori_location
         # region 记录场上位置数
         if lo == 'ST':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'ST_num': player.player_model.ST_num + 1})
         elif lo == 'CM':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'CM_num': player.player_model.CM_num + 1})
         elif lo == 'LW':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'LW_num': player.player_model.LW_num + 1})
         elif lo == 'RW':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'RW_num': player.player_model.RW_num + 1})
         elif lo == 'CB':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'CB_num': player.player_model.CB_num + 1})
         elif lo == 'LB':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'LB_num': player.player_model.LB_num + 1})
         elif lo == 'RB':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'RB_num': player.player_model.RB_num + 1})
         elif lo == 'GK':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'GK_num': player.player_model.GK_num + 1})
         elif lo == 'CAM':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'CAM_num': player.player_model.CAM_num + 1})
         elif lo == 'LM':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'LM_num': player.player_model.LM_num + 1})
         elif lo == 'RM':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'RM_num': player.player_model.RM_num + 1})
         elif lo == 'CDM':
-            crud.update_player(db=self.db, player_id=player_id,
+            self.update_player(player.player_model,
                                attri={'CDM_num': player.player_model.CDM_num + 1})
         else:
             logger.warning('没有球员对应的位置！')
         # endregion
         # region 能力成长
         if player.data['real_rating'] < 4:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.05))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.05))
         elif 4 <= player.data['real_rating'] < 5:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.1))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.1))
         elif 5 <= player.data['real_rating'] < 6:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.15))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.15))
         elif 6 <= player.data['real_rating'] < 7:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.2))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.2))
         elif 7 <= player.data['real_rating'] < 8:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.25))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.25))
         elif 8 <= player.data['real_rating'] < 9:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.3))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.3))
         elif player.data['real_rating'] >= 9:
-            crud.update_player(self.db, player_id, self.get_cap_improvement(player, 0.35))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.35))
         else:
             logger.error('没有球员相对应的评分！')
         # endregion
+
+    @staticmethod
+    def update_player(player_model: models.Player, attri: dict):
+        for key, value in attri.items():
+            setattr(player_model, key, value)
 
     @staticmethod
     def get_cap_improvement(player: game_eve_app.Player, value: float) -> Dict[str, float]:
@@ -203,12 +208,21 @@ class GameEvE:
             crud.update_game_team_data(db=self.db, game_team_data_id=game_team_data_model.id,
                                        attri={"game_team_info_id": game_team_info_model.id})
             # 保存GamePlayerData
+            game_player_data_model_list: List[models.GamePlayerData] = []
             for player in team.players:
                 game_player_data_schemas = player.export_game_player_data_schemas(created_time)
                 game_player_data_model = crud.create_game_player_data(db=self.db,
                                                                       game_player_data=game_player_data_schemas)
-                crud.update_game_player_data(db=self.db, game_player_data_id=game_player_data_model.id,
-                                             attri={"game_team_info_id": game_team_info_model.id})
+
+                # 将game_player_data_model放在一个列表里，统一commit
+                attri = {"game_team_info_id": game_team_info_model.id}
+                for key, value in attri.items():
+                    setattr(game_player_data_model, key, value)
+                game_player_data_model_list.append(game_player_data_model)
+
+                # crud.update_game_player_data(db=self.db, game_player_data_id=game_player_data_model.id,
+                #                              attri={"game_team_info_id": game_team_info_model.id})
+            self.db.commit()
 
     def add_script(self, text: str):
         """

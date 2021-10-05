@@ -36,9 +36,9 @@
   {
     "name": "CB",
     "offset": {
-      "interception": 0.5,
-      "anticipation": 0.2,
-      "strength": 0.2,
+      "interception": 0.4,
+      "anticipation": 0.25,
+      "strength": 0.25,
       "passing": 0.1
     }
   },
