@@ -11,7 +11,7 @@ import schemas
 import models
 import crud
 import game_configs
-from modules import generate_app, game_app
+from modules import generate_app, game_app, computed_data_app
 from utils import logger, Date
 
 
@@ -148,7 +148,7 @@ def start_game(test_num: int, league_id: int, db: Session):
                                                       player_club_id=player_club_id)
             tactic_adjustor.adjust()
             # 开始模拟比赛
-            game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, 'test', season)
+            game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, league_model.name, season)
             score1, score2 = game_eve.start()
             logger.info("{}: {} {}:{} {}".format(test_num, game[0].name, score1, score2, game[1].name))
         date.plus_days(7)
@@ -159,9 +159,27 @@ async def imitate_game_season(test_num: str, league_id: int, background_tasks: B
                               db: Session = Depends(get_db), ):
     """
     模拟指定联赛一个赛季的比赛
+    :param background_tasks: 后台任务参数
+    :param test_num: 标记
     :param league_id: 联赛id
     :param db: database
     :return:
     """
     background_tasks.add_task(start_game, test_num=test_num, league_id=league_id, db=db)
     return {"message": "正在比赛..."}
+
+
+@router.get('/points-table')
+def get_points_table(game_season: int, game_type: str, db: Session = Depends(get_db)):
+    # TODO 此处有sql注入问题
+    computed_game = computed_data_app.ComputedGame(db)
+    df = computed_game.get_season_points_table(game_season, game_type)
+    return computed_game.switch2json(df)
+
+
+@router.get('/player-chart')
+def get_player_chart(game_season: int, game_type: str, db: Session = Depends(get_db)):
+    # TODO 此处有sql注入问题
+    computed_game = computed_data_app.ComputedGame(db)
+    df = computed_game.get_season_player_chart(game_season, game_type)
+    return computed_game.switch2json(df)

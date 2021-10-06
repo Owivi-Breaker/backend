@@ -11,10 +11,15 @@ from typing import Dict, List, Tuple
 
 
 class ComputedPlayer:
-    def __init__(self, player_id: int, db: Session):
+    def __init__(self, player_id: int, db: Session, player_model: models.Player = None):
         self.db = db
         self.player_id = player_id
-        self.player_model = crud.get_player_by_id(db=self.db, player_id=self.player_id)
+
+        if player_model:
+            # 为了减少数据的读操作，可以传入现成的player_model
+            self.player_model = player_model
+        else:
+            self.player_model = crud.get_player_by_id(db=self.db, player_id=self.player_id)
 
     def get_show_data(self) -> schemas.PlayerShow:
         """

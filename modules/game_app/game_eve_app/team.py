@@ -23,6 +23,20 @@ class Team:
         self.score: int = 0  # 本方比分
 
         # self.data记录俱乐部场上数据
+        self.data = dict()
+        self.init_data()
+
+    def reset(self):
+        """
+        重置所有数据
+        """
+        self.init_tactic()
+        self.score = 0
+        self.init_data()
+        for player in self.players:
+            player.reset()
+
+    def init_data(self):
         self.data = {
             'attempts': 0,
             "wing_cross": 0,
