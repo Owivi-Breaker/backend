@@ -12,6 +12,7 @@ from typing import List, Dict
 from fastapi import Depends
 from core.db import get_db
 from sqlalchemy.orm import Session
+import random
 
 
 class PlayerSelector:
@@ -20,21 +21,31 @@ class PlayerSelector:
         self.club_id = club_id
         self.club_model = crud.get_club_by_id(db=self.db, club_id=self.club_id)
 
-    def select_players(self) -> (List[models.Player], List[str]):
+    def select_players(self, is_random: bool = True) -> (List[models.Player], List[str]):
         """
         选人
         :return: (选定球员, 选定球员对应的位置)
         """
-
-        players_model1, locations_list1 = self.select_players1(self.club_model.players, self.club_model.coach.formation)
-        players_model2, locations_list2 = self.select_players2(self.club_model.players, self.club_model.coach.formation)
-
-        capa1 = self.get_total_capa(players_model1, locations_list1)
-        capa2 = self.get_total_capa(players_model2, locations_list2)
-        if capa1 >= capa2:
-            players_model, locations_list = players_model1, locations_list1
+        if is_random:
+            a = random.choice([1, 2])
+            if a == 1:
+                players_model, locations_list = self.select_players1(self.club_model.players,
+                                                                     self.club_model.coach.formation)
+            else:
+                players_model, locations_list = self.select_players2(self.club_model.players,
+                                                                     self.club_model.coach.formation)
         else:
-            players_model, locations_list = players_model2, locations_list2
+            players_model1, locations_list1 = self.select_players1(self.club_model.players,
+                                                                   self.club_model.coach.formation)
+            players_model2, locations_list2 = self.select_players2(self.club_model.players,
+                                                                   self.club_model.coach.formation)
+
+            capa1 = self.get_total_capa(players_model1, locations_list1)
+            capa2 = self.get_total_capa(players_model2, locations_list2)
+            if capa1 >= capa2:
+                players_model, locations_list = players_model1, locations_list1
+            else:
+                players_model, locations_list = players_model2, locations_list2
 
         return players_model, locations_list
 
