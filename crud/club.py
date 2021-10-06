@@ -13,7 +13,7 @@ def create_club(db: Session, club: schemas.ClubCreate):
 
 
 def update_club(db: Session, club_id: int, attri: dict):
-    db_club = db.query(models.Club).filter(models.Club.id == club_id).first()
+    db_club: models.Club = db.query(models.Club).filter(models.Club.id == club_id).first()
     for key, value in attri.items():
         setattr(db_club, key, value)
     db.commit()

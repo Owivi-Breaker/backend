@@ -9,10 +9,12 @@ import random
 from typing import Dict, List, Sequence, Set, Tuple, Optional
 import datetime
 from sqlalchemy.orm import Session
+import time
 
 
 class GameEvE:
-    def __init__(self, db: Session, club1_id: int, club2_id: int, date: Date, game_type: str,season:int):
+    def __init__(self, db: Session, club1_id: int, club2_id: int,
+                 date: Date, game_type: str = 'test', season: int = 0):
         self.db = db
         self.lteam = game_eve_app.Team(self, club1_id)
         self.rteam = game_eve_app.Team(self, club2_id)
@@ -21,7 +23,7 @@ class GameEvE:
         self.type = game_type
         self.season = season
 
-    def start(self) -> Tuple[int, int]:
+    def start(self) -> Tuple:
         """
         开始比赛
         :return: 比分元组
@@ -49,7 +51,56 @@ class GameEvE:
         self.rate()  # 球员评分
         self.save_in_db()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
+
         return self.lteam.score, self.rteam.score
+
+    def tactical_start(self):
+        """
+        用于战术调整的模拟比赛
+        :return: 两队的战术数据
+        """
+        tactic = dict()
+        tactic['wing_cross'] = 50
+        tactic['under_cutting'] = 50
+        tactic['pull_back'] = 50
+        tactic['middle_attack'] = 50
+        tactic['counter_attack'] = 50
+        self.lteam.tactic = tactic
+        self.rteam.tactic = tactic
+
+        s = time.time()
+        for i in range(100):
+            self.set_full_stamina()
+            # 模拟一场比赛
+            hold_ball_team, no_ball_team = self.init_hold_ball_team()
+            counter_attack_permitted = False
+            for _ in range(50):
+                # 确定本次战术组织每个球员的场上位置
+                self.lteam.shift_location()
+                self.rteam.shift_location()
+                original_score = (self.lteam.score, self.rteam.score)
+                # 执行进攻战术
+                exchange_ball = hold_ball_team.attack(no_ball_team, counter_attack_permitted)
+                if exchange_ball:
+                    hold_ball_team, no_ball_team = self.exchange_hold_ball_team(hold_ball_team)
+                if exchange_ball and original_score == (self.lteam.score, self.rteam.score):
+                    # 若球权易位且比分未变，允许使用防守反击
+                    counter_attack_permitted = True
+                else:
+                    counter_attack_permitted = False
+        e = time.time()
+        logger.info("100场模拟比赛耗时{}秒".format(str(e - s)))
+        # 返回队伍战术执行数据
+        return self.lteam.data, self.rteam.data
+
+    def set_full_stamina(self):
+        """
+        初始化所有球员的体力
+        """
+        for player in self.lteam.players:
+            player.stamina = player.data['original_stamina']
+        for player in self.rteam.players:
+            player.stamina = player.data['original_stamina']
 
     def update_players_data(self):
         """

@@ -260,9 +260,8 @@ class Team:
             self.add_script('{}阻截了{}的进攻'.format(defender.name, attacker.name))
             return False
 
-    def sprint_dribble_and_block(self, attackers: List[game_eve_app.Player], defenders: List[game_eve_app.Player]) -> \
-            Tuple[
-                bool, game_eve_app.Player]:
+    def sprint_dribble_and_block(self, attackers: List[game_eve_app.Player],
+                                 defenders: List[game_eve_app.Player]) -> Tuple[bool, game_eve_app.Player]:
         """
         冲刺、过人与抢断，多对多
         :param attackers: 进攻球员组
@@ -498,7 +497,7 @@ class Team:
                 state = self.pass_ball(win_player, rival_team.get_average_capability('passing'))
                 if state:
                     shooters = self.get_location_players((game_configs.Location.ST, game_configs.Location.CM))
-                    if shooters:
+                    if not shooters:
                         return True
                     shooter = random.choice(shooters)
                     goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]

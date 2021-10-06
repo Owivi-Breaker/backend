@@ -118,7 +118,11 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
 
 def start_game(test_num: int, league_id: int, db: Session):
     league_model = crud.get_league_by_id(db=db, league_id=league_id)
-    season = crud.get_save_by_id(db=db, save_id=league_model.save_id).season  # 获取赛季序号的方式不够优雅，要改
+    # TODO 获取赛季序号和玩家俱乐部id的方式不够优雅，要改
+    save_model = crud.get_save_by_id(db=db, save_id=league_model.save_id)
+    season = save_model.season
+    player_club_id = save_model.player_club_id
+
     clubs = league_model.clubs
 
     clubs_a = random.sample(clubs, len(clubs) // 2)  # 随机挑一半
@@ -139,9 +143,14 @@ def start_game(test_num: int, league_id: int, db: Session):
         # 进行每一轮比赛
         logger.info('{} 的比赛'.format(str(date)))
         for game in games:
-            logger.info("{}: {}对{}".format(test_num, game[0].name, game[1].name))
+            # 调整战术比重
+            tactic_adjustor = game_app.TacticAdjustor(db=db, club1_id=game[0].id, club2_id=game[1].id,
+                                                      player_club_id=player_club_id)
+            tactic_adjustor.adjust()
+            # 开始模拟比赛
             game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, 'test', season)
-            game_eve.start()
+            score1, score2 = game_eve.start()
+            logger.info("{}: {} {}:{} {}".format(test_num, game[0].name, score1, score2, game[1].name))
         date.plus_days(7)
 
 
