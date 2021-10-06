@@ -1,5 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
+from sqlalchemy import or_,and_
 
 import models
 import schemas

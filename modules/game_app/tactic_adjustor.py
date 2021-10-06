@@ -18,12 +18,13 @@ class TacticAdjustor:
         self.player_club_id = player_club_id
 
     def adjust(self):
-        lteam_data = dict()
-        rteam_data = dict()
+        """
+        调整战术比重
+        """
         game = game_app.GameEvE(db=self.db,
                                 club1_id=self.club1_id, club2_id=self.club2_id,
                                 date=Date(1970, 1, 1))
-        lteam_data, rteam_data = game.tactical_start()
+        lteam_data, rteam_data = game.tactical_start(num=20)
 
         tactic_pro1 = dict()
         tactic_pro1['wing_cross'] = int((lteam_data['wing_cross_success'] / lteam_data['wing_cross']) * 1000) + 5

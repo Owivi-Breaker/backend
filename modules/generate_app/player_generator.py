@@ -1,8 +1,9 @@
 import models
-from utils import utils
+from utils import utils, logger
 import game_configs
 import crud
 import schemas
+from modules import computed_data_app
 
 import random
 import json
@@ -138,7 +139,7 @@ class PlayerGenerator:
         """
         ori_mean_capa = self.ori_mean_capa
         if local_nationality in game_configs.country_potential.keys():
-            return int(utils.normalvariate(ori_mean_capa + game_configs.country_potential[local_nationality], 6))
+            return int(utils.normalvariate(ori_mean_capa + game_configs.country_potential[local_nationality], 5))
         else:
             return float(utils.retain_decimal(int(utils.normalvariate(ori_mean_capa, 6))))
 
@@ -165,24 +166,44 @@ class PlayerGenerator:
             # 选择一个位置
             original_location = dict()
             if location:
-                for x in game_configs.capa_potential:
+                for x in game_configs.location_capability:
                     if x['name'] == location:
                         original_location = x
                         break
             else:
-                original_location = random.choice(game_configs.capa_potential)
+                original_location = random.choice(game_configs.location_capability)
             self.data[original_location['name'] + '_num'] = 1
             # 重写一遍位置对应的能力与潜力
 
-            # ps: 其实这样不是最好的办法。。因为每个能力对位置的影响力是不同的。。。不过再说啦
-            for capa in original_location['offset'].keys():
+            # 正态分布获取一个预期的综合能力值
+            target_lo_capa = min(self.get_capa(self.data['translated_nationality']), 88)
+
+            while True:
+                # 模拟球员按照位置权重成长的过程
+                capa_name = utils.select_by_pro(original_location['weight'])
+                if self.data[capa_name] <= 90:
+                    # 防止溢出
+                    self.data[capa_name] += 1
+                # 获取综合能力值
+                lo_capa = 0
+                for capa, weight in original_location['weight'].items():
+                    lo_capa += self.data[capa] * weight
+                if lo_capa >= target_lo_capa:
+                    # logger.info("综合能力为{}".format(lo_capa))
+                    break
+
+            for capa in original_location['weight'].keys():
                 # 把这个位置相应的潜力设置以ori_mean_potential_capa正态分布的值
-                self.data[capa + '_limit'] = self.get_capa_potential(
-                    self.data['translated_nationality'])
-                # 把这个位置相应的能力力设置以ori_mean_capa正态分布的值
+                self.data[capa + '_limit'] = max(self.get_capa_potential(
+                    self.data['translated_nationality']), int(self.data[capa]) + 1)
+                # 保证能力不超过上限
                 self.data[capa] = self.adjust_capa(
-                    self.get_capa(self.data['translated_nationality']),
-                    self.data[capa + '_limit'])
+                    self.data[capa], self.data[capa + '_limit'])
+            # 额外设置体力
+            self.data['stamina'] = self.adjust_capa(
+                self.get_capa(self.data['translated_nationality']),
+                self.data['stamina_limit'])
+
         else:
             # 生成年轻球员
             self.generate_data()
@@ -217,7 +238,7 @@ class PlayerGenerator:
             self.data['nationality'], self.data['translated_nationality'] = self.get_nationality()
         # 年龄
         if average_age:
-            self.data['age'] = utils.get_mean_range(average_age, per_range=0.3)
+            self.data['age'] = utils.get_mean_range(average_age, per_range=0.2)
         else:
             self.data['age'] = 15
         self.data['height'] = self.get_height()

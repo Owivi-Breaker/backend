@@ -109,3 +109,13 @@ def date_range(start_year, start_month, start_day, end_year, end_month, end_day)
             break
         start_date.plus_days(1)
     return date_list
+
+
+def get_key_with_max_value(_dict: dict):
+    """
+    获取拥有最大值的键名
+    :param _dict: 字典
+    :return: 键名
+    """
+    result = max(_dict, key=lambda x: _dict[x])
+    return result

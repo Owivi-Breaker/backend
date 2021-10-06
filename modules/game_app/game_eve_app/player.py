@@ -15,12 +15,21 @@ class Player:
         self.db = db
         self.player_model = player_model
         self.name = player_model.translated_name  # 解说用
-        self.ori_location = location  # 原本位置
+        self.ori_location = location  # 原本位置，不会变
         self.real_location = location  # 每个回合变化后的实时位置
         self.capa = dict()  # 球员能力字典
         self.init_capa()
         self.stamina = player_model.real_stamina  # 初始体力，会随着比赛进行而减少
         # self.data记录球员场上数据
+        self.data = dict()
+        self.init_data()
+
+    def reset(self):
+        self.init_capa()
+        self.stamina = self.player_model.real_stamina
+        self.init_data()
+
+    def init_data(self):
         self.data = {
             "original_stamina": self.stamina,  # 初始体力
             "actions": 0,
@@ -44,21 +53,10 @@ class Player:
     def init_capa(self):
         """
         将球员的各项能力值读入self.rating中
-        TODO 读入球员经过年龄滤镜后的真实能力
         """
-        computed_player = computed_data_app.ComputedPlayer(player_id=self.player_model.id, db=self.db)
+        computed_player = computed_data_app.ComputedPlayer(player_id=self.player_model.id, db=self.db,
+                                                           player_model=self.player_model)
         self.capa = computed_player.get_all_capa()
-        self.capa['shooting'] = self.player_model.shooting
-        self.capa['passing'] = self.player_model.passing
-        self.capa['dribbling'] = self.player_model.dribbling
-        self.capa['interception'] = self.player_model.interception
-        self.capa['pace'] = self.player_model.pace
-        self.capa['strength'] = self.player_model.strength
-        self.capa['aggression'] = self.player_model.aggression
-        self.capa['anticipation'] = self.player_model.anticipation
-        self.capa['free_kick'] = self.player_model.free_kick
-        self.capa['stamina'] = self.player_model.stamina  # 注意，这个是体力“能力”，不是真正的体力！
-        self.capa['goalkeeping'] = self.player_model.goalkeeping
 
     def export_game_player_data_schemas(self, created_time=datetime.datetime.now()) -> schemas.GamePlayerDataCreate:
         """

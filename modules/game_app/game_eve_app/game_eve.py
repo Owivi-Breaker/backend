@@ -28,6 +28,12 @@ class GameEvE:
         开始比赛
         :return: 比分元组
         """
+        # 战术调整
+        # self.adjust_tactic(*self.tactical_start(num=10))
+        # # 重置队伍、球员信息
+        # self.lteam.reset()
+        # self.rteam.reset()
+
         self.add_script('比赛开始！')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
@@ -54,7 +60,7 @@ class GameEvE:
 
         return self.lteam.score, self.rteam.score
 
-    def tactical_start(self):
+    def tactical_start(self, num: int = 20):
         """
         用于战术调整的模拟比赛
         :return: 两队的战术数据
@@ -68,8 +74,7 @@ class GameEvE:
         self.lteam.tactic = tactic
         self.rteam.tactic = tactic
 
-        s = time.time()
-        for i in range(100):
+        for i in range(num):
             self.set_full_stamina()
             # 模拟一场比赛
             hold_ball_team, no_ball_team = self.init_hold_ball_team()
@@ -88,10 +93,40 @@ class GameEvE:
                     counter_attack_permitted = True
                 else:
                     counter_attack_permitted = False
-        e = time.time()
-        logger.info("100场模拟比赛耗时{}秒".format(str(e - s)))
+        # logger.info("{}场模拟比赛耗时{}秒".format(num, str(e - s)))
         # 返回队伍战术执行数据
         return self.lteam.data, self.rteam.data
+
+    def adjust_tactic(self, lteam_data, rteam_data, player_club_id: int = 0):
+        """
+        调整两队的战术比重
+        """
+        tactic_pro1 = dict()
+        tactic_pro1['wing_cross'] = int((lteam_data['wing_cross_success'] / lteam_data['wing_cross']) * 1000) + 5
+        tactic_pro1['under_cutting'] = int(
+            (lteam_data['under_cutting_success'] / lteam_data['under_cutting']) * 1000) + 5
+        tactic_pro1['pull_back'] = int((lteam_data['pull_back_success'] / lteam_data['pull_back']) * 1000) + 5
+        tactic_pro1['middle_attack'] = int(
+            (lteam_data['middle_attack_success'] / lteam_data['middle_attack']) * 1000) + 5
+        tactic_pro1['counter_attack'] = int(
+            (lteam_data['counter_attack_success'] / lteam_data['counter_attack']) * 1000) + 5
+
+        tactic_pro2 = dict()
+        tactic_pro2['wing_cross'] = int((rteam_data['wing_cross_success'] / rteam_data['wing_cross']) * 1000) + 5
+        tactic_pro2['under_cutting'] = int(
+            (rteam_data['under_cutting_success'] / rteam_data['under_cutting']) * 1000) + 5
+        tactic_pro2['pull_back'] = int((rteam_data['pull_back_success'] / rteam_data['pull_back']) * 1000) + 5
+        tactic_pro2['middle_attack'] = int(
+            (rteam_data['middle_attack_success'] / rteam_data['middle_attack']) * 1000) + 5
+        tactic_pro2['counter_attack'] = int(
+            (rteam_data['counter_attack_success'] / rteam_data['counter_attack']) * 1000) + 5
+
+        if self.lteam.club_id != player_club_id:
+            coach_id = crud.get_club_by_id(db=self.db, club_id=self.lteam.club_id).coach.id
+            crud.update_coach(db=self.db, coach_id=coach_id, attri=tactic_pro1)
+        if self.rteam.club_id != player_club_id:
+            coach_id = crud.get_club_by_id(db=self.db, club_id=self.rteam.club_id).coach.id
+            crud.update_coach(db=self.db, coach_id=coach_id, attri=tactic_pro2)
 
     def set_full_stamina(self):
         """
@@ -216,8 +251,9 @@ class GameEvE:
         result = dict()
         for capa in improvement:
             limit = eval('player.player_model.{}_limit'.format(capa))
-            if player.capa[capa] + value <= limit:
-                result[capa] = float(utils.retain_decimal(player.capa[capa] + value))
+            real_capa = eval('player.player_model.{}'.format(capa))
+            if real_capa + value <= limit:
+                result[capa] = float(utils.retain_decimal(real_capa + value))
             else:
                 result[capa] = limit
         return result

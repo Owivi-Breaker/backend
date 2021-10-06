@@ -21,3 +21,4 @@ class Club(Base):
     league_id = Column(Integer, ForeignKey('league.id'))
     coach = relationship("Coach", uselist=False, backref="club", lazy='select')
     players = relationship("Player", backref="club", lazy='select')
+    game_team_info = relationship("GameTeamInfo", backref="club", lazy='select')
