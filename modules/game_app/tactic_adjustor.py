@@ -18,6 +18,9 @@ class TacticAdjustor:
         self.player_club_id = player_club_id
 
     def adjust(self):
+        """
+        调整战术比重
+        """
         game = game_app.GameEvE(db=self.db,
                                 club1_id=self.club1_id, club2_id=self.club2_id,
                                 date=Date(1970, 1, 1))

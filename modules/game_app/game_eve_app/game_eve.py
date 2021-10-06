@@ -251,8 +251,9 @@ class GameEvE:
         result = dict()
         for capa in improvement:
             limit = eval('player.player_model.{}_limit'.format(capa))
-            if player.capa[capa] + value <= limit:
-                result[capa] = float(utils.retain_decimal(player.capa[capa] + value))
+            real_capa = eval('player.player_model.{}'.format(capa))
+            if real_capa + value <= limit:
+                result[capa] = float(utils.retain_decimal(real_capa + value))
             else:
                 result[capa] = limit
         return result

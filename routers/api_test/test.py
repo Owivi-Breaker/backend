@@ -75,7 +75,7 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
                 for i in range(num):
                     player_model = player_generator.generate(ori_mean_capa=club['ori_mean_capa'],
                                                              ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                                                             average_age=30, location=lo)
+                                                             average_age=26, location=lo)
                     player_model_list.append(player_model)
                     # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
 
@@ -83,7 +83,7 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
                 # 随机生成7名任意位置成年球员
                 player_model = player_generator.generate(ori_mean_capa=club['ori_mean_capa'],
                                                          ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                                                         average_age=30)
+                                                         average_age=26)
                 player_model_list.append(player_model)
                 # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
             for _ in range(6):

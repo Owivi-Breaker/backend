@@ -77,8 +77,8 @@ class ComputedPlayer:
         location_capa = 0
         if not weight_dict:
             logger.error('没有找到对应位置！')
-        for lo, weight in weight_dict.items():
-            location_capa += self.get_capa(lo) * weight
+        for capa_name, weight in weight_dict.items():
+            location_capa += self.get_capa(capa_name) * weight
         return location_capa
 
     def get_sorted_location_capa(self) -> List[List]:
@@ -91,7 +91,7 @@ class ComputedPlayer:
             location_capa.append(
                 [location['name'], self.get_location_capa(location['name'])]
             )
-            location_capa = sorted(location_capa, key=lambda x: -x[1])
+        location_capa = sorted(location_capa, key=lambda x: -x[1])
         return location_capa
 
     def get_top_capa_n_location(self) -> Tuple[float, str]:
