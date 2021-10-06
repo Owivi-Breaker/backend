@@ -118,6 +118,7 @@ def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Sav
 
 def start_game(test_num: int, league_id: int, db: Session):
     league_model = crud.get_league_by_id(db=db, league_id=league_id)
+    season = crud.get_save_by_id(db=db, save_id=league_model.save_id).season  # 获取赛季序号的方式不够优雅，要改
     clubs = league_model.clubs
 
     clubs_a = random.sample(clubs, len(clubs) // 2)  # 随机挑一半
@@ -139,7 +140,7 @@ def start_game(test_num: int, league_id: int, db: Session):
         logger.info('{} 的比赛'.format(str(date)))
         for game in games:
             logger.info("{}: {}对{}".format(test_num, game[0].name, game[1].name))
-            game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, 'test')
+            game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, 'test', season)
             game_eve.start()
         date.plus_days(7)
 

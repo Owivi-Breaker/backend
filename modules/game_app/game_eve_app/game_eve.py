@@ -12,14 +12,14 @@ from sqlalchemy.orm import Session
 
 
 class GameEvE:
-    def __init__(self, db: Session, club1_id: int, club2_id: int, date: Date, game_type: str):
+    def __init__(self, db: Session, club1_id: int, club2_id: int, date: Date, game_type: str,season:int):
         self.db = db
-        # TODO game_type 改为联赛 id 或杯赛 id
         self.lteam = game_eve_app.Team(self, club1_id)
         self.rteam = game_eve_app.Team(self, club2_id)
         self.date = str(date)
         self.script = ''
         self.type = game_type
+        self.season = season
 
     def start(self) -> Tuple[int, int]:
         """
@@ -181,7 +181,7 @@ class GameEvE:
             'type': self.type,
             'created_time': created_time,
             'date': self.date,
-            'season': self.date[:4],
+            'season': self.season,
             'script': self.script,
             'mvp': self.get_highest_rating_player().player_model.id
         }
