@@ -212,6 +212,9 @@ class GameEvE:
             logger.error('没有球员相对应的评分！')
         # endregion
 
+        # region TODO 剩余体力保存
+        # endregion
+
     @staticmethod
     def update_player(player_model: models.Player, attri: dict):
         for key, value in attri.items():

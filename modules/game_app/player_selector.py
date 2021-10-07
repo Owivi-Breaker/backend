@@ -8,7 +8,7 @@ import game_configs
 from utils import logger, utils
 from modules.computed_data_app import ComputedPlayer
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 from fastapi import Depends
 from core.db import get_db
 from sqlalchemy.orm import Session
@@ -16,10 +16,13 @@ import random
 
 
 class PlayerSelector:
-    def __init__(self, club_id: int, db: Session):
+    def __init__(self, club_id: int, db: Session, club_model: Optional[models.Club] = None):
         self.db = db
         self.club_id = club_id
-        self.club_model = crud.get_club_by_id(db=self.db, club_id=self.club_id)
+        if club_model:
+            self.club_model = club_model
+        else:
+            self.club_model = crud.get_club_by_id(db=self.db, club_id=self.club_id)
 
     def select_players(self, is_random: bool = True) -> (List[models.Player], List[str]):
         """
