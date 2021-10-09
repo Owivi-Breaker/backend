@@ -29,8 +29,8 @@
     "name": "CM",
     "offset": {
       "passing": 0.6,
-      "stamina": 0.3,
-      "shooting": 0.1
+      "stamina": 0.2,
+      "shooting": 0.2
     }
   },
   {

@@ -8,3 +8,5 @@ fastapi
 uvicorn[standard]
 passlib
 python-jose[cryptography]
+python-multipart
+bcrypt
