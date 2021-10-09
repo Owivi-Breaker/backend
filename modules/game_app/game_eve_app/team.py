@@ -65,7 +65,7 @@ class Team:
         """
         挑选球员，写入self.players中
         """
-        player_selector = PlayerSelector(self.club_id, self.game.db)
+        player_selector = PlayerSelector(club_id=self.club_id, db=self.game.db, club_model=self.team_model)
         players_model, locations_list = player_selector.select_players()
         for player_model, location in zip(players_model, locations_list):
             self.players.append(game_eve_app.Player(self.game.db, player_model, location))

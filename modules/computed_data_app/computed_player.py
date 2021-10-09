@@ -7,11 +7,11 @@ import crud
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from core.db import get_db
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 
 class ComputedPlayer:
-    def __init__(self, player_id: int, db: Session, player_model: models.Player = None):
+    def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None):
         self.db = db
         self.player_id = player_id
 
