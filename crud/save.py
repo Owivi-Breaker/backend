@@ -23,3 +23,8 @@ def update_save(db: Session, save_id: int, attri: dict):
 def get_save_by_id(db: Session, save_id: int):
     db_save = db.query(models.Save).filter(models.Save.id == save_id).first()
     return db_save
+
+
+def get_save_by_user(db: Session, user_id: int):
+    db_save = db.query(models.Save).filter(models.Save.user_id == user_id).offset(0).limit(100).all()
+    return db_save

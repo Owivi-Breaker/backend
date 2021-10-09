@@ -5,3 +5,5 @@ from crud.club import *
 from crud.league import *
 from crud.save import *
 from crud.calendar import *
+from crud.user import *
+from crud.save import *
