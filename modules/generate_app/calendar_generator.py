@@ -26,6 +26,7 @@ class CalendarGenerator:
         """
         self.generate_league_games()
         self.generate_cup_games(game_type="cup32to16")
+        self.generate_champions_league_games(game_type='champions_group')
         self.generate_transfer_days()
         self.turn_dict2str()
 
@@ -108,12 +109,21 @@ class CalendarGenerator:
                     lower_league = crud.get_league_by_id(db=self.db, league_id=league_model.lower_league)
 
                     clubs: List[models.Club] = league_model.clubs.copy()  # 参赛俱乐部
-                    for club in lower_league.clubs:
-                        # TODO 按排名选择二级联赛的队伍
-                        # 把参赛俱乐部数量填充到32支：所有一级联赛俱乐部+部分二级联赛俱乐部
-                        clubs.append(club)
-                        if len(clubs) == 32:
-                            break
+                    # 把参赛俱乐部数量填充到32支：所有一级联赛俱乐部+部分二级联赛俱乐部
+                    if self.save_model.season == 1:
+                        # 如果是初始赛季，低级联赛的12支队伍随便选
+                        clubs.extend(random.sample(lower_league.clubs, 32 - len(clubs)))
+                    else:
+                        # 按排名选择二级联赛的队伍
+                        computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                        top_clubs = computed_game.get_top_clubs_model(
+                            num=(32 - len(clubs)),
+                            game_season=self.save_model.season - 1,
+                            game_name=league_model.name,
+                        )
+                        clubs.extend(top_clubs)
+                    if len(clubs) != 32:
+                        logger.error('cup32to16 数量错误!')
                     clubs_a = random.sample(clubs, 16)  # 随机挑一半
                     clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
                     two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
@@ -141,7 +151,7 @@ class CalendarGenerator:
                 if not league_model.upper_league:
                     # 生成一个联赛的16进8杯赛赛事
                     computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
-                    clubs_id = computed_game.get_game_winner(
+                    clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup32to16',
                         game_name=league_model.cup
@@ -175,7 +185,7 @@ class CalendarGenerator:
                 if not league_model.upper_league:
                     # 生成一个联赛的8进4杯赛赛事
                     computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
-                    clubs_id = computed_game.get_game_winner(
+                    clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup16to8',
                         game_name=league_model.cup
@@ -209,7 +219,7 @@ class CalendarGenerator:
                 if not league_model.upper_league:
                     # 生成一个联赛的4进2杯赛赛事
                     computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
-                    clubs_id = computed_game.get_game_winner(
+                    clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup8to4',
                         game_name=league_model.cup
@@ -243,7 +253,7 @@ class CalendarGenerator:
                 if not league_model.upper_league:
                     # 生成一个联赛的2进1杯赛赛事
                     computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
-                    clubs_id = computed_game.get_game_winner(
+                    clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup4to2',
                         game_name=league_model.cup
@@ -264,6 +274,7 @@ class CalendarGenerator:
                         league_game["pve"].append(one_game_dict)
                     else:
                         league_game["eve"].append(one_game_dict)
+                    self.add_dict(str(date), league_game)
         else:
             logger.error("无{}赛程".format(game_type))
 
@@ -274,47 +285,87 @@ class CalendarGenerator:
         :return:
         """
         year, month, day = self.save_model.time.split('-')
-        if game_type == "champions_league_group":
-            # TODO 欸，没写呢
-            # 一般是在赛季开始初始化日程表时，生成32进16的赛事
+        if game_type == "champions_group":
+            if self.save_model.season == 1:
+                # 第一赛季无欧冠
+                return
+            # 选32支俱乐部
+            clubs_model_list: List[models.Club] = []
+            computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+            lower_the_third: List[models.Club] = []
             for league_model in self.save_model.leagues:
                 if not league_model.upper_league:
-                    # 生成一个联赛的杯赛赛事
-                    lower_league = crud.get_league_by_id(db=self.db, league_id=self.save_model.lower_league)
+                    # 每个甲级联赛前四名
+                    top_clubs = computed_game.get_top_clubs_model(
+                        num=4,
+                        game_season=self.save_model.season - 1,
+                        game_name=league_model.name,
+                    )
+                    clubs_model_list.extend(top_clubs)
+                else:
+                    # 每个乙级联赛前两名
+                    top_clubs = computed_game.get_top_clubs_model(
+                        num=3,
+                        game_season=self.save_model.season - 1,
+                        game_name=league_model.name,
+                    )
+                    clubs_model_list.extend(top_clubs[:2])
+                    lower_the_third.append(top_clubs[-1])
+            # 乙级联赛声望最高的两个第三名
+            lower_the_third = sorted(lower_the_third, key=lambda x: x.reputation, reverse=True)
+            clubs_model_list.extend(lower_the_third[:2])
+            if len(clubs_model_list) != 32:
+                logger.error("champions_league_group 数量错误!")
+            # 添加赛程
+            random.shuffle(clubs_model_list)  # 乱序
+            for i in range(8):
+                # 八个小组，每组四支队伍
+                group = clubs_model_list[(i * 4):(i * 4 + 4)]
+                # 构建比赛日程
+                group_a = group[:2]
+                group_b = group[2:]
+                schedule = []  # 比赛赛程
+                for _ in range((len(group) - 1)):
+                    # 前半赛季的比赛
+                    schedule.append([game for game in zip(group_a, group_b)])
+                    group_a.insert(1, group_b.pop(0))
+                    group_b.append(group_a.pop(-1))
+                schedule_reverse = []  # 主客场对调的后半赛季赛程
+                for games in schedule:
+                    schedule_reverse.append([tuple(list(x)[::-1]) for x in games])
+                schedule.extend(schedule_reverse)
 
-                    clubs: List[models.Club] = league_model.clubs  # 参赛俱乐部
-                    for club in lower_league.clubs:
-                        # 把参赛俱乐部数量填充到32支：所有一级联赛俱乐部+部分二级联赛俱乐部
-                        clubs.append(club)
-                        if len(clubs) == 32:
-                            break
-                    clubs_a = random.sample(clubs, 16)  # 随机挑一半
-                    clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
-                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
-                    one_day_schedule = [two_days_schedule[:8], two_days_schedule[8:]]
-                    date = Date(int(year), 8, 24)
-                    for schedule in one_day_schedule:
-                        for games in schedule:
-                            league_game = dict()
-                            league_game["eve"] = []
-                            league_game["pve"] = []
-                            for game in games:
-                                one_game_dict = dict()
-                                one_game_dict['game_name']='champions_league'
-                                one_game_dict["game_type"] = "champion32to16"
-                                one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
-                                if game[0].id == self.save_model.player_club_id or \
-                                        game[1].id == self.save_model.player_club_id:
-                                    league_game["pve"].append(one_game_dict)
-                                else:
-                                    league_game["eve"].append(one_game_dict)
-                            self.add_dict(str(date), league_game)
-                        date.plus_days(1)
+                date = Date(int(year), 9, 15)
+                for games in schedule:
+                    league_game = dict()
+                    league_game["eve"] = []
+                    league_game["pve"] = []
+                    for game in games:
+                        one_game_dict = dict()
+                        one_game_dict["game_name"] = 'champions_league'
+                        one_game_dict["game_type"] = "champions_group"
+                        one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
+                        if game[0].id == self.save_model.player_club_id or \
+                                game[1].id == self.save_model.player_club_id:
+                            league_game["pve"].append(one_game_dict)
+                        else:
+                            league_game["eve"].append(one_game_dict)
+                    self.add_dict(str(date), league_game)
+                    date.plus_days(14)
+        elif game_type == "champions16to8":
+            pass
+        elif game_type == "champions8to4":
+            pass
+        elif game_type == "champions4to2":
+            pass
+        elif game_type == "champions2to1":
+            pass
+        else:
+            logger.error("无{}赛程".format(game_type))
 
     def generate_transfer_days(self):
         """
         生成转会日
-        :return:
         """
         year, month, day = self.save_model.time.split('-')
         # 夏窗

@@ -100,7 +100,7 @@ def start_season_games(db: Session, save_id: int, years: int = 0):
 
 @router.get('/imitate_game_season')
 async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, years: int = 1,
-                              db: Session = Depends(get_db), ):
+                              db: Session = Depends(get_db)):
     """
     模拟指定存档中一个赛季的比赛
     :param years: 赛季数

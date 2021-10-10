@@ -31,22 +31,25 @@ class ComputedGame:
     def switch2csv(data: pd.DataFrame) -> str:
         return data.to_csv(index=False)
 
-    def get_season_points_table(self, game_season: int, game_name: str) -> pd.DataFrame:
+    def get_season_points_table(self, game_season: int, game_name: str, game_type: str = None) -> pd.DataFrame:
         """
         获取赛季积分榜
-        :param save_id: 存档id
         :param game_name: 比赛名
         :param game_season: 赛季序号
+        :param game_type: 比赛类型
         :return: df
         """
-        query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.name=='{}')".format(
-            self.save_id, int(game_season), game_name)
+        if game_type:
+            query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.name=='{}', models.Game.type=='{}')".format(
+                self.save_id, int(game_season), game_name, game_type)
+        else:
+            query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.name=='{}')".format(
+                self.save_id, int(game_season), game_name)
         games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         points_dict = dict()
         for game in games:
             team1 = game.teams[0]
             team2 = game.teams[1]
-
             if team1.club.name not in points_dict.keys():
                 points_dict[team1.club.name] = dict()
                 points_dict[team1.club.name]['id'] = team1.club_id
@@ -93,15 +96,15 @@ class ComputedGame:
         df.insert(7, '净胜球', s)
         return df.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
 
-    def get_season_player_chart(self, game_season: int, game_type: str) -> pd.DataFrame:
+    def get_season_player_chart(self, game_season: int, game_name: str) -> pd.DataFrame:
         """
         获取赛季球员数据
-        :param game_type: 比赛类型
+        :param game_name: 比赛类型
         :param game_season: 赛季序号
         :return: df
         """
-        query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
-            self.save_id, int(game_season), game_type)
+        query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.name=='{}')".format(
+            self.save_id, int(game_season), game_name)
         games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         player_data_list = [player_data for game in games for game_team_info in game.teams for player_data in
                             game_team_info.player_data]
@@ -161,7 +164,32 @@ class ComputedGame:
         # df.to_csv(path + '/' + filename)
         df.to_sql(filename, engine)
 
-    def get_game_winner(self, season: int, game_type: str, game_name: str) -> List[int]:
+    def get_top_clubs_id(self, num: int, game_season: int, game_name: str, game_type: str = None) -> List[int]:
+        """
+        获取积分榜的前num名
+        :param num: 返回的数量
+        :param game_season: 赛季
+        :param game_name: 比赛名
+        :param game_type: 比赛类型
+        :return: 前num名的club_id
+        """
+        df = self.get_season_points_table(game_season=game_season, game_name=game_name, game_type=game_type)
+        return df[0:num, [0]].to_list()
+
+    def get_top_clubs_model(
+            self, num: int, game_season: int, game_name: str, game_type: str = None) -> List[models.Club]:
+        """
+        获取积分榜的前num名
+        :param num: 返回的数量
+        :param game_season: 赛季
+        :param game_name: 比赛名
+        :param game_type: 比赛类型
+        :return: 前num名的club_model
+        """
+        id_list = self.get_top_clubs_id(num=num, game_season=game_season, game_name=game_name, game_type=game_type)
+        return [crud.get_club_by_id(db=self.db, club_id=club_id) for club_id in id_list]
+
+    def get_game_winners(self, season: int, game_type: str, game_name: str) -> List[int]:
         """
         获取指定比赛中的胜者
         :param season: 赛季
