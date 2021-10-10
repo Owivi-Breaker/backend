@@ -1,4 +1,5 @@
 import crud
+import models
 from utils import utils, logger
 
 from core.db import engine
@@ -9,8 +10,9 @@ import json
 
 
 class ComputedGame:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, save_id: int):
         self.db = db
+        self.save_id = save_id
 
     @staticmethod
     def switch2df(data: List[dict]) -> pd.DataFrame:
@@ -29,7 +31,7 @@ class ComputedGame:
     def switch2csv(data: pd.DataFrame) -> str:
         return data.to_csv(index=False)
 
-    def get_season_points_table(self, game_season: int, game_name: str, save_id: int) -> pd.DataFrame:
+    def get_season_points_table(self, game_season: int, game_name: str) -> pd.DataFrame:
         """
         获取赛季积分榜
         :param save_id: 存档id
@@ -38,7 +40,7 @@ class ComputedGame:
         :return: df
         """
         query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.name=='{}')".format(
-            save_id, int(game_season), game_name)
+            self.save_id, int(game_season), game_name)
         games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         points_dict = dict()
         for game in games:
@@ -98,7 +100,8 @@ class ComputedGame:
         :param game_season: 赛季序号
         :return: df
         """
-        query_str = "and_(models.Game.season=='{}', models.Game.type=='{}')".format(int(game_season), game_type)
+        query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
+            self.save_id, int(game_season), game_type)
         games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         player_data_list = [player_data for game in games for game_team_info in game.teams for player_data in
                             game_team_info.player_data]
@@ -157,3 +160,26 @@ class ComputedGame:
     def save_in_db(df, filename: str):
         # df.to_csv(path + '/' + filename)
         df.to_sql(filename, engine)
+
+    def get_game_winner(self, season: int, game_type: str, game_name: str) -> List[int]:
+        """
+        获取指定比赛中的胜者
+        :param season: 赛季
+        :param game_type: 比赛性质
+        :param game_name: 比赛名
+        :return: 胜者club_id数组
+        """
+        query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}', models.Game.name=='{}')".format(
+            self.save_id, season, game_type, game_name)
+        games: List[models.Game] = crud.get_games_by_attri(db=self.db, query_str=query_str)
+        clubs_id: List[int] = []  # 参赛俱乐部
+        for game in games:
+            team1 = game.teams[0]
+            team2 = game.teams[1]
+            if team1.score > team2.score:
+                clubs_id.append(team1.club_id)
+            elif team1.score < team2.score:
+                clubs_id.append(team2.club_id)
+            else:
+                logger.error("淘汰赛平局！")
+        return clubs_id

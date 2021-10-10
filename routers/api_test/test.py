@@ -62,11 +62,11 @@ def promote_n_relegate(save_model: models.Save, db: Session):
     for league_model in save_model.leagues:
         if not league_model.upper_league:
             lower_league = crud.get_league_by_id(db=db, league_id=league_model.lower_league)
-            computed_game = computed_data_app.ComputedGame(db)
+            computed_game = computed_data_app.ComputedGame(db, save_id=save_model.id)
             df1 = computed_game.get_season_points_table(
-                game_season=save_model.season, game_name=league_model.name, save_id=save_model.id)
+                game_season=save_model.season, game_name=league_model.name)
             df2 = computed_game.get_season_points_table(
-                game_season=save_model.season, game_name=lower_league.name, save_id=save_model.id)
+                game_season=save_model.season, game_name=lower_league.name)
 
             relegate_df = df1.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
             relegate_club_id = relegate_df[-4:]['id'].to_list()
@@ -116,14 +116,14 @@ async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, y
 @router.get('/points-table')
 def get_points_table(save_id: int, game_season: int, game_type: str, db: Session = Depends(get_db)):
     # TODO 此处有sql注入问题
-    computed_game = computed_data_app.ComputedGame(db)
-    df = computed_game.get_season_points_table(game_season, game_type, save_id)
+    computed_game = computed_data_app.ComputedGame(db=db, save_id=save_id)
+    df = computed_game.get_season_points_table(game_season, game_type)
     return computed_game.switch2json(df)
 
 
 @router.get('/player-chart')
-def get_player_chart(game_season: int, game_type: str, db: Session = Depends(get_db)):
+def get_player_chart(save_id: int, game_season: int, game_type: str, db: Session = Depends(get_db)):
     # TODO 此处有sql注入问题
-    computed_game = computed_data_app.ComputedGame(db)
+    computed_game = computed_data_app.ComputedGame(db=db, save_id=save_id)
     df = computed_game.get_season_player_chart(game_season, game_type)
     return computed_game.switch2json(df)

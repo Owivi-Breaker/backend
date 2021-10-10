@@ -1,6 +1,7 @@
 import crud
 import models
 import schemas
+from modules import computed_data_app
 from utils import Date, logger, utils
 
 from sqlalchemy.orm import Session
@@ -81,7 +82,8 @@ class CalendarGenerator:
                 league_game["pve"] = []
                 for game in games:
                     one_game_dict = dict()
-                    one_game_dict["game_type"] = league_model.name
+                    one_game_dict['game_name'] = league_model.name
+                    one_game_dict["game_type"] = 'league'
                     one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
                     if game[0].id == self.save_model.player_club_id or \
                             game[1].id == self.save_model.player_club_id:
@@ -123,6 +125,7 @@ class CalendarGenerator:
                         league_game["pve"] = []
                         for game in games:
                             one_game_dict = dict()
+                            one_game_dict["game_name"] = league_model.cup
                             one_game_dict["game_type"] = "cup32to16"
                             one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
                             if game[0].id == self.save_model.player_club_id or \
@@ -132,54 +135,135 @@ class CalendarGenerator:
                                 league_game["eve"].append(one_game_dict)
                         self.add_dict(str(date), league_game)
                         date.plus_days(1)
-        elif game_type == "16to8":
+        elif game_type == "cup16to8":
+            # 一般是在结束所有32进16的比赛后运行(8/26)
             for league_model in self.save_model.leagues:
                 if not league_model.upper_league:
                     # 生成一个联赛的16进8杯赛赛事
-                    # TODO 将筛选胜者的具体逻辑放在computed_data_app中
-                    query_str = "and_(models.Game.season=='{}', models.Game.type=='{}')".format(
-                        self.save_model.season, 'cup32to16')
-                    games: List[models.Game] = crud.get_games_by_attri(db=self.db, query_str=query_str)
-                    clubs_id: List[int] = []  # 参赛俱乐部
-                    for game in games:
-                        team1 = game.teams[0]
-                        team2 = game.teams[0]
-                        if team1.score > team2.score:
-                            clubs_id.append(team1.club_id)
-                        elif team1.score < team2.score:
-                            clubs_id.append(team2.club_id)
-                        else:
-                            logger.error("淘汰赛平局！")
+                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    clubs_id = computed_game.get_game_winner(
+                        season=self.save_model.season,
+                        game_type='cup32to16',
+                        game_name=league_model.cup
+                    )
                     if len(clubs_id) != 16:
-                        logger.error("参赛俱乐部不是16支！")
-
-                    clubs_a = random.sample(clubs_id, 16)  # 随机挑一半
+                        logger.error('cup16to8 数量错误!')
+                    clubs_a = random.sample(clubs_id, 8)  # 随机挑一半
                     clubs_b = list(set(clubs_id) ^ set(clubs_a))  # 剩下另一半
                     two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
-                    one_day_schedule = [two_days_schedule[:8], two_days_schedule[8:]]
+                    one_day_schedule = [two_days_schedule[:4], two_days_schedule[4:]]
                     date = Date(int(year), 12, 7)
-                    for schedule in one_day_schedule:
-                        for games in schedule:
-                            league_game = dict()
-                            league_game["eve"] = []
-                            league_game["pve"] = []
-                            for game in games:
-                                one_game_dict = dict()
-                                one_game_dict["game_type"] = "cup16to8"
-                                one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
-                                if game[0] == self.save_model.player_club_id or \
-                                        game[1] == self.save_model.player_club_id:
-                                    league_game["pve"].append(one_game_dict)
-                                else:
-                                    league_game["eve"].append(one_game_dict)
-                            self.add_dict(str(date), league_game)
-                        date.plus_days(1)
+                    for games in one_day_schedule:
+                        league_game = dict()
+                        league_game["eve"] = []
+                        league_game["pve"] = []
+                        for game in games:
+                            one_game_dict = dict()
+                            one_game_dict["game_name"] = league_model.cup
+                            one_game_dict["game_type"] = "cup16to8"
+                            one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                            if game[0] == self.save_model.player_club_id or \
+                                    game[1] == self.save_model.player_club_id:
+                                league_game["pve"].append(one_game_dict)
+                            else:
+                                league_game["eve"].append(one_game_dict)
+                        self.add_dict(str(date), league_game)
+                    date.plus_days(1)
         elif game_type == "cup8to4":
-            pass
+            # 一般是在结束所有16进8的比赛后运行(12/9)
+            for league_model in self.save_model.leagues:
+                if not league_model.upper_league:
+                    # 生成一个联赛的8进4杯赛赛事
+                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    clubs_id = computed_game.get_game_winner(
+                        season=self.save_model.season,
+                        game_type='cup16to8',
+                        game_name=league_model.cup
+                    )
+                    if len(clubs_id) != 8:
+                        logger.error('cup8to4 数量错误!')
+                    clubs_a = random.sample(clubs_id, 4)  # 随机挑一半
+                    clubs_b = list(set(clubs_id) ^ set(clubs_a))  # 剩下另一半
+                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
+                    one_day_schedule = [two_days_schedule[:2], two_days_schedule[2:]]
+                    date = Date(int(year) + 1, 2, 1)  # 注意是下一年了！
+                    for games in one_day_schedule:
+                        league_game = dict()
+                        league_game["eve"] = []
+                        league_game["pve"] = []
+                        for game in games:
+                            one_game_dict = dict()
+                            one_game_dict["game_name"] = league_model.cup
+                            one_game_dict["game_type"] = "cup8to4"
+                            one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                            if game[0] == self.save_model.player_club_id or \
+                                    game[1] == self.save_model.player_club_id:
+                                league_game["pve"].append(one_game_dict)
+                            else:
+                                league_game["eve"].append(one_game_dict)
+                        self.add_dict(str(date), league_game)
+                    date.plus_days(1)
         elif game_type == "cup4to2":
-            pass
+            # 一般是在结束所有8进4的比赛后运行(2/3)
+            for league_model in self.save_model.leagues:
+                if not league_model.upper_league:
+                    # 生成一个联赛的4进2杯赛赛事
+                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    clubs_id = computed_game.get_game_winner(
+                        season=self.save_model.season,
+                        game_type='cup8to4',
+                        game_name=league_model.cup
+                    )
+                    if len(clubs_id) != 4:
+                        logger.error('cup4to2 数量错误!')
+                    clubs_a = random.sample(clubs_id, 2)  # 随机挑一半
+                    clubs_b = list(set(clubs_id) ^ set(clubs_a))  # 剩下另一半
+                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
+                    one_day_schedule = [two_days_schedule[:1], two_days_schedule[1:]]
+                    date = Date(int(year), 3, 15)
+                    for games in one_day_schedule:
+                        league_game = dict()
+                        league_game["eve"] = []
+                        league_game["pve"] = []
+                        for game in games:
+                            one_game_dict = dict()
+                            one_game_dict["game_name"] = league_model.cup
+                            one_game_dict["game_type"] = "cup4to2"
+                            one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                            if game[0] == self.save_model.player_club_id or \
+                                    game[1] == self.save_model.player_club_id:
+                                league_game["pve"].append(one_game_dict)
+                            else:
+                                league_game["eve"].append(one_game_dict)
+                        self.add_dict(str(date), league_game)
+                    date.plus_days(1)
         elif game_type == "cup2to1":
-            pass
+            # 一般是在结束所有4进2的比赛后运行(3/17)
+            for league_model in self.save_model.leagues:
+                if not league_model.upper_league:
+                    # 生成一个联赛的2进1杯赛赛事
+                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    clubs_id = computed_game.get_game_winner(
+                        season=self.save_model.season,
+                        game_type='cup4to2',
+                        game_name=league_model.cup
+                    )
+                    if len(clubs_id) != 2:
+                        logger.error('cup2to1 数量错误!')
+                    date = Date(int(year), 4, 20)
+                    league_game = dict()
+                    league_game["eve"] = []
+                    league_game["pve"] = []
+
+                    one_game_dict = dict()
+                    one_game_dict["game_name"] = league_model.cup
+                    one_game_dict["game_type"] = "cup2to1"
+                    one_game_dict["club_id"] = ",".join([str(clubs_id[0]), str(clubs_id[1])])
+                    if clubs_id[0] == self.save_model.player_club_id or \
+                            clubs_id[1] == self.save_model.player_club_id:
+                        league_game["pve"].append(one_game_dict)
+                    else:
+                        league_game["eve"].append(one_game_dict)
         else:
             logger.error("无{}赛程".format(game_type))
 
@@ -216,7 +300,8 @@ class CalendarGenerator:
                             league_game["pve"] = []
                             for game in games:
                                 one_game_dict = dict()
-                                one_game_dict["game_type"] = "cup32to16"
+                                one_game_dict['game_name']='champions_league'
+                                one_game_dict["game_type"] = "champion32to16"
                                 one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
                                 if game[0].id == self.save_model.player_club_id or \
                                         game[1].id == self.save_model.player_club_id:
