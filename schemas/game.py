@@ -92,6 +92,8 @@ class GameTeamInfo(GameTeamInfoCreate):
 class GameCreate(BaseModel):
     created_time: datetime
     date: str
+
+    name:str
     type: str
     season: str
     script: str

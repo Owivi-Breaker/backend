@@ -24,7 +24,8 @@ class TacticAdjustor:
         """
         game = game_app.GameEvE(db=self.db,
                                 club1_id=self.club1_id, club2_id=self.club2_id,
-                                date=Date(1970, 1, 1), game_type='test', season=0, save_id=self.save_id)
+                                date=Date(1970, 1, 1), game_type='test', game_name='test',
+                                season=0, save_id=self.save_id)
         lteam_data, rteam_data = game.tactical_start(num=20)
 
         tactic_pro1 = dict()

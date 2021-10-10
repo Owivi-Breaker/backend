@@ -14,13 +14,14 @@ import time
 
 class GameEvE:
     def __init__(self, db: Session, club1_id: int, club2_id: int,
-                 date: Date, game_type: str, season: int, save_id: int):
+                 date: Date, game_type: str, game_name: str, season: int, save_id: int):
         self.db = db
         self.lteam = game_eve_app.Team(self, club1_id)
         self.rteam = game_eve_app.Team(self, club2_id)
         self.date = str(date)
         self.script = ''
         self.type = game_type
+        self.name = game_name
         self.season = season
         self.save_id = save_id
 
@@ -269,6 +270,7 @@ class GameEvE:
         :return: schemas.GameCreate
         """
         data = {
+            'name':self.name,
             'type': self.type,
             'created_time': created_time,
             'date': self.date,

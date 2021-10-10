@@ -47,8 +47,8 @@ def start_season_game(league_model: models.League, save_model: models.Save, db: 
                                                       save_id=save_model.id)
             tactic_adjustor.adjust()
             # 开始模拟比赛
-            game_eve = game_app.GameEvE(db=db, club1_id=game[0].id, club2_id=game[1].id,
-                                        date=date, game_type=league_model.name,
+            game_eve = game_app.GameEvE(db=db, club1_id=game[0].id, club2_id=game[1].id, date=date,
+                                        game_name=league_model.name, game_type='league',
                                         season=save_model.season, save_id=save_model.id)
             score1, score2 = game_eve.start()
             logger.info("{} {}:{} {}".format(game[0].name, score1, score2, game[1].name))
@@ -64,9 +64,9 @@ def promote_n_relegate(save_model: models.Save, db: Session):
             lower_league = crud.get_league_by_id(db=db, league_id=league_model.lower_league)
             computed_game = computed_data_app.ComputedGame(db)
             df1 = computed_game.get_season_points_table(
-                game_season=save_model.season, game_type=league_model.name, save_id=save_model.id)
+                game_season=save_model.season, game_name=league_model.name, save_id=save_model.id)
             df2 = computed_game.get_season_points_table(
-                game_season=save_model.season, game_type=lower_league.name, save_id=save_model.id)
+                game_season=save_model.season, game_name=lower_league.name, save_id=save_model.id)
 
             relegate_df = df1.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
             relegate_club_id = relegate_df[-4:]['id'].to_list()
@@ -99,10 +99,11 @@ def start_season_games(db: Session, save_id: int, years: int = 0):
 
 
 @router.get('/imitate_game_season')
-async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, years: int = 0,
+async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, years: int = 1,
                               db: Session = Depends(get_db), ):
     """
-    模拟指定联赛一个赛季的比赛
+    模拟指定存档中一个赛季的比赛
+    :param years: 赛季数
     :param background_tasks: 后台任务参数
     :param save_id: 存档id
     :param db: database
