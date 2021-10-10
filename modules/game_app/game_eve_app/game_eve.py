@@ -14,7 +14,7 @@ import time
 
 class GameEvE:
     def __init__(self, db: Session, club1_id: int, club2_id: int,
-                 date: Date, game_type: str = 'test', season: int = 0):
+                 date: Date, game_type: str, season: int, save_id: int):
         self.db = db
         self.lteam = game_eve_app.Team(self, club1_id)
         self.rteam = game_eve_app.Team(self, club2_id)
@@ -22,6 +22,7 @@ class GameEvE:
         self.script = ''
         self.type = game_type
         self.season = season
+        self.save_id = save_id
 
     def start(self) -> Tuple:
         """
@@ -273,7 +274,8 @@ class GameEvE:
             'date': self.date,
             'season': self.season,
             'script': self.script,
-            'mvp': self.get_highest_rating_player().player_model.id
+            'mvp': self.get_highest_rating_player().player_model.id,
+            'save_id': self.save_id
         }
         game_data = schemas.GameCreate(**data)
         return game_data

@@ -14,117 +14,15 @@ import game_configs
 from modules import generate_app, game_app, computed_data_app
 from utils import logger, Date
 
-
-class SaveData(BaseModel):
-    type: str
-
-
 router = APIRouter()
 
 
-@router.post('/init_save')
-def init_save(save_data: SaveData, db: Session = Depends(get_db)) -> schemas.Save:
+def start_season_game(league_model: models.League, save_model: models.Save, db: Session):
     """
-    初始化新存档
-    :param save_data: 初始化存档的一些参数
-    :param db: database
-    :return: 存档实例
+    快速进行一个赛季的比赛
     """
-    # 初始化生成器
-    save_generator = generate_app.SaveGenerator(db)
-    league_generator = generate_app.LeagueGenerator(db)
-    club_generator = generate_app.ClubGenerator(db)
-    player_generator = generate_app.PlayerGenerator(db)
-    coach_generator = generate_app.CoachGenerator(db)
-    # 生成存档
-    save_create_schemas = schemas.SaveCreate(created_time=datetime.datetime.now(),
-                                             time='2021-08-01')
-    save_model = save_generator.generate(save_create_schemas)
-    logger.info("存档生成")
-    # 生成联赛
-    league_list = eval("game_configs.{}".format(save_data.type))
-    for league in league_list:
-        league_create_schemas = schemas.LeagueCreate(created_time=datetime.datetime.now(),
-                                                     name=league['name'],
-                                                     points=league['points'],
-                                                     cup=league['cup'])
-        league_model = league_generator.generate(league_create_schemas)
-        crud.update_league(db=db, league_id=league_model.id, attri={"save_id": save_model.id})
-        league['id'] = league_model.id
-        logger.info("联赛{}生成".format(league['name']))
-
-        for club in league["clubs"]:
-            # 生成俱乐部
-            club_create_schemas = schemas.ClubCreate(created_time=datetime.datetime.now(),
-                                                     name=club['name'],
-                                                     finance=club['finance'],
-                                                     reputation=club['reputation'])
-            club_model = club_generator.generate(club_create_schemas)
-            crud.update_club(db=db, club_id=club_model.id, attri={"league_id": league_model.id})
-            logger.info("俱乐部{}生成".format(club['name']))
-
-            # 随机生成教练
-            coach_model = coach_generator.generate()
-            crud.update_coach(db=db, coach_id=coach_model.id, attri={"club_id": club_model.id})
-
-            # 随机生成球员
-            # 随机生成11名适配阵型位置的成年球员
-            formation_dict = game_configs.formations[coach_model.formation]
-            player_model_list: List[models.Player] = []
-            for lo, num in formation_dict.items():
-                for i in range(num):
-                    player_model = player_generator.generate(ori_mean_capa=club['ori_mean_capa'],
-                                                             ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                                                             average_age=26, location=lo)
-                    player_model_list.append(player_model)
-                    # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
-
-            for _ in range(7):
-                # 随机生成7名任意位置成年球员
-                player_model = player_generator.generate(ori_mean_capa=club['ori_mean_capa'],
-                                                         ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                                                         average_age=26)
-                player_model_list.append(player_model)
-                # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
-            for _ in range(6):
-                # 随机生成6名年轻球员
-                player_model = player_generator.generate()
-                player_model_list.append(player_model)
-                # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
-            # 统一提交24名球员的修改
-            attri = {"club_id": club_model.id}
-            for player_model in player_model_list:
-                for key, value in attri.items():
-                    setattr(player_model, key, value)
-            db.commit()
-    for league in league_list:
-        # 标记上下游联赛关系
-        if league['upper_league']:
-            for target_league in league_list:
-                if target_league['name'] == league['upper_league']:
-                    crud.update_league(db=db, league_id=league['id'], attri={"upper_league": target_league['id']})
-        if league['lower_league']:
-            for target_league in league_list:
-                if target_league['name'] == league['lower_league']:
-                    crud.update_league(db=db, league_id=league['id'], attri={"lower_league": target_league['id']})
-    logger.info("联赛上下游关系标记完成")
-    # 生成日程表
-    calendar_generator = generate_app.CalendarGenerator(db=db, save_id=save_model.id)
-    calendar_generator.generate()
-    logger.info("日程表生成")
-
-    return crud.get_save_by_id(db=db, save_id=save_model.id)
-
-
-def start_game(test_num: int, league_id: int, db: Session):
-    league_model = crud.get_league_by_id(db=db, league_id=league_id)
-    # TODO 获取赛季序号和玩家俱乐部id的方式不够优雅，要改
-    save_model = crud.get_save_by_id(db=db, save_id=league_model.save_id)
-    season = save_model.season
-    player_club_id = save_model.player_club_id
 
     clubs = league_model.clubs
-
     clubs_a = random.sample(clubs, len(clubs) // 2)  # 随机挑一半
     clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
     schedule = []  # 比赛赛程
@@ -145,35 +43,80 @@ def start_game(test_num: int, league_id: int, db: Session):
         for game in games:
             # 调整战术比重
             tactic_adjustor = game_app.TacticAdjustor(db=db, club1_id=game[0].id, club2_id=game[1].id,
-                                                      player_club_id=player_club_id)
+                                                      player_club_id=save_model.player_club_id,
+                                                      save_id=save_model.id)
             tactic_adjustor.adjust()
             # 开始模拟比赛
-            game_eve = game_app.GameEvE(db, game[0].id, game[1].id, date, league_model.name, season)
+            game_eve = game_app.GameEvE(db=db, club1_id=game[0].id, club2_id=game[1].id,
+                                        date=date, game_type=league_model.name,
+                                        season=save_model.season, save_id=save_model.id)
             score1, score2 = game_eve.start()
-            logger.info("{}: {} {}:{} {}".format(test_num, game[0].name, score1, score2, game[1].name))
+            logger.info("{} {}:{} {}".format(game[0].name, score1, score2, game[1].name))
         date.plus_days(7)
 
 
+def promote_n_relegate(save_model: models.Save, db: Session):
+    """
+    联赛升降级设置，根据赛季积分榜，在数据库中修改应升级/降级的球队的联赛级别
+    """
+    for league_model in save_model.leagues:
+        if not league_model.upper_league:
+            lower_league = crud.get_league_by_id(db=db, league_id=league_model.lower_league)
+            computed_game = computed_data_app.ComputedGame(db)
+            df1 = computed_game.get_season_points_table(
+                game_season=save_model.season, game_type=league_model.name, save_id=save_model.id)
+            df2 = computed_game.get_season_points_table(
+                game_season=save_model.season, game_type=lower_league.name, save_id=save_model.id)
+
+            relegate_df = df1.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
+            relegate_club_id = relegate_df[-4:]['id'].to_list()
+            for club_id in relegate_club_id:
+                # 降级
+                crud.update_club(db=db, club_id=club_id, attri={'league_id': lower_league.id})
+            promote_df = df2.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
+            promote_club_id = promote_df[:4]['id'].to_list()
+            for club_id in promote_club_id:
+                # 升级
+                crud.update_club(db=db, club_id=club_id, attri={'league_id': league_model.id})
+
+
+def start_season_games(db: Session, save_id: int, years: int = 0):
+    """
+    进行存档中所有联赛一个赛季的比赛
+    """
+    save_model = crud.get_save_by_id(db=db, save_id=save_id)
+
+    crud.delete_game_by_attri(db=db,
+                              query_str='and_(models.Game.season=="{}", models.Game.save_id=="{}")'.format(
+                                  save_model.season, save_model.id))
+
+    for _ in range(years):
+        for league_model in save_model.leagues:
+            start_season_game(league_model, save_model, db)
+        promote_n_relegate(save_model=save_model, db=db)
+        save_model.season += 1
+        db.commit()
+
+
 @router.get('/imitate_game_season')
-async def imitate_game_season(test_num: str, league_id: int, background_tasks: BackgroundTasks,
+async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, years: int = 0,
                               db: Session = Depends(get_db), ):
     """
     模拟指定联赛一个赛季的比赛
     :param background_tasks: 后台任务参数
-    :param test_num: 标记
-    :param league_id: 联赛id
+    :param save_id: 存档id
     :param db: database
     :return:
     """
-    background_tasks.add_task(start_game, test_num=test_num, league_id=league_id, db=db)
+    background_tasks.add_task(start_season_games, db=db, save_id=save_id, years=years)
     return {"message": "正在比赛..."}
 
 
 @router.get('/points-table')
-def get_points_table(game_season: int, game_type: str, db: Session = Depends(get_db)):
+def get_points_table(save_id: int, game_season: int, game_type: str, db: Session = Depends(get_db)):
     # TODO 此处有sql注入问题
     computed_game = computed_data_app.ComputedGame(db)
-    df = computed_game.get_season_points_table(game_season, game_type)
+    df = computed_game.get_season_points_table(game_season, game_type, save_id)
     return computed_game.switch2json(df)
 
 

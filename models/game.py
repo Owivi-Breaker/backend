@@ -13,9 +13,11 @@ class Game(Base):
     created_time = Column(DateTime)
     date = Column(String)
     season = Column(String)
-    mvp = Column(Integer, ForeignKey('player.id'))
     script = Column(String)
     teams = relationship("GameTeamInfo", backref="game")
+    save_id = Column(Integer)
+
+    mvp = Column(Integer, ForeignKey('player.id'))
 
 
 class GameTeamInfo(Base):

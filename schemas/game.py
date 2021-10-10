@@ -96,6 +96,7 @@ class GameCreate(BaseModel):
     season: str
     script: str
     mvp: int
+    save_id: int
 
     class Config:
         orm_mode = True

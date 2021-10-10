@@ -29,14 +29,15 @@ class ComputedGame:
     def switch2csv(data: pd.DataFrame) -> str:
         return data.to_csv(index=False)
 
-    def get_season_points_table(self, game_season: int, game_type: str) -> pd.DataFrame:
+    def get_season_points_table(self, game_season: int, game_type: str, save_id: int) -> pd.DataFrame:
         """
         获取赛季积分榜
         :param game_type: 比赛类型
         :param game_season: 赛季序号
         :return: df
         """
-        query_str = "and_(models.Game.season=='{}', models.Game.type=='{}')".format(int(game_season), game_type)
+        query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.type=='{}')".format(
+            save_id, int(game_season), game_type)
         games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         points_dict = dict()
         for game in games:

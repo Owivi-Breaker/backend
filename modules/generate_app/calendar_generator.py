@@ -24,7 +24,7 @@ class CalendarGenerator:
         :return: 日程表实例
         """
         self.generate_league_games()
-        self.generate_cup_games(game_type="32to16")
+        self.generate_cup_games(game_type="cup32to16")
         self.generate_transfer_days()
         self.turn_dict2str()
 
@@ -81,7 +81,7 @@ class CalendarGenerator:
                 league_game["pve"] = []
                 for game in games:
                     one_game_dict = dict()
-                    one_game_dict["game_type"] = "league"
+                    one_game_dict["game_type"] = league_model.name
                     one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
                     if game[0].id == self.save_model.player_club_id or \
                             game[1].id == self.save_model.player_club_id:
@@ -98,7 +98,7 @@ class CalendarGenerator:
         适用于两级联赛的杯赛
         """
         year, month, day = self.save_model.time.split('-')
-        if game_type == "32to16":
+        if game_type == "cup32to16":
             # 一般是在赛季开始初始化日程表时，生成32进16的赛事
             for league_model in self.save_model.leagues:
                 if not league_model.upper_league:
@@ -174,11 +174,11 @@ class CalendarGenerator:
                                     league_game["eve"].append(one_game_dict)
                             self.add_dict(str(date), league_game)
                         date.plus_days(1)
-        elif game_type == "8to4":
+        elif game_type == "cup8to4":
             pass
-        elif game_type == "4to2":
+        elif game_type == "cup4to2":
             pass
-        elif game_type == "16to8":
+        elif game_type == "cup2to1":
             pass
         else:
             logger.error("无{}赛程".format(game_type))
@@ -190,7 +190,8 @@ class CalendarGenerator:
         :return:
         """
         year, month, day = self.save_model.time.split('-')
-        if game_type == "group":
+        if game_type == "champions_league_group":
+            # TODO 欸，没写呢
             # 一般是在赛季开始初始化日程表时，生成32进16的赛事
             for league_model in self.save_model.leagues:
                 if not league_model.upper_league:

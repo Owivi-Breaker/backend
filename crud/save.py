@@ -20,7 +20,7 @@ def update_save(db: Session, save_id: int, attri: dict):
     return db_save
 
 
-def get_save_by_id(db: Session, save_id: int):
+def get_save_by_id(db: Session, save_id: int) -> models.Save:
     db_save = db.query(models.Save).filter(models.Save.id == save_id).first()
     return db_save
 

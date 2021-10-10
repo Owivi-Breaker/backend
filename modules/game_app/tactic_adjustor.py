@@ -11,11 +11,12 @@ class TacticAdjustor:
     最终结果，修改Coach表中的战术比重
     """
 
-    def __init__(self, db: Session, club1_id: int, club2_id: int, player_club_id: int):
+    def __init__(self, db: Session, club1_id: int, club2_id: int, player_club_id: int, save_id: int):
         self.db = db
         self.club1_id = club1_id
         self.club2_id = club2_id
         self.player_club_id = player_club_id
+        self.save_id = save_id
 
     def adjust(self):
         """
@@ -23,7 +24,7 @@ class TacticAdjustor:
         """
         game = game_app.GameEvE(db=self.db,
                                 club1_id=self.club1_id, club2_id=self.club2_id,
-                                date=Date(1970, 1, 1))
+                                date=Date(1970, 1, 1), game_type='test', season=0, save_id=self.save_id)
         lteam_data, rteam_data = game.tactical_start(num=20)
 
         tactic_pro1 = dict()
