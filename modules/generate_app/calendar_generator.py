@@ -568,6 +568,7 @@ class CalendarGenerator:
                     self.add_dict(str(Date(int(year), 3, 3)), league_game)
                 count += 1
         elif game_type == "champions2to1":
+            # 一般是在结束4to2比赛后运行(4/8)
             clubs: List[int] = []
             for i in range(2):
                 # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
@@ -599,6 +600,7 @@ class CalendarGenerator:
                 league_game["pve"].append(one_game_dict)
             else:
                 league_game["eve"].append(one_game_dict)
+            self.add_dict(str(Date(int(year), 5, 7)), league_game)
         else:
             logger.error("无{}赛程".format(game_type))
 

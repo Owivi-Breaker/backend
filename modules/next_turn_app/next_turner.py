@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 import crud
 import models
-from utils import Date
+import utils.utils
+from utils import Date, utils
 from modules import game_app
 
 
@@ -27,20 +28,23 @@ class NextTurner:
         query_str = "and_(models.Calendar.save_id=='{}', models.Calendar.date=='{}')".format(
             self.save_model.id, str(self.date))
         calendars: List[models.Calendar] = crud.get_calendars_by_attri(db=self.db, query_str=query_str)
+        total_events = dict()
         for calendar in calendars:
             event = json.loads(calendar.event_str)
-            if 'eve' in event.keys():
-                self.eve_starter()
-            if 'pve' in event.keys():
-                self.pve_starter()
-            if 'transfer' in event.keys():
-                self.transfer_starter()
+            total_events = utils.merge_dict_with_list_items(total_events, event)
+        if 'pve' in total_events.keys():
+            self.pve_starter(total_events['pve'])
+        if 'eve' in total_events.keys():
+            self.eve_starter(total_events['eve'])
+        if 'transfer' in total_events.keys():
+            self.transfer_starter(total_events['transfer'])
 
-    def eve_starter(self):
+    def eve_starter(self, eve_dict: dict):
         pass
 
-    def pve_starter(self):
-        pass
+    def pve_starter(self, pve_dict: dict):
+        # 暂时跟eve作相同处理
+        self.eve_starter(pve_dict)
 
-    def transfer_starter(self):
+    def transfer_starter(self, transfer_dict: dict):
         pass
