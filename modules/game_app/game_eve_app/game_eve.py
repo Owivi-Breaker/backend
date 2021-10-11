@@ -219,6 +219,12 @@ class GameEvE:
 
     @staticmethod
     def update_player(player_model: models.Player, attri: dict):
+        """
+        为了统一commit所设置的中间函数
+        :param player_model:
+        :param attri:
+        :return:
+        """
         for key, value in attri.items():
             setattr(player_model, key, value)
 
@@ -230,37 +236,25 @@ class GameEvE:
         :param value: 外部函数传入的提升值
         :return: 记录能力提升的字典
         """
-        improvement = []
-        if player.ori_location == game_configs.Location.ST:
-            improvement = random.sample(['shooting', 'anticipation', 'strength', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.LW or player.ori_location == game_configs.Location.RW:
-            improvement = random.sample(['shooting', 'passing', 'dribbling', 'pace', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.CM:
-            improvement = random.sample(['shooting', 'passing', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.CB:
-            improvement = random.sample(['interception', 'anticipation', 'strength', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.LB or player.ori_location == game_configs.Location.RB:
-            improvement = random.sample(['passing', 'dribbling', 'interception', 'pace', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.GK:
-            value /= 2
-            improvement = random.sample(['goalkeeping', 'stamina', 'passing'], 2)
-        elif player.ori_location == game_configs.Location.CAM:
-            improvement = random.sample(['shooting', 'passing', 'anticipation', 'strength', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.LM or player.ori_location == game_configs.Location.RM:
-            improvement = random.sample(['shooting', 'passing', 'dribbling', 'pace', 'stamina'], 2)
-        elif player.ori_location == game_configs.Location.CDM:
-            improvement = random.sample(['passing', 'interception', 'strength', 'anticipation', 'stamina'], 2)
-        else:
-            logger.error('球员位置不正确！')
-        # 防止能力超出上限
+        original_location = dict()  # 对应位置的能力比重字典
+        for x in game_configs.location_capability:
+            if x['name'] == player.ori_location:
+                original_location = x
+                break
+        count = 0
+        circulation = 0  # 记录循环次数，防止当所有能力都满值时无法跳出循环
         result = dict()
-        for capa in improvement:
-            limit = eval('player.player_model.{}_limit'.format(capa))
-            real_capa = eval('player.player_model.{}'.format(capa))
+        while True:
+            capa_name = utils.select_by_pro(original_location['weight'])
+            limit = eval('player.player_model.{}_limit'.format(capa_name))
+            real_capa = eval('player.player_model.{}'.format(capa_name))
             if real_capa + value <= limit:
-                result[capa] = float(utils.retain_decimal(real_capa + value))
-            else:
-                result[capa] = limit
+                result[capa_name] = float(utils.retain_decimal(real_capa + value))
+                count += 1
+            circulation += 1
+            if count == 2 or circulation > 20:
+                # 若加满两项能力或循环超过20次，退出
+                break
         return result
 
     def export_game_schemas(self, created_time=datetime.datetime.now()) -> schemas.GameCreate:
@@ -270,7 +264,7 @@ class GameEvE:
         :return: schemas.GameCreate
         """
         data = {
-            'name':self.name,
+            'name': self.name,
             'type': self.type,
             'created_time': created_time,
             'date': self.date,

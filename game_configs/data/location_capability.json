@@ -2,7 +2,7 @@
   {
     "name": "ST",
     "weight": {
-      "shooting": 0.5,
+      "shooting": 0.45,
       "passing": 0,
       "dribbling": 0.05,
       "interception": 0,
@@ -11,7 +11,7 @@
       "aggression": 0,
       "anticipation": 0.15,
       "free_kick": 0,
-      "stamina": 0.1,
+      "stamina": 0.15,
       "goalkeeping": 0
     }
   },
