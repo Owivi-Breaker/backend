@@ -1,4 +1,7 @@
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session
+from typing import List
+
 import models
 import schemas
 from utils import logger
@@ -23,3 +26,12 @@ def update_calendar(db: Session, calendar_id: int, attri: dict):
 def get_calendar_by_id(db: Session, calendar_id: int):
     db_calendar = db.query(models.Calendar).filter(models.Calendar.id == calendar_id).first()
     return db_calendar
+
+
+def get_calendars_by_attri(db: Session, query_str: str, only_one: bool = False) -> List[models.Calendar]:
+    if only_one:
+        db_calendar = db.query(models.Calendar).filter(eval(query_str)).first()
+        return db_calendar
+    else:
+        db_calendars = db.query(models.Calendar).filter(eval(query_str)).all()
+        return db_calendars

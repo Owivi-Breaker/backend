@@ -15,6 +15,5 @@ class Date:
     def plus_days(self, days: int):
         self.date += datetime.timedelta(days=days)
 
-
     def __str__(self, date_format: str = "%Y-%m-%d"):
         return self.date.strftime(date_format)

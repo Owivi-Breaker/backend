@@ -104,7 +104,7 @@ class ComputedGame:
         :return: df
         """
         query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.name=='{}')".format(
-            self.save_id, int(game_season), game_name)
+            self.save_id, game_season, game_name)
         games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         player_data_list = [player_data for game in games for game_team_info in game.teams for player_data in
                             game_team_info.player_data]
