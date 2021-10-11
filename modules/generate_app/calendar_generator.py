@@ -343,7 +343,7 @@ class CalendarGenerator:
                     for game in games:
                         one_game_dict = dict()
                         one_game_dict["game_name"] = 'champions_league'
-                        one_game_dict["game_type"] = "champions_group"
+                        one_game_dict["game_type"] = "champions_group{}".format(i + 1)
                         one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
                         if game[0].id == self.save_model.player_club_id or \
                                 game[1].id == self.save_model.player_club_id:
@@ -353,13 +353,252 @@ class CalendarGenerator:
                     self.add_dict(str(date), league_game)
                     date.plus_days(14)
         elif game_type == "champions16to8":
-            pass
+            # 一般是在结束所有小组赛比赛后运行(12/9)
+            computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+            clubs: List[models.Club] = []
+            for i in range(8):
+                # 八个小组头两名出线
+                top_clubs = computed_game.get_top_clubs_model(
+                    num=2,
+                    game_season=self.save_model.season,
+                    game_name='champions_league',
+                    game_type='champions_group{}'.format(i + 1),
+                )
+                clubs.extend(top_clubs)
+            if len(clubs) != 16:
+                logger.error('champions16to8 数量错误!')
+
+            clubs_a = random.sample(clubs, 8)  # 随机挑一半
+            clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
+            schedule = [game for game in zip(clubs_a, clubs_b)]
+
+            count = 1
+            for i in range(4):
+                league_game = dict()
+                league_game["eve"] = []
+                league_game["pve"] = []
+                for game in schedule[(i * 2):(i * 2 + 2)]:
+                    one_game_dict = dict()
+                    one_game_dict["game_name"] = 'champions_league'
+                    one_game_dict["game_type"] = "champions16to8_{}".format(count)
+                    one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
+                    if game[0].id == self.save_model.player_club_id or \
+                            game[1].id == self.save_model.player_club_id:
+                        league_game["pve"].append(one_game_dict)
+                    else:
+                        league_game["eve"].append(one_game_dict)
+                    count += 1
+                if i == 0:
+                    self.add_dict(str(Date(int(year), 12, 29)), league_game)
+                elif i == 1:
+                    self.add_dict(str(Date(int(year), 12, 30)), league_game)
+                elif i == 2:
+                    self.add_dict(str(Date(int(year) + 1, 1, 5)), league_game)
+                elif i == 3:
+                    self.add_dict(str(Date(int(year) + 1, 1, 6)), league_game)
+                else:
+                    logger.error('日期错误！')
+            # 两队反一反，打第二轮的比赛
+            count = 1
+            for i in range(4):
+                league_game = dict()
+                league_game["eve"] = []
+                league_game["pve"] = []
+                for game in schedule[(i * 2):(i * 2 + 2)]:
+                    one_game_dict = dict()
+                    one_game_dict["game_name"] = 'champions_league'
+                    one_game_dict["game_type"] = "champions16to8_{}".format(count)
+                    one_game_dict["club_id"] = ",".join([str(game[1].id), str(game[0].id)])
+                    if game[0].id == self.save_model.player_club_id or \
+                            game[1].id == self.save_model.player_club_id:
+                        league_game["pve"].append(one_game_dict)
+                    else:
+                        league_game["eve"].append(one_game_dict)
+                    count += 1
+                if i == 0:
+                    self.add_dict(str(Date(int(year) + 1, 1, 12)), league_game)
+                elif i == 1:
+                    self.add_dict(str(Date(int(year) + 1, 1, 13)), league_game)
+                elif i == 2:
+                    self.add_dict(str(Date(int(year) + 1, 1, 19)), league_game)
+                elif i == 3:
+                    self.add_dict(str(Date(int(year) + 1, 1, 20)), league_game)
+                else:
+                    logger.error('日期错误！')
         elif game_type == "champions8to4":
-            pass
+            # 一般是在结束16to8比赛后运行(1/21)
+            # computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+            clubs: List[int] = []
+            for i in range(8):
+                # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
+                query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
+                    self.save_id, self.save_model.season, 'champions16to8_{}'.format(i + 1))
+                games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+                score_dict = dict()
+                for game in games:
+                    score_dict.get(game.teams[0].club_id, 0)
+                    score_dict[game.teams[0].club_id] += game.teams[0].score
+                    score_dict.get(game.teams[1].club_id, 0)
+                    score_dict[game.teams[1].club_id] += game.teams[1].score
+                if score_dict[games[0].teams[0].club_id] > score_dict[games[0].teams[1].club_id]:
+                    clubs.append(games[0].teams[0].club_id)
+                else:
+                    clubs.append(games[0].teams[1].club_id)
+            if len(clubs) != 8:
+                logger.error('champions8to4" 数量错误!')
+
+            clubs_a = random.sample(clubs, 4)  # 随机挑一半
+            clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
+            schedule = [game for game in zip(clubs_a, clubs_b)]
+
+            count = 1
+            for i in range(2):
+                league_game = dict()
+                league_game["eve"] = []
+                league_game["pve"] = []
+                for game in schedule[(i * 2):(i * 2 + 2)]:
+                    one_game_dict = dict()
+                    one_game_dict["game_name"] = 'champions_league'
+                    one_game_dict["game_type"] = "champions8to4_{}".format(count)
+                    one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                    if game[0] == self.save_model.player_club_id or \
+                            game[1] == self.save_model.player_club_id:
+                        league_game["pve"].append(one_game_dict)
+                    else:
+                        league_game["eve"].append(one_game_dict)
+                    count += 1
+                if i == 0:
+                    self.add_dict(str(Date(int(year), 2, 23)), league_game)
+                elif i == 1:
+                    self.add_dict(str(Date(int(year), 2, 24)), league_game)
+                else:
+                    logger.error('日期错误！')
+            # 两队反一反，打第二轮的比赛
+            count = 1
+            for i in range(2):
+                league_game = dict()
+                league_game["eve"] = []
+                league_game["pve"] = []
+                for game in schedule[(i * 2):(i * 2 + 2)]:
+                    one_game_dict = dict()
+                    one_game_dict["game_name"] = 'champions_league'
+                    one_game_dict["game_type"] = "champions16to8_{}".format(count)
+                    one_game_dict["club_id"] = ",".join([str(game[1]), str(game[0])])
+                    if game[0] == self.save_model.player_club_id or \
+                            game[1] == self.save_model.player_club_id:
+                        league_game["pve"].append(one_game_dict)
+                    else:
+                        league_game["eve"].append(one_game_dict)
+                    count += 1
+                if i == 0:
+                    self.add_dict(str(Date(int(year), 3, 2)), league_game)
+                elif i == 1:
+                    self.add_dict(str(Date(int(year), 3, 3)), league_game)
+                else:
+                    logger.error('日期错误！')
+
         elif game_type == "champions4to2":
-            pass
+            # 一般是在结束8to4比赛后运行(3/4)
+            # computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+            clubs: List[int] = []
+            for i in range(4):
+                # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
+                query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
+                    self.save_id, self.save_model.season, 'champions8to4_{}'.format(i + 1))
+                games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+                score_dict = dict()
+                for game in games:
+                    score_dict.get(game.teams[0].club_id, 0)
+                    score_dict[game.teams[0].club_id] += game.teams[0].score
+                    score_dict.get(game.teams[1].club_id, 0)
+                    score_dict[game.teams[1].club_id] += game.teams[1].score
+                if score_dict[games[0].teams[0].club_id] > score_dict[games[0].teams[1].club_id]:
+                    clubs.append(games[0].teams[0].club_id)
+                else:
+                    clubs.append(games[0].teams[1].club_id)
+            if len(clubs) != 4:
+                logger.error('champions4to2" 数量错误!')
+
+            clubs_a = random.sample(clubs, 2)  # 随机挑一半
+            clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
+            schedule = [game for game in zip(clubs_a, clubs_b)]
+
+            count = 1
+            for game in schedule:
+                # 每天打一场
+                league_game = dict()
+                league_game["eve"] = []
+                league_game["pve"] = []
+                one_game_dict = dict()
+                one_game_dict["game_name"] = 'champions_league'
+                one_game_dict["game_type"] = "champions4to2_{}".format(count)
+                one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                if game[0] == self.save_model.player_club_id or \
+                        game[1] == self.save_model.player_club_id:
+                    league_game["pve"].append(one_game_dict)
+                else:
+                    league_game["eve"].append(one_game_dict)
+
+                if count == 1:
+                    self.add_dict(str(Date(int(year), 2, 23)), league_game)
+                elif count == 2:
+                    self.add_dict(str(Date(int(year), 2, 24)), league_game)
+                count += 1
+
+            # 两队反一反，打第二轮的比赛
+            count = 1
+            for game in schedule:
+                # 每天打一场
+                league_game = dict()
+                league_game["eve"] = []
+                league_game["pve"] = []
+                one_game_dict = dict()
+                one_game_dict["game_name"] = 'champions_league'
+                one_game_dict["game_type"] = "champions4to2_{}".format(count)
+                one_game_dict["club_id"] = ",".join([str(game[1]), str(game[0])])
+                if game[0] == self.save_model.player_club_id or \
+                        game[1] == self.save_model.player_club_id:
+                    league_game["pve"].append(one_game_dict)
+                else:
+                    league_game["eve"].append(one_game_dict)
+
+                if count == 1:
+                    self.add_dict(str(Date(int(year), 3, 2)), league_game)
+                elif count == 2:
+                    self.add_dict(str(Date(int(year), 3, 3)), league_game)
+                count += 1
         elif game_type == "champions2to1":
-            pass
+            clubs: List[int] = []
+            for i in range(2):
+                # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
+                query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
+                    self.save_id, self.save_model.season, 'champions4to2_{}'.format(i + 1))
+                games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+                score_dict = dict()
+                for game in games:
+                    score_dict.get(game.teams[0].club_id, 0)
+                    score_dict[game.teams[0].club_id] += game.teams[0].score
+                    score_dict.get(game.teams[1].club_id, 0)
+                    score_dict[game.teams[1].club_id] += game.teams[1].score
+                if score_dict[games[0].teams[0].club_id] > score_dict[games[0].teams[1].club_id]:
+                    clubs.append(games[0].teams[0].club_id)
+                else:
+                    clubs.append(games[0].teams[1].club_id)
+            if len(clubs) != 2:
+                logger.error('champions2to1" 数量错误!')
+
+            league_game = dict()
+            league_game["eve"] = []
+            league_game["pve"] = []
+            one_game_dict = dict()
+            one_game_dict["game_name"] = 'champions_league'
+            one_game_dict["game_type"] = "champions2to1"
+            one_game_dict["club_id"] = ",".join([str(clubs[0]), str(clubs[1])])
+            if clubs[0] == self.save_model.player_club_id or \
+                    clubs[1] == self.save_model.player_club_id:
+                league_game["pve"].append(one_game_dict)
+            else:
+                league_game["eve"].append(one_game_dict)
         else:
             logger.error("无{}赛程".format(game_type))
 
