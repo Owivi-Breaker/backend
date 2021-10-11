@@ -54,7 +54,7 @@ class ComputedPlayer:
         :return: 能力值
         """
         ori_capa = eval("self.player_model.{}".format(capa_name))
-        age = self.player_model.age
+        age = self.get_age()
         start_age = 30
         if age >= start_age:
             weight = 1 - (age - 30 + 1) * 0.05
@@ -108,3 +108,10 @@ class ComputedPlayer:
         :return: 身价
         """
         pass
+
+    def get_age(self) -> int:
+        """
+        获取年龄
+        :return: 年龄
+        """
+        return self.player_model.age + self.player_model.club.league.save.season - 1
