@@ -9,7 +9,7 @@
       {
         "name": "曼城",
         "finance": 30000,
-        "reputation": 80,
+        "reputation": 78,
         "ori_mean_capa": 71
       },
       {
@@ -27,13 +27,13 @@
       {
         "name": "切尔西",
         "finance": 28000,
-        "reputation": 76,
+        "reputation": 78,
         "ori_mean_capa": 69
       },
       {
         "name": "阿森纳",
         "finance": 10000,
-        "reputation": 75,
+        "reputation": 74,
         "ori_mean_capa": 65
       },
       {
@@ -313,7 +313,7 @@
         "ori_mean_capa": 57
       },
       {
-        "name": "比利亚雷尔",
+        "name": "比利亚雷亚尔",
         "finance": 6700,
         "reputation": 61,
         "ori_mean_capa": 56
@@ -778,5 +778,781 @@
         "ori_mean_capa": 42
       }
     ]
+  },
+  {
+    "name": "德甲",
+    "cup": "德国杯",
+    "upper_league": "",
+    "lower_league": "德乙",
+    "points": 81,
+    "clubs": [
+      {
+        "name": "拜仁慕尼黑",
+        "finance": 19000,
+        "reputation": 80,
+        "ori_mean_capa": 69
+      },
+      {
+        "name": "多特",
+        "finance": 13000,
+        "reputation": 72,
+        "ori_mean_capa": 63
+      },
+      {
+        "name": "勒沃库森",
+        "finance": 8000,
+        "reputation": 69,
+        "ori_mean_capa": 61
+      },
+      {
+        "name": "莱比锡红牛",
+        "finance": 9000,
+        "reputation": 61,
+        "ori_mean_capa": 58
+      },
+      {
+        "name": "沃尔夫斯堡",
+        "finance": 7300,
+        "reputation": 63,
+        "ori_mean_capa": 58
+      },
+      {
+        "name": "法兰克福",
+        "finance": 7300,
+        "reputation": 62,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "柏林联合",
+        "finance": 7200,
+        "reputation": 62,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "门兴格拉德巴赫",
+        "finance": 7000,
+        "reputation": 61,
+        "ori_mean_capa": 56
+      },
+      {
+        "name": "斯图加特",
+        "finance": 7000,
+        "reputation": 60,
+        "ori_mean_capa": 56
+      },
+      {
+        "name": "弗莱堡",
+        "finance": 6900,
+        "reputation": 59,
+        "ori_mean_capa": 55
+      },
+      {
+        "name": "霍芬海姆",
+        "finance": 6500,
+        "reputation": 58,
+        "ori_mean_capa": 54
+      },
+      {
+        "name": "美因茨",
+        "finance": 6400,
+        "reputation": 58,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "奥格斯堡",
+        "finance": 6300,
+        "reputation": 57,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "柏林赫塔",
+        "finance": 6100,
+        "reputation": 57,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "比勒弗尔德",
+        "finance": 6000,
+        "reputation": 56,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "波鸿",
+        "finance": 6000,
+        "reputation": 55,
+        "ori_mean_capa": 51
+      },
+      {
+        "name": "菲尔特",
+        "finance": 5800,
+        "reputation": 55,
+        "ori_mean_capa": 51
+      },
+      {
+        "name": "科隆",
+        "finance": 5800,
+        "reputation": 52,
+        "ori_mean_capa": 50
+      },
+      {
+        "name": "云达不来梅",
+        "finance": 5600,
+        "reputation": 52,
+        "ori_mean_capa": 50
+      },
+      {
+        "name": "沙尔克04",
+        "finance": 5600,
+        "reputation": 52,
+        "ori_mean_capa": 50
+      }
+    ]
+  },
+  {
+    "name": "德乙",
+    "cup": "德杯",
+    "upper_league": "德甲",
+    "lower_league": "",
+    "points": 65,
+    "clubs": [
+      {
+        "name": "圣保利",
+        "finance": 3600,
+        "reputation": 31,
+        "ori_mean_capa": 48
+      },
+      {
+        "name": "雷根斯堡",
+        "finance": 3500,
+        "reputation": 31,
+        "ori_mean_capa": 47
+      },
+      {
+        "name": "帕德博恩",
+        "finance": 3400,
+        "reputation": 30,
+        "ori_mean_capa": 46
+      },
+      {
+        "name": "纽伦堡",
+        "finance": 3300,
+        "reputation": 29,
+        "ori_mean_capa": 45
+      },
+      {
+        "name": "海登海姆",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "汉堡",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "达姆施塔特",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "卡尔斯鲁厄",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "德累斯顿迪纳摩",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "杜塞尔多夫",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "汉诺威96",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "罗斯托克",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "荷尔斯泰因基尔",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "桑德豪森",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "奥厄",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "因戈尔施塔特",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "马格德堡",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "奥斯纳布",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "慕尼黑1860",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "曼海姆",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      }
+    ]
+  },
+  {
+    "name": "法甲",
+    "cup": "法国杯",
+    "upper_league": "",
+    "lower_league": "法乙",
+    "points": 79,
+    "clubs": [
+      {
+        "name": "巴黎圣日尔曼",
+        "finance": 31000,
+        "reputation": 70,
+        "ori_mean_capa": 68
+      },
+      {
+        "name": "里昂",
+        "finance": 8000,
+        "reputation": 63,
+        "ori_mean_capa": 61
+      },
+      {
+        "name": "里尔",
+        "finance": 8000,
+        "reputation": 65,
+        "ori_mean_capa": 63
+      },
+      {
+        "name": "摩纳哥",
+        "finance": 7600,
+        "reputation": 61,
+        "ori_mean_capa": 58
+      },
+      {
+        "name": "马赛",
+        "finance": 7400,
+        "reputation": 63,
+        "ori_mean_capa": 58
+      },
+      {
+        "name": "雷恩",
+        "finance": 7300,
+        "reputation": 62,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "尼斯",
+        "finance": 7200,
+        "reputation": 62,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "昂热",
+        "finance": 7000,
+        "reputation": 61,
+        "ori_mean_capa": 56
+      },
+      {
+        "name": "朗斯",
+        "finance": 7000,
+        "reputation": 60,
+        "ori_mean_capa": 56
+      },
+      {
+        "name": "蒙彼利埃",
+        "finance": 6900,
+        "reputation": 59,
+        "ori_mean_capa": 55
+      },
+      {
+        "name": "兰斯",
+        "finance": 6500,
+        "reputation": 58,
+        "ori_mean_capa": 54
+      },
+      {
+        "name": "克莱蒙",
+        "finance": 6400,
+        "reputation": 58,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "波尔多",
+        "finance": 6300,
+        "reputation": 57,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "特鲁瓦",
+        "finance": 6100,
+        "reputation": 57,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "梅斯",
+        "finance": 6000,
+        "reputation": 56,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "斯特拉斯堡",
+        "finance": 6000,
+        "reputation": 55,
+        "ori_mean_capa": 51
+      },
+      {
+        "name": "洛里昂",
+        "finance": 5800,
+        "reputation": 55,
+        "ori_mean_capa": 51
+      },
+      {
+        "name": "南特",
+        "finance": 5800,
+        "reputation": 52,
+        "ori_mean_capa": 50
+      },
+      {
+        "name": "布雷斯特",
+        "finance": 5600,
+        "reputation": 52,
+        "ori_mean_capa": 50
+      },
+      {
+        "name": "圣埃蒂安",
+        "finance": 5600,
+        "reputation": 52,
+        "ori_mean_capa": 50
+      }
+    ]
+  },
+  {
+    "name": "法乙",
+    "cup": "法国杯",
+    "upper_league": "法甲",
+    "lower_league": "",
+    "points": 65,
+    "clubs": [
+      {
+        "name": "南锡",
+        "finance": 3600,
+        "reputation": 31,
+        "ori_mean_capa": 48
+      },
+      {
+        "name": "第戎",
+        "finance": 3500,
+        "reputation": 31,
+        "ori_mean_capa": 47
+      },
+      {
+        "name": "巴黎FC",
+        "finance": 3400,
+        "reputation": 30,
+        "ori_mean_capa": 46
+      },
+      {
+        "name": "图卢兹",
+        "finance": 3300,
+        "reputation": 29,
+        "ori_mean_capa": 45
+      },
+      {
+        "name": "索肖",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "欧赛尔",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "勒阿弗尔",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "阿雅克肖",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "波城",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "奎维利鲁昂",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "尼奥特",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "瓦朗谢讷",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "尼姆",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "卡昂",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "甘冈",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "格勒诺布尔",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "罗德兹",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "巴斯蒂亚",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "亚眠",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      },
+      {
+        "name": "敦刻尔克",
+        "finance": 2600,
+        "reputation": 28,
+        "ori_mean_capa": 42
+      }
+    ]
+  },
+  {
+    "name": "欧洲地区联赛",
+    "cup": "",
+    "upper_league": "",
+    "lower_league": "",
+    "points": 70,
+    "clubs": [
+      {
+        "name": "阿贾克斯",
+        "finance": 8000,
+        "reputation": 67,
+        "ori_mean_capa": 59
+      },
+      {
+        "name": "本菲卡",
+        "finance": 7800,
+        "reputation": 67,
+        "ori_mean_capa": 58
+      },
+      {
+        "name": "波尔图",
+        "finance": 7300,
+        "reputation": 67,
+        "ori_mean_capa": 58
+      },
+      {
+        "name": "PSV埃因霍温",
+        "finance": 7200,
+        "reputation": 65,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "费耶诺德",
+        "finance": 6800,
+        "reputation": 64,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "葡萄牙体育",
+        "finance": 6800,
+        "reputation": 66,
+        "ori_mean_capa": 57
+      },
+      {
+        "name": "泽尼特",
+        "finance": 6500,
+        "reputation": 61,
+        "ori_mean_capa": 55
+      },
+      {
+        "name": "莫斯科中央陆军",
+        "finance": 6000,
+        "reputation": 56,
+        "ori_mean_capa": 52
+      },
+      {
+        "name": "布鲁日",
+        "finance": 6000,
+        "reputation": 60,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "萨尔茨堡红牛",
+        "finance": 6300,
+        "reputation": 55,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "凯尔特人",
+        "finance": 5000,
+        "reputation": 40,
+        "ori_mean_capa": 48
+      },
+      {
+        "name": "流浪者",
+        "finance": 5000,
+        "reputation": 40,
+        "ori_mean_capa": 48
+      },
+      {
+        "name": "费内巴切",
+        "finance": 4800,
+        "reputation": 37,
+        "ori_mean_capa": 45
+      },
+      {
+        "name": "特拉布宗体育",
+        "finance": 4600,
+        "reputation": 35,
+        "ori_mean_capa": 43
+      },
+      {
+        "name": "中日德兰",
+        "finance": 4500,
+        "reputation": 37,
+        "ori_mean_capa": 43
+      },
+      {
+        "name": "哥本哈根",
+        "finance": 4500,
+        "reputation": 37,
+        "ori_mean_capa": 43
+      },
+      {
+        "name": "基辅迪那摩",
+        "finance": 6500,
+        "reputation": 61,
+        "ori_mean_capa": 55
+      },
+      {
+        "name": "顿涅茨克矿工",
+        "finance": 6300,
+        "reputation": 60,
+        "ori_mean_capa": 54
+      },
+      {
+        "name": "安特卫普",
+        "finance": 5800,
+        "reputation": 59,
+        "ori_mean_capa": 53
+      },
+      {
+        "name": "莫斯科火车头",
+        "finance": 5800,
+        "reputation": 55,
+        "ori_mean_capa": 53
+      }
+    ]
+  },
+  {
+    "name": "其他地区联赛",
+    "cup": "",
+    "upper_league": "",
+    "lower_league": "",
+    "points": 70,
+    "clubs": [
+      {
+        "name": "卡利美洲",
+        "finance": 4500,
+        "reputation": 38,
+        "ori_mean_capa": 36
+      },
+      {
+        "name": "纽维尔老男孩",
+        "finance": 4000,
+        "reputation": 37,
+        "ori_mean_capa": 35
+      },
+      {
+        "name": "博卡青年",
+        "finance": 4500,
+        "reputation": 41,
+        "ori_mean_capa": 37
+      },
+      {
+        "name": "河床",
+        "finance": 4500,
+        "reputation": 40,
+        "ori_mean_capa": 38
+      },
+      {
+        "name": "桑托斯",
+        "finance": 4000,
+        "reputation": 37,
+        "ori_mean_capa": 35
+      },
+      {
+        "name": "科林蒂安",
+        "finance": 4300,
+        "reputation": 39,
+        "ori_mean_capa": 36
+      },
+      {
+        "name": "弗拉门戈",
+        "finance": 4500,
+        "reputation": 38,
+        "ori_mean_capa": 37
+      },
+      {
+        "name": "洛杉矶银河",
+        "finance": 4600,
+        "reputation": 37,
+        "ori_mean_capa": 34
+      },
+      {
+        "name": "鹿岛鹿角",
+        "finance": 3600,
+        "reputation": 32,
+        "ori_mean_capa": 31
+      },
+      {
+        "name": "神户胜利船",
+        "finance": 3600,
+        "reputation": 34,
+        "ori_mean_capa": 34
+      },
+      {
+        "name": "横滨水手",
+        "finance": 3700,
+        "reputation": 32,
+        "ori_mean_capa": 34
+      },
+      {
+        "name": "川崎前锋",
+        "finance": 3800,
+        "reputation": 32,
+        "ori_mean_capa": 35
+      },
+      {
+        "name": "水原三星",
+        "finance": 3500,
+        "reputation": 31,
+        "ori_mean_capa": 31
+      },
+      {
+        "name": "蔚山现代",
+        "finance": 3700,
+        "reputation": 33,
+        "ori_mean_capa": 34
+      },
+      {
+        "name": "全北现代",
+        "finance": 3700,
+        "reputation": 32,
+        "ori_mean_capa": 33
+      },
+      {
+        "name": "上海申花",
+        "finance": 3500,
+        "reputation": 34,
+        "ori_mean_capa": 30
+      },
+      {
+        "name": "上海海港",
+        "finance": 3500,
+        "reputation": 32,
+        "ori_mean_capa": 31
+      },
+      {
+        "name": "北京国安",
+        "finance": 3500,
+        "reputation": 34,
+        "ori_mean_capa": 31
+      },
+      {
+        "name": "浙江绿城",
+        "finance": 3100,
+        "reputation": 30,
+        "ori_mean_capa": 27
+      },
+      {
+        "name": "广州恒大",
+        "finance": 3600,
+        "reputation": 33,
+        "ori_mean_capa": 33
+      }
+    ]
   }
+
+
 ]
