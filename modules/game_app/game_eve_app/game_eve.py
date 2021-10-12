@@ -197,19 +197,19 @@ class GameEvE:
         # endregion
         # region 能力成长
         if player.data['real_rating'] < 4:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.05))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.025))
         elif 4 <= player.data['real_rating'] < 5:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.1))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.05))
         elif 5 <= player.data['real_rating'] < 6:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.15))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.075))
         elif 6 <= player.data['real_rating'] < 7:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.2))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.1))
         elif 7 <= player.data['real_rating'] < 8:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.25))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.125))
         elif 8 <= player.data['real_rating'] < 9:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.3))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.15))
         elif player.data['real_rating'] >= 9:
-            self.update_player(player.player_model, self.get_cap_improvement(player, 0.35))
+            self.update_player(player.player_model, self.get_cap_improvement(player, 0.175))
         else:
             logger.error('没有球员相对应的评分！')
         # endregion
