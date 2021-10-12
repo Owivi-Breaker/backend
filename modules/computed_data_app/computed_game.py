@@ -174,7 +174,7 @@ class ComputedGame:
         :return: 前num名的club_id
         """
         df = self.get_season_points_table(game_season=game_season, game_name=game_name, game_type=game_type)
-        return df[0:num, [0]].to_list()
+        return [x[0] for x in df.iloc[0:num, 0:1].values.tolist()]
 
     def get_top_clubs_model(
             self, num: int, game_season: int, game_name: str, game_type: str = None) -> List[models.Club]:
@@ -204,7 +204,7 @@ class ComputedGame:
         for game in games:
             team1 = game.teams[0]
             team2 = game.teams[1]
-            if team1.score > team2.score:
+            if team1.score >= team2.score:  # TODO 删掉等于号
                 clubs_id.append(team1.club_id)
             elif team1.score < team2.score:
                 clubs_id.append(team2.club_id)

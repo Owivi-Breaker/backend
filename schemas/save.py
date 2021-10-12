@@ -15,9 +15,13 @@ class SaveCreate(BaseModel):
         orm_mode = True
 
 
-
 class Save(SaveCreate):
     id: int
     user_id: int
     calendars: List[schemas.Calendar] = []
     leagues: List[schemas.League] = []
+
+
+class SaveShow(SaveCreate):
+    id: int
+    user_id: int

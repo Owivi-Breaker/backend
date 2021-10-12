@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 import crud
 import models
 from utils import Date, utils, logger
-from modules import game_app
+from modules import game_app, generate_app, computed_data_app
 
 
 class NextTurner:
@@ -38,6 +38,12 @@ class NextTurner:
             self.eve_starter(total_events['eve'])
         if 'transfer' in total_events.keys():
             self.transfer_starter(total_events['transfer'])
+        if 'game_generation' in total_events.keys():
+            self.game_generation_starter(total_events['game_generation'])
+        if 'next_calendar' in total_events.keys():
+            self.next_calendar_starter()
+        if 'promote_n_relegate' in total_events.keys():
+            self.promote_n_relegate_starter()
 
     def eve_starter(self, eve: list):
         for game in eve:
@@ -56,7 +62,7 @@ class NextTurner:
                                         season=self.save_model.season,
                                         save_id=self.save_model.id)
             name1, name2, score1, score2 = game_eve.start()
-            logger.info("{}: {} {}:{} {}".format(game['game_name'], name1, score1, score2, name2))
+            logger.info("{} {}: {} {}:{} {}".format(game['game_name'],game['game_type'], name1, score1, score2, name2))
 
     def pve_starter(self, pve: list):
         # 暂时跟eve作相同处理
@@ -64,3 +70,45 @@ class NextTurner:
 
     def transfer_starter(self, transfer: list):
         pass
+
+    def game_generation_starter(self, game_generation):
+        calendar_generator = generate_app.CalendarGenerator(db=self.db, save_id=self.save_id)
+        for game_event in game_generation:
+            if 'cup' in game_event:
+                calendar_generator.generate_cup_games(game_type=game_event)
+                calendar_generator.save_in_db()
+            if 'champions' in game_event:
+                calendar_generator.generate_champions_league_games(game_type=game_event)
+                calendar_generator.save_in_db()
+
+    def promote_n_relegate_starter(self):
+        for league_model in self.save_model.leagues:
+            if not league_model.upper_league:
+                lower_league = crud.get_league_by_id(db=self.db, league_id=league_model.lower_league)
+                computed_game = computed_data_app.ComputedGame(self.db, save_id=self.save_model.id)
+                df1 = computed_game.get_season_points_table(
+                    game_season=self.save_model.season, game_name=league_model.name)
+                df2 = computed_game.get_season_points_table(
+                    game_season=self.save_model.season, game_name=lower_league.name)
+
+                relegate_df = df1.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
+                relegate_club_id = relegate_df[-4:]['id'].to_list()
+                for club_id in relegate_club_id:
+                    # 降级
+                    crud.update_club(db=self.db, club_id=club_id, attri={'league_id': lower_league.id})
+                promote_df = df2.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
+                promote_club_id = promote_df[:4]['id'].to_list()
+                for club_id in promote_club_id:
+                    # 升级
+                    crud.update_club(db=self.db, club_id=club_id, attri={'league_id': league_model.id})
+        logger.info('{}赛季的联赛升降级完成'.format(str(self.save_model.season + 1)))
+
+    def next_calendar_starter(self):
+        """
+        生成下赛季的日程表
+        """
+        calendar_generator = generate_app.CalendarGenerator(db=self.db, save_id=self.save_model.id)
+        calendar_generator.generate()
+        self.save_model.season += 1  # 赛季+1
+        self.db.commit()
+        logger.info('{}赛季的日程表生成完成'.format(str(self.save_model.season + 1)))

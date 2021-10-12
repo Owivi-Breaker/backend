@@ -135,7 +135,7 @@ async def create_save(save_data: SaveData, current_user: models.User = Depends(g
     return save_model
 
 
-@router.get("/users/show-saves/", response_model=List[schemas.Save])
+@router.get("/users/show-saves/", response_model=List[schemas.SaveShow])
 async def show_saves(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return crud.get_save_by_user(db=db, user_id=current_user.id)
 
