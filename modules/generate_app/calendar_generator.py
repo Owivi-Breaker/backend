@@ -104,6 +104,8 @@ class CalendarGenerator:
         if game_type == "cup32to16":
             # 一般是在赛季开始初始化日程表时，生成32进16的赛事
             for league_model in self.save_model.leagues:
+                if league_model.name == '欧洲地区联赛' or league_model.name == '其他地区联赛':
+                    continue
                 if not league_model.upper_league:
                     # 生成一个联赛的杯赛赛事
                     lower_league = crud.get_league_by_id(db=self.db, league_id=league_model.lower_league)
