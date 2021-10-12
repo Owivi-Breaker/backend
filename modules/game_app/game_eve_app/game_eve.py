@@ -60,7 +60,7 @@ class GameEvE:
         self.save_in_db()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
 
-        return self.lteam.score, self.rteam.score
+        return self.lteam.team_model.name, self.rteam.team_model.name, self.lteam.score, self.rteam.score
 
     def tactical_start(self, num: int = 20):
         """

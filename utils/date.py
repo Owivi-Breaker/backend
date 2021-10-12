@@ -5,8 +5,8 @@ class Date:
     def __init__(self, *args):
         if len(args) >= 3:
             self.year, self.month, self.day = args
-        elif len(args) == 1 and isinstance(args, str):
-            self.year, self.month, self.day = args.split('-')
+        elif len(args) == 1 and isinstance(args[0], str):
+            self.year, self.month, self.day = [int(x) for x in args[0].split('-')]
         self.date = datetime.date(self.year, self.month, self.day)
 
     def get_date(self):

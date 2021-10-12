@@ -5,7 +5,7 @@ Faker
 loguru
 pygtrans
 fastapi
-uvicorn[standard]
+uvicorn
 passlib
 python-jose[cryptography]
 python-multipart

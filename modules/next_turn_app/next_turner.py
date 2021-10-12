@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 
 import crud
 import models
-import utils.utils
-from utils import Date, utils
+from utils import Date, utils, logger
 from modules import game_app
 
 
@@ -25,6 +24,7 @@ class NextTurner:
 
     def check(self):
         self.plus_days()
+        logger.info(str(self.date))
         query_str = "and_(models.Calendar.save_id=='{}', models.Calendar.date=='{}')".format(
             self.save_model.id, str(self.date))
         calendars: List[models.Calendar] = crud.get_calendars_by_attri(db=self.db, query_str=query_str)
@@ -39,12 +39,28 @@ class NextTurner:
         if 'transfer' in total_events.keys():
             self.transfer_starter(total_events['transfer'])
 
-    def eve_starter(self, eve_dict: dict):
-        pass
+    def eve_starter(self, eve: list):
+        for game in eve:
+            clubs_id = game['club_id'].split(',')
+            tactic_adjustor = game_app.TacticAdjustor(db=self.db,
+                                                      club1_id=clubs_id[0], club2_id=clubs_id[1],
+                                                      player_club_id=self.save_model.player_club_id,
+                                                      save_id=self.save_model.id)
+            tactic_adjustor.adjust()
+            # 开始模拟比赛
+            game_eve = game_app.GameEvE(db=self.db,
+                                        club1_id=clubs_id[0], club2_id=clubs_id[1],
+                                        date=self.date,
+                                        game_name=game['game_name'],
+                                        game_type=game['game_type'],
+                                        season=self.save_model.season,
+                                        save_id=self.save_model.id)
+            name1, name2, score1, score2 = game_eve.start()
+            logger.info("{}: {} {}:{} {}".format(game['game_name'], name1, score1, score2, name2))
 
-    def pve_starter(self, pve_dict: dict):
+    def pve_starter(self, pve: list):
         # 暂时跟eve作相同处理
-        self.eve_starter(pve_dict)
+        self.eve_starter(pve)
 
-    def transfer_starter(self, transfer_dict: dict):
+    def transfer_starter(self, transfer: list):
         pass
