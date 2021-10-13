@@ -17,6 +17,13 @@ from utils import logger, Date
 router = APIRouter()
 
 
+def quick_game(db: Session, fake_season, save_id):
+    game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=Date(2021, 8, 14),
+                                game_name='国王杯', game_type='cup4to2',
+                                season=fake_season, save_id=save_id)
+    score = game_eve.start()
+
+
 def start_season_game(league_model: models.League, save_model: models.Save, db: Session):
     """
     快速进行一个赛季的比赛
@@ -96,6 +103,13 @@ def start_season_games(db: Session, save_id: int, years: int = 0):
         promote_n_relegate(save_model=save_model, db=db)
         save_model.season += 1
         db.commit()
+
+
+@router.get('/quick_game')
+async def make_50_games(db: Session = Depends(get_db), save_id=1):
+    for s in range(50):
+        print('正在进行第' +str(s)  + '场')
+        game = quick_game(db, s, save_id)
 
 
 @router.get('/imitate_game_season')

@@ -63,9 +63,14 @@ class GameEvE:
         else:
             pass
 
-        self.judge_extra_time()  # 加时判断
+        self.judge_extra_time()  # 加时判断&点球判断
         self.add_script('比赛结束！ {} {}:{} {}'.format(
             self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name))
+        if self.winner_id == self.lteam.club_id:
+            winner_name = self.lteam.name
+        else:
+            winner_name = self.rteam.name
+        self.add_script('胜者为{}！'.format(winner_name))
         self.rate()  # 球员评分
         self.save_in_db()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
@@ -98,6 +103,8 @@ class GameEvE:
         """
         进行加时比赛
         """
+        print('加时')
+        self.add_script('\n开始加时比赛！')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
         for _ in range(20):  # 加时赛20个回合
@@ -125,9 +132,53 @@ class GameEvE:
         """
         进行点球
         """
-        lteam_p, rteam_p =0
+        print('点球')
+        lteam_p = 0  # 点球进球数
+        rteam_p = 0
 
+        turn = 0
+        win_club_id = 0  # 胜者
+        while win_club_id == 0:
+            self.add_script('\n第{}轮点球！'.format(turn + 1))
+            l_out = self.lteam.making_final_penalty(self.rteam, turn)  # 点球结果
+            if l_out:
+                self.add_script('稳稳将球罚进！')
+                lteam_p += 1
+            elif not l_out:
+                self.add_script('被门将拒之门外！')
 
+            r_out = self.rteam.making_final_penalty(self.lteam, turn)
+
+            if r_out:
+                self.add_script('稳稳将球罚进！')
+                rteam_p += 1
+            elif not r_out:
+                self.add_script('被门将拒之门外！')
+            self.add_script('{} : {}'.format(lteam_p, rteam_p))
+            if turn < 3 and lteam_p - rteam_p > 2:  # 前三轮，2：0还能继续
+                win_club_id = self.lteam.club_id
+
+            if turn < 3 and rteam_p - lteam_p > 2:  # 前三轮，2：0还能继续
+                win_club_id = self.rteam.club_id
+
+            # turn=3,第四轮
+            if turn == 3 and lteam_p - rteam_p >= 2:
+                win_club_id = self.lteam.club_id
+
+            if turn == 3 and rteam_p - lteam_p >= 2:
+                win_club_id = self.rteam.club_id
+
+            if turn > 3 and lteam_p - rteam_p >= 1:  # 第五轮及以后，1：0就结束
+                win_club_id = self.lteam.club_id
+
+            if turn > 3 and rteam_p - lteam_p >= 1:  # 第五轮及以后，1：0就结束
+                win_club_id = self.rteam.club_id
+
+            turn += 1
+
+        self.winner_id = win_club_id
+        self.add_script('点球结束！ {} {}:{} {}'.format(
+            self.lteam.name, lteam_p, rteam_p, self.rteam.name))
 
     def tactical_start(self, num: int = 20):
         """
