@@ -10,6 +10,6 @@ class Calendar(Base):
     created_time = Column(DateTime)
 
     date = Column(String(50))
-    event_str = Column(LONGTEXT)
+    event_str = Column(String)
 
     save_id = Column(Integer, ForeignKey('save.id'))

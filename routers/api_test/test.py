@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-from core.db import SessionLocal, engine, get_db
+from core.db import engine, get_db, drop_all
 from pydantic import BaseModel
 import datetime
 import random
@@ -135,3 +135,8 @@ def next_turn(save_id: int, turn_num: int, db: Session = Depends(get_db)):
     for i in range(turn_num):
         logger.info('第{}回合'.format(i))
         next_turner.check()
+
+
+@router.get('/clear_db')
+def clear_db():
+    drop_all()

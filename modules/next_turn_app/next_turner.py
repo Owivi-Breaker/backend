@@ -1,6 +1,7 @@
 import json
 from typing import List
 from sqlalchemy.orm import Session
+import threading
 
 import crud
 import models
@@ -48,22 +49,26 @@ class NextTurner:
 
     def eve_starter(self, eve: list):
         for game in eve:
-            clubs_id = game['club_id'].split(',')
-            tactic_adjustor = game_app.TacticAdjustor(db=self.db,
-                                                      club1_id=clubs_id[0], club2_id=clubs_id[1],
-                                                      player_club_id=self.save_model.player_club_id,
-                                                      save_id=self.save_model.id)
-            tactic_adjustor.adjust()
-            # 开始模拟比赛
-            game_eve = game_app.GameEvE(db=self.db,
-                                        club1_id=clubs_id[0], club2_id=clubs_id[1],
-                                        date=self.date,
-                                        game_name=game['game_name'],
-                                        game_type=game['game_type'],
-                                        season=self.save_model.season,
-                                        save_id=self.save_model.id)
-            name1, name2, score1, score2 = game_eve.start()
-            logger.info("{} {}: {} {}:{} {}".format(game['game_name'], game['game_type'], name1, score1, score2, name2))
+            t = threading.Thread(target=self.play_game, args=(game,))
+            t.start()
+
+    def play_game(self, game):
+        clubs_id = game['club_id'].split(',')
+        tactic_adjustor = game_app.TacticAdjustor(db=self.db,
+                                                  club1_id=clubs_id[0], club2_id=clubs_id[1],
+                                                  player_club_id=self.save_model.player_club_id,
+                                                  save_id=self.save_model.id)
+        tactic_adjustor.adjust()
+        # 开始模拟比赛
+        game_eve = game_app.GameEvE(db=self.db,
+                                    club1_id=clubs_id[0], club2_id=clubs_id[1],
+                                    date=self.date,
+                                    game_name=game['game_name'],
+                                    game_type=game['game_type'],
+                                    season=self.save_model.season,
+                                    save_id=self.save_model.id)
+        name1, name2, score1, score2 = game_eve.start()
+        logger.info("{} {}: {} {}:{} {}".format(game['game_name'], game['game_type'], name1, score1, score2, name2))
 
     def pve_starter(self, pve: list):
         # 暂时跟eve作相同处理
