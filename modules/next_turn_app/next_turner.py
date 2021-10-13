@@ -32,6 +32,7 @@ class NextTurner:
         for calendar in calendars:
             event = json.loads(calendar.event_str)
             total_events = utils.merge_dict_with_list_items(total_events, event)
+        logger.debug(total_events)
         if 'pve' in total_events.keys():
             self.pve_starter(total_events['pve'])
         if 'eve' in total_events.keys():
@@ -62,7 +63,7 @@ class NextTurner:
                                         season=self.save_model.season,
                                         save_id=self.save_model.id)
             name1, name2, score1, score2 = game_eve.start()
-            logger.info("{} {}: {} {}:{} {}".format(game['game_name'],game['game_type'], name1, score1, score2, name2))
+            logger.info("{} {}: {} {}:{} {}".format(game['game_name'], game['game_type'], name1, score1, score2, name2))
 
     def pve_starter(self, pve: list):
         # 暂时跟eve作相同处理
