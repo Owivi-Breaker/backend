@@ -8,7 +8,7 @@ class Club(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
-    name = Column(String)
+    name = Column(String(1000))
 
     finance = Column(Float)
     reputation = Column(Float)

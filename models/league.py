@@ -9,10 +9,10 @@ class League(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
-    name = Column(String)
+    name = Column(String(1000))
     points = Column(Float)
 
-    cup = Column(String)
+    cup = Column(String(1000))
     upper_league = Column(Integer)
     lower_league = Column(Integer)
 

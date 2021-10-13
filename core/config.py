@@ -8,7 +8,7 @@ import os
 class Settings:
     CWD_URL = str(Path.cwd())  # 根目录
     ENV = os.environ.get("fast_env", "DEV")  # 本次启动环境
-    APP_NAME = "Test~~~"
+    APP_NAME = "FM"
     # api前缀
     API_PREFIX = "/api"
     # jwt密钥,建议随机生成一个
@@ -19,7 +19,8 @@ class Settings:
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost:8080", "http://192.168.1.105:8080"]
     # db配置
-    DB_URL = "sqlite:///./sql_apps.db"
+    DB_URL = {"sqlite": "sqlite:///./sql_apps.db",
+              "MySQL": "mysql+pymysql://root:1234@sh-cdb-1q4p2vuy.sql.tencentcdb.com:59484/demo"}
     # 启动端口配置
     PORT = 8000
     # 是否热加载

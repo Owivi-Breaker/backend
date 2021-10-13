@@ -8,7 +8,7 @@ class Calendar(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
 
-    date = Column(String)
-    event_str = Column(String)
+    date = Column(String(50))
+    event_str = Column(String(1000))
 
     save_id = Column(Integer, ForeignKey('save.id'))

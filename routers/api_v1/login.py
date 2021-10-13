@@ -119,7 +119,7 @@ async def read_users_me(current_user: models.User = Depends(get_current_user)): 
     return current_user.email, current_user.is_active
 
 
-@router.post("/users/create-save/", response_model=schemas.SaveCreate)
+@router.post("/users/create-save/", response_model=schemas.SaveShow)
 async def create_save(save_data: SaveData, current_user: models.User = Depends(get_current_user),
                       db: Session = Depends(get_db)):
     """

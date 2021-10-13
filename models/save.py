@@ -8,7 +8,7 @@ class Save(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
-    time = Column(String)
+    time = Column(String(1000))
     player_club_id = Column(Integer)
     season = Column(Integer)
 

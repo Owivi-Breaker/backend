@@ -9,16 +9,16 @@ class Coach(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
-    name = Column(String)
-    translated_name = Column(String)
-    nationality = Column(String)
-    translated_nationality = Column(String)
+    name = Column(String(1000))
+    translated_name = Column(String(1000))
+    nationality = Column(String(1000))
+    translated_nationality = Column(String(1000))
     age = Column(Integer)
-    birth_date = Column(String)
+    birth_date = Column(String(1000))
     values = Column(Integer)
     wages = Column(Integer)
     # 战术
-    formation = Column(String) # 阵型
+    formation = Column(String(1000)) # 阵型
     wing_cross = Column(Integer)
     under_cutting = Column(Integer)
     pull_back = Column(Integer)

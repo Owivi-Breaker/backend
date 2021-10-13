@@ -10,14 +10,14 @@ class Player(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
-    name = Column(String)
-    translated_name = Column(String)
-    nationality = Column(String)
-    translated_nationality = Column(String)
+    name = Column(String(1000))
+    translated_name = Column(String(1000))
+    nationality = Column(String(1000))
+    translated_nationality = Column(String(1000))
     age = Column(Integer)
     height = Column(Integer)
     weight = Column(Integer)
-    birth_date = Column(String)
+    birth_date = Column(String(1000))
 
     wages = Column(Float)
 

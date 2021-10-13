@@ -13,7 +13,7 @@ class GamePvE(Base):
     computer_club_id = Column(Integer)
 
     turns = Column(Integer)
-    scripts = Column(String)
+    scripts = Column(String(1000))
 
     teams = relationship("TeamPvE", backref="game_pve")
 
