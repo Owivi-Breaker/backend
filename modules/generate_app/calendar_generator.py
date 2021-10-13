@@ -57,7 +57,8 @@ class CalendarGenerator:
         将self.data中的字典数据转换成字符
         """
         for key, value in self.data.items():
-            self.data[key] = json.dumps(value)
+            self.data[key] = json.dumps(
+                value, ensure_ascii=False).encode('utf8')
 
     def generate_league_games(self):
         """
@@ -89,7 +90,8 @@ class CalendarGenerator:
                     one_game_dict = dict()
                     one_game_dict['game_name'] = league_model.name
                     one_game_dict["game_type"] = 'league'
-                    one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
+                    one_game_dict["club_id"] = ",".join(
+                        [str(game[0].id), str(game[1].id)])
                     if game[0].id == self.save_model.player_club_id or \
                             game[1].id == self.save_model.player_club_id:
                         league_game["pve"].append(one_game_dict)
@@ -112,16 +114,20 @@ class CalendarGenerator:
                     continue
                 if not league_model.upper_league:
                     # 生成一个联赛的杯赛赛事
-                    lower_league = crud.get_league_by_id(db=self.db, league_id=league_model.lower_league)
+                    lower_league = crud.get_league_by_id(
+                        db=self.db, league_id=league_model.lower_league)
 
-                    clubs: List[models.Club] = league_model.clubs.copy()  # 参赛俱乐部
+                    # 参赛俱乐部
+                    clubs: List[models.Club] = league_model.clubs.copy()
                     # 把参赛俱乐部数量填充到32支：所有一级联赛俱乐部+部分二级联赛俱乐部
                     if self.save_model.season == 1:
                         # 如果是初始赛季，低级联赛的12支队伍随便选
-                        clubs.extend(random.sample(lower_league.clubs, 32 - len(clubs)))
+                        clubs.extend(random.sample(
+                            lower_league.clubs, 32 - len(clubs)))
                     else:
                         # 按排名选择二级联赛的队伍
-                        computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                        computed_game = computed_data_app.ComputedGame(
+                            db=self.db, save_id=self.save_id)
                         top_clubs = computed_game.get_top_clubs_model(
                             num=(32 - len(clubs)),
                             game_season=self.save_model.season - 1,
@@ -132,8 +138,10 @@ class CalendarGenerator:
                         logger.error('cup32to16 数量错误!')
                     clubs_a = random.sample(clubs, 16)  # 随机挑一半
                     clubs_b = list(set(clubs) ^ set(clubs_a))  # 剩下另一半
-                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
-                    one_day_schedule = [two_days_schedule[:8], two_days_schedule[8:]]
+                    two_days_schedule = [
+                        game for game in zip(clubs_a, clubs_b)]
+                    one_day_schedule = [
+                        two_days_schedule[:8], two_days_schedule[8:]]
                     date = Date(int(year), 8, 24)
                     for games in one_day_schedule:
                         league_game = dict()
@@ -143,7 +151,8 @@ class CalendarGenerator:
                             one_game_dict = dict()
                             one_game_dict["game_name"] = league_model.cup
                             one_game_dict["game_type"] = "cup32to16"
-                            one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
+                            one_game_dict["club_id"] = ",".join(
+                                [str(game[0].id), str(game[1].id)])
                             if game[0].id == self.save_model.player_club_id or \
                                     game[1].id == self.save_model.player_club_id:
                                 league_game["pve"].append(one_game_dict)
@@ -158,7 +167,8 @@ class CalendarGenerator:
                     continue
                 if not league_model.upper_league:
                     # 生成一个联赛的16进8杯赛赛事
-                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    computed_game = computed_data_app.ComputedGame(
+                        db=self.db, save_id=self.save_id)
                     clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup32to16',
@@ -168,8 +178,10 @@ class CalendarGenerator:
                         logger.error('cup16to8 数量错误!')
                     clubs_a = random.sample(clubs_id, 8)  # 随机挑一半
                     clubs_b = list(set(clubs_id) ^ set(clubs_a))  # 剩下另一半
-                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
-                    one_day_schedule = [two_days_schedule[:4], two_days_schedule[4:]]
+                    two_days_schedule = [
+                        game for game in zip(clubs_a, clubs_b)]
+                    one_day_schedule = [
+                        two_days_schedule[:4], two_days_schedule[4:]]
                     date = Date(int(year), 12, 7)
                     for games in one_day_schedule:
                         league_game = dict()
@@ -179,7 +191,8 @@ class CalendarGenerator:
                             one_game_dict = dict()
                             one_game_dict["game_name"] = league_model.cup
                             one_game_dict["game_type"] = "cup16to8"
-                            one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                            one_game_dict["club_id"] = ",".join(
+                                [str(game[0]), str(game[1])])
                             if game[0] == self.save_model.player_club_id or \
                                     game[1] == self.save_model.player_club_id:
                                 league_game["pve"].append(one_game_dict)
@@ -194,7 +207,8 @@ class CalendarGenerator:
                     continue
                 if not league_model.upper_league:
                     # 生成一个联赛的8进4杯赛赛事
-                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    computed_game = computed_data_app.ComputedGame(
+                        db=self.db, save_id=self.save_id)
                     clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup16to8',
@@ -204,8 +218,10 @@ class CalendarGenerator:
                         logger.error('cup8to4 数量错误!')
                     clubs_a = random.sample(clubs_id, 4)  # 随机挑一半
                     clubs_b = list(set(clubs_id) ^ set(clubs_a))  # 剩下另一半
-                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
-                    one_day_schedule = [two_days_schedule[:2], two_days_schedule[2:]]
+                    two_days_schedule = [
+                        game for game in zip(clubs_a, clubs_b)]
+                    one_day_schedule = [
+                        two_days_schedule[:2], two_days_schedule[2:]]
                     date = Date(int(year) + 1, 2, 1)  # 注意是下一年了！
                     for games in one_day_schedule:
                         league_game = dict()
@@ -215,7 +231,8 @@ class CalendarGenerator:
                             one_game_dict = dict()
                             one_game_dict["game_name"] = league_model.cup
                             one_game_dict["game_type"] = "cup8to4"
-                            one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                            one_game_dict["club_id"] = ",".join(
+                                [str(game[0]), str(game[1])])
                             if game[0] == self.save_model.player_club_id or \
                                     game[1] == self.save_model.player_club_id:
                                 league_game["pve"].append(one_game_dict)
@@ -230,7 +247,8 @@ class CalendarGenerator:
                     continue
                 if not league_model.upper_league:
                     # 生成一个联赛的4进2杯赛赛事
-                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    computed_game = computed_data_app.ComputedGame(
+                        db=self.db, save_id=self.save_id)
                     clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup8to4',
@@ -240,8 +258,10 @@ class CalendarGenerator:
                         logger.error('cup4to2 数量错误!')
                     clubs_a = random.sample(clubs_id, 2)  # 随机挑一半
                     clubs_b = list(set(clubs_id) ^ set(clubs_a))  # 剩下另一半
-                    two_days_schedule = [game for game in zip(clubs_a, clubs_b)]
-                    one_day_schedule = [two_days_schedule[:1], two_days_schedule[1:]]
+                    two_days_schedule = [
+                        game for game in zip(clubs_a, clubs_b)]
+                    one_day_schedule = [
+                        two_days_schedule[:1], two_days_schedule[1:]]
                     date = Date(int(year), 3, 15)
                     for games in one_day_schedule:
                         league_game = dict()
@@ -251,7 +271,8 @@ class CalendarGenerator:
                             one_game_dict = dict()
                             one_game_dict["game_name"] = league_model.cup
                             one_game_dict["game_type"] = "cup4to2"
-                            one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                            one_game_dict["club_id"] = ",".join(
+                                [str(game[0]), str(game[1])])
                             if game[0] == self.save_model.player_club_id or \
                                     game[1] == self.save_model.player_club_id:
                                 league_game["pve"].append(one_game_dict)
@@ -266,7 +287,8 @@ class CalendarGenerator:
                     continue
                 if not league_model.upper_league:
                     # 生成一个联赛的2进1杯赛赛事
-                    computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                    computed_game = computed_data_app.ComputedGame(
+                        db=self.db, save_id=self.save_id)
                     clubs_id = computed_game.get_game_winners(
                         season=self.save_model.season,
                         game_type='cup4to2',
@@ -282,7 +304,8 @@ class CalendarGenerator:
                     one_game_dict = dict()
                     one_game_dict["game_name"] = league_model.cup
                     one_game_dict["game_type"] = "cup2to1"
-                    one_game_dict["club_id"] = ",".join([str(clubs_id[0]), str(clubs_id[1])])
+                    one_game_dict["club_id"] = ",".join(
+                        [str(clubs_id[0]), str(clubs_id[1])])
                     if clubs_id[0] == self.save_model.player_club_id or \
                             clubs_id[1] == self.save_model.player_club_id:
                         league_game["pve"].append(one_game_dict)
@@ -314,7 +337,8 @@ class CalendarGenerator:
             # 选32支俱乐部
             else:
                 clubs_model_list: List[models.Club] = []
-                computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+                computed_game = computed_data_app.ComputedGame(
+                    db=self.db, save_id=self.save_id)
                 lower_the_third: List[models.Club] = []
                 for league_model in self.save_model.leagues:
                     if league_model.name == '欧洲地区联赛' or league_model.name == '其他地区联赛':
@@ -337,7 +361,8 @@ class CalendarGenerator:
                         clubs_model_list.extend(top_clubs[:2])
                         lower_the_third.append(top_clubs[-1])
                 # 乙级联赛声望最高的两个第三名
-                lower_the_third = sorted(lower_the_third, key=lambda x: x.reputation, reverse=True)
+                lower_the_third = sorted(
+                    lower_the_third, key=lambda x: x.reputation, reverse=True)
                 clubs_model_list.extend(lower_the_third[:2])
             if len(clubs_model_list) != 32:
                 logger.error("champions_league_group 数量错误!")
@@ -357,7 +382,8 @@ class CalendarGenerator:
                     group_b.append(group_a.pop(-1))
                 schedule_reverse = []  # 主客场对调的后半赛季赛程
                 for games in schedule:
-                    schedule_reverse.append([tuple(list(x)[::-1]) for x in games])
+                    schedule_reverse.append(
+                        [tuple(list(x)[::-1]) for x in games])
                 schedule.extend(schedule_reverse)
 
                 date = Date(int(year), 9, 15)
@@ -368,8 +394,10 @@ class CalendarGenerator:
                     for game in games:
                         one_game_dict = dict()
                         one_game_dict["game_name"] = 'champions_league'
-                        one_game_dict["game_type"] = "champions_group{}".format(i + 1)
-                        one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
+                        one_game_dict["game_type"] = "champions_group{}".format(
+                            i + 1)
+                        one_game_dict["club_id"] = ",".join(
+                            [str(game[0].id), str(game[1].id)])
                         if game[0].id == self.save_model.player_club_id or \
                                 game[1].id == self.save_model.player_club_id:
                             league_game["pve"].append(one_game_dict)
@@ -379,7 +407,8 @@ class CalendarGenerator:
                     date.plus_days(14)
         elif game_type == "champions16to8":
             # 一般是在结束所有小组赛比赛后运行(11/25)
-            computed_game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+            computed_game = computed_data_app.ComputedGame(
+                db=self.db, save_id=self.save_id)
             clubs: List[models.Club] = []
             for i in range(8):
                 # 八个小组头两名出线
@@ -405,8 +434,10 @@ class CalendarGenerator:
                 for game in schedule[(i * 2):(i * 2 + 2)]:
                     one_game_dict = dict()
                     one_game_dict["game_name"] = 'champions_league'
-                    one_game_dict["game_type"] = "champions16to8_{}".format(count)
-                    one_game_dict["club_id"] = ",".join([str(game[0].id), str(game[1].id)])
+                    one_game_dict["game_type"] = "champions16to8_{}".format(
+                        count)
+                    one_game_dict["club_id"] = ",".join(
+                        [str(game[0].id), str(game[1].id)])
                     if game[0].id == self.save_model.player_club_id or \
                             game[1].id == self.save_model.player_club_id:
                         league_game["pve"].append(one_game_dict)
@@ -432,8 +463,10 @@ class CalendarGenerator:
                 for game in schedule[(i * 2):(i * 2 + 2)]:
                     one_game_dict = dict()
                     one_game_dict["game_name"] = 'champions_league'
-                    one_game_dict["game_type"] = "champions16to8_{}".format(count)
-                    one_game_dict["club_id"] = ",".join([str(game[1].id), str(game[0].id)])
+                    one_game_dict["game_type"] = "champions16to8_{}".format(
+                        count)
+                    one_game_dict["club_id"] = ",".join(
+                        [str(game[1].id), str(game[0].id)])
                     if game[0].id == self.save_model.player_club_id or \
                             game[1].id == self.save_model.player_club_id:
                         league_game["pve"].append(one_game_dict)
@@ -458,12 +491,15 @@ class CalendarGenerator:
                 # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
                 query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
                     self.save_id, self.save_model.season, 'champions16to8_{}'.format(i + 1))
-                games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+                games = crud.get_games_by_attri(
+                    db=self.db, query_str=query_str)
                 score_dict = dict()
                 for game in games:
-                    score_dict[game.teams[0].club_id] = score_dict.get(game.teams[0].club_id, 0)
+                    score_dict[game.teams[0].club_id] = score_dict.get(
+                        game.teams[0].club_id, 0)
                     score_dict[game.teams[0].club_id] += game.teams[0].score
-                    score_dict[game.teams[1].club_id] = score_dict.get(game.teams[1].club_id, 0)
+                    score_dict[game.teams[1].club_id] = score_dict.get(
+                        game.teams[1].club_id, 0)
                     score_dict[game.teams[1].club_id] += game.teams[1].score
                 if score_dict[games[0].teams[0].club_id] > score_dict[games[0].teams[1].club_id]:
                     clubs.append(games[0].teams[0].club_id)
@@ -484,8 +520,10 @@ class CalendarGenerator:
                 for game in schedule[(i * 2):(i * 2 + 2)]:
                     one_game_dict = dict()
                     one_game_dict["game_name"] = 'champions_league'
-                    one_game_dict["game_type"] = "champions8to4_{}".format(count)
-                    one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                    one_game_dict["game_type"] = "champions8to4_{}".format(
+                        count)
+                    one_game_dict["club_id"] = ",".join(
+                        [str(game[0]), str(game[1])])
                     if game[0] == self.save_model.player_club_id or \
                             game[1] == self.save_model.player_club_id:
                         league_game["pve"].append(one_game_dict)
@@ -507,8 +545,10 @@ class CalendarGenerator:
                 for game in schedule[(i * 2):(i * 2 + 2)]:
                     one_game_dict = dict()
                     one_game_dict["game_name"] = 'champions_league'
-                    one_game_dict["game_type"] = "champions16to8_{}".format(count)
-                    one_game_dict["club_id"] = ",".join([str(game[1]), str(game[0])])
+                    one_game_dict["game_type"] = "champions16to8_{}".format(
+                        count)
+                    one_game_dict["club_id"] = ",".join(
+                        [str(game[1]), str(game[0])])
                     if game[0] == self.save_model.player_club_id or \
                             game[1] == self.save_model.player_club_id:
                         league_game["pve"].append(one_game_dict)
@@ -529,12 +569,15 @@ class CalendarGenerator:
                 # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
                 query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
                     self.save_id, self.save_model.season, 'champions8to4_{}'.format(i + 1))
-                games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+                games = crud.get_games_by_attri(
+                    db=self.db, query_str=query_str)
                 score_dict = dict()
                 for game in games:
-                    score_dict[game.teams[0].club_id] = score_dict.get(game.teams[0].club_id, 0)
+                    score_dict[game.teams[0].club_id] = score_dict.get(
+                        game.teams[0].club_id, 0)
                     score_dict[game.teams[0].club_id] += game.teams[0].score
-                    score_dict[game.teams[1].club_id] = score_dict.get(game.teams[1].club_id, 0)
+                    score_dict[game.teams[1].club_id] = score_dict.get(
+                        game.teams[1].club_id, 0)
                     score_dict[game.teams[1].club_id] += game.teams[1].score
                 if score_dict[games[0].teams[0].club_id] > score_dict[games[0].teams[1].club_id]:
                     clubs.append(games[0].teams[0].club_id)
@@ -556,7 +599,8 @@ class CalendarGenerator:
                 one_game_dict = dict()
                 one_game_dict["game_name"] = 'champions_league'
                 one_game_dict["game_type"] = "champions4to2_{}".format(count)
-                one_game_dict["club_id"] = ",".join([str(game[0]), str(game[1])])
+                one_game_dict["club_id"] = ",".join(
+                    [str(game[0]), str(game[1])])
                 if game[0] == self.save_model.player_club_id or \
                         game[1] == self.save_model.player_club_id:
                     league_game["pve"].append(one_game_dict)
@@ -579,7 +623,8 @@ class CalendarGenerator:
                 one_game_dict = dict()
                 one_game_dict["game_name"] = 'champions_league'
                 one_game_dict["game_type"] = "champions4to2_{}".format(count)
-                one_game_dict["club_id"] = ",".join([str(game[1]), str(game[0])])
+                one_game_dict["club_id"] = ",".join(
+                    [str(game[1]), str(game[0])])
                 if game[0] == self.save_model.player_club_id or \
                         game[1] == self.save_model.player_club_id:
                     league_game["pve"].append(one_game_dict)
@@ -598,12 +643,15 @@ class CalendarGenerator:
                 # TODO 把挑选两场比赛的分数最高者的逻辑写进ComputedGame中
                 query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.type=='{}')".format(
                     self.save_id, self.save_model.season, 'champions4to2_{}'.format(i + 1))
-                games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+                games = crud.get_games_by_attri(
+                    db=self.db, query_str=query_str)
                 score_dict = dict()
                 for game in games:
-                    score_dict[game.teams[0].club_id] = score_dict.get(game.teams[0].club_id, 0)
+                    score_dict[game.teams[0].club_id] = score_dict.get(
+                        game.teams[0].club_id, 0)
                     score_dict[game.teams[0].club_id] += game.teams[0].score
-                    score_dict[game.teams[1].club_id] = score_dict.get(game.teams[1].club_id, 0)
+                    score_dict[game.teams[1].club_id] = score_dict.get(
+                        game.teams[1].club_id, 0)
                     score_dict[game.teams[1].club_id] += game.teams[1].score
                 if score_dict[games[0].teams[0].club_id] > score_dict[games[0].teams[1].club_id]:
                     clubs.append(games[0].teams[0].club_id)
@@ -640,7 +688,8 @@ class CalendarGenerator:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)
         # 冬窗
-        date_range = utils.date_range(int(year) + 1, 1, 1, int(year) + 1, 1, 31)
+        date_range = utils.date_range(
+            int(year) + 1, 1, 1, int(year) + 1, 1, 31)
         for date_str in date_range:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)
@@ -704,7 +753,8 @@ class CalendarGenerator:
         for key, value in self.data.items():
             data_schemas = schemas.CalendarCreate(created_time=datetime.datetime.now(),
                                                   date=key, event_str=value)
-            calendar_model = crud.create_calendar(db=self.db, calendar=data_schemas)
+            calendar_model = crud.create_calendar(
+                db=self.db, calendar=data_schemas)
             crud.update_calendar(db=self.db, calendar_id=calendar_model.id,
                                  attri={"save_id": self.save_id})
         self.data = dict()  # 清空数据

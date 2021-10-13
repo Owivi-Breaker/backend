@@ -9,7 +9,7 @@ from models.base import Base
 #     settings.DB_URL["sqlite"], connect_args={"check_same_thread": False}
 # )
 
-engine = create_engine(settings.DB_URL["MySQL"])
+engine = create_engine(settings.DB_URL["MySQLIn"], encoding="utf-8")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

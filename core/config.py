@@ -20,7 +20,8 @@ class Settings:
         "http://localhost:8080", "http://192.168.1.105:8080"]
     # db配置
     DB_URL = {"sqlite": "sqlite:///./sql_apps.db",
-              "MySQL": "mysql+pymysql://root:1234@sh-cdb-1q4p2vuy.sql.tencentcdb.com:59484/demo"}
+              "MySQLOut": "mysql+pymysql://root:1234@sh-cdb-1q4p2vuy.sql.tencentcdb.com:59484/demo",
+              "MySQLIn": "mysql+pymysql://root:1234@172.17.16.11:3306/demo"}
     # 启动端口配置
     PORT = 8000
     # 是否热加载
