@@ -215,6 +215,31 @@ class Team:
             logger.error('战术名称{}错误！'.format(tactic_name))
         return exchange_ball
 
+    def get_best_shooter(self) -> List[game_eve_app.Player]:
+        return sorted(self.players, key=lambda x: x.get_capa('shooting'))
+
+    def making_final_penalty(self, rival_team: 'Team', num):
+        """
+        点球过程
+        num:点球轮次
+        return:是否进球
+        """
+        goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]
+        return self.final_penalty_and_save(self.get_best_shooter()[num - 1], goal_keeper)
+
+    def final_penalty_and_save(self, shooter: game_eve_app.player, keeper: game_eve_app.Player) -> bool:
+        """
+        点球与扑救
+        :return: 是否进球
+        """
+        self.add_script('{}罚出点球！'.format(shooter.name))
+        win_player = utils.select_by_pro(
+            {shooter: shooter.get_capa('shooting'), keeper: keeper.get_capa('goalkeeping')})
+        if win_player == shooter:
+            return True
+        else:
+            return False
+
     def shot_and_save(self, attacker: game_eve_app.Player, defender: game_eve_app.Player,
                       assister: Optional[game_eve_app.Player] = None) -> bool:
         """

@@ -18,7 +18,8 @@ class Game(Base):
     teams = relationship("GameTeamInfo", backref="game")
     save_id = Column(Integer)
 
-    mvp = Column(Integer, ForeignKey('player.id'))
+    mvp = Column(Integer)
+    winner_id = Column(Integer)
 
 
 class GameTeamInfo(Base):

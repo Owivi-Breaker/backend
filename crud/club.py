@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -23,3 +24,11 @@ def update_club(db: Session, club_id: int, attri: dict):
 def get_club_by_id(db: Session, club_id: int):
     db_club = db.query(models.Club).filter(models.Club.id == club_id).first()
     return db_club
+
+
+"""
+def get_club_by_name(db: Session, club_name: str, save_id: int):
+    db_club = db.query(models.Club).filter(
+        and_(models.Club.name == club_name, models.Club.league.save_id == save_id)).first()
+    return db_club
+"""
