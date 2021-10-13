@@ -104,10 +104,11 @@ def merge_dict_with_list_items(a: dict, b: dict) -> dict:
     :return: 相加后的字典
     """
     for key, value in b.items():
-        if key in a.keys():
-            a[key].append(value)
-        else:
-            a[key] = value
+        if value:
+            if key in a.keys():
+                a[key].extend(value)
+            else:
+                a[key] = value
     return a
 
 

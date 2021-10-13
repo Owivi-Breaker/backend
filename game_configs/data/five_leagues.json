@@ -202,12 +202,6 @@
         "ori_mean_capa": 43
       },
       {
-        "name": "米尔沃尔",
-        "finance": 2700,
-        "reputation": 29,
-        "ori_mean_capa": 43
-      },
-      {
         "name": "布莱克浦",
         "finance": 2700,
         "reputation": 29,
@@ -1553,6 +1547,4 @@
       }
     ]
   }
-
-
 ]
