@@ -7,6 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import schemas
 import models
 import crud
-from core.db import Session_factory, engine, get_db
+from core.db import engine, get_db
 
 router = APIRouter()

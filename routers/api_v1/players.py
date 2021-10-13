@@ -3,12 +3,11 @@ from fastapi import APIRouter
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-from core.db import Session_factory, engine, get_db
+from core.db import engine, get_db
 
 import schemas
 import models
 import crud
-
 
 router = APIRouter()
 
