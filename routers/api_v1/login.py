@@ -18,8 +18,8 @@ from utils import logger, Date
 
 
 class SaveData(BaseModel):
-    type: str
-    player_club_id: int
+    type: str = 'super_leagues'
+    player_club_name: str = '巴塞罗那'
 
 
 router = APIRouter()
@@ -129,8 +129,22 @@ async def create_save(save_data: SaveData, current_user: models.User = Depends(g
     :return: 生成的存档信息
     """
     save_generator = generate_app.SaveGenerator(db)
-    save_schema = schemas.SaveCreate(player_club_id=save_data.player_club_id, created_time=datetime.datetime.now())
+    save_schema = schemas.SaveCreate(created_time=datetime.datetime.now())
     save_model = save_generator.generate(save_schema, current_user.id, save_data.type)
+    break_flag = False
+    for league in save_model.leagues:
+        for club in league.clubs:
+            if club.name == save_data.player_club_name:
+                break_flag = True
+                current_club_id = club.id
+                current_club = {'player_club_id': current_club_id}
+                crud.update_save(db, save_model.id, current_club)  # 玩家俱乐部ID加入save
+    if not break_flag:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect club name",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     return save_model
 

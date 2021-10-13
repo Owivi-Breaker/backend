@@ -24,6 +24,7 @@ class GameEvE:
         self.name = game_name
         self.season = season
         self.save_id = save_id
+        self.winner_id = 0
 
     def start(self) -> Tuple:
         """
@@ -39,6 +40,7 @@ class GameEvE:
         self.add_script('比赛开始！')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
+
         for _ in range(50):
             # 确定本次战术组织每个球员的场上位置
             self.lteam.shift_location()
@@ -53,14 +55,79 @@ class GameEvE:
                 counter_attack_permitted = True
             else:
                 counter_attack_permitted = False
+
+        if self.lteam.score > self.rteam.score:
+            self.winner_id = self.lteam.club_id
+        elif self.lteam.score < self.rteam.score:
+            self.winner_id = self.rteam.club_id  # 常规时间胜负关系
+        else:
+            pass
+
+        self.judge_extra_time()  # 加时判断
         self.add_script('比赛结束！ {} {}:{} {}'.format(
             self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name))
-
         self.rate()  # 球员评分
         self.save_in_db()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
 
         return self.lteam.team_model.name, self.rteam.team_model.name, self.lteam.score, self.rteam.score
+
+    def judge_extra_time(self):
+        """
+        type:比赛类型
+        l_score,r_score:两队的比分
+        判断比赛类型及结果，决定是否要进行加时赛
+        """
+        if 'cup' in self.type and self.rteam.score == self.lteam.score:
+            self.extra_time()
+        if 'champion' in self.type and 'group' not in self.type:
+            if self.type == 'champions2to1' and self.rteam.score == self.lteam.score:
+                self.extra_time()
+            else:
+                query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.type=='{}')".format(
+                    self.save_id, int(self.season), self.type)
+                games = crud.get_games_by_attri(db=self.db, query_str=query_str)  # 查找同阶段的其他比赛
+                for game in games:
+                    team1 = game.teams[0]
+                    team2 = game.teams[1]
+                    if self.lteam.club_id == team2.club_id or self.lteam.club_id == team1.club_id:  # 查找这两队上一次比赛
+                        if team1.score == team2.score:  # 上一轮打平，这一轮加时
+                            self.extra_time()
+
+    def extra_time(self):
+        """
+        进行加时比赛
+        """
+        hold_ball_team, no_ball_team = self.init_hold_ball_team()
+        counter_attack_permitted = False
+        for _ in range(20):  # 加时赛20个回合
+            self.lteam.shift_location()
+            self.rteam.shift_location()
+            original_score = (self.lteam.score, self.rteam.score)
+            # 执行进攻战术
+            exchange_ball = hold_ball_team.attack(no_ball_team, counter_attack_permitted)
+            if exchange_ball:
+                hold_ball_team, no_ball_team = self.exchange_hold_ball_team(hold_ball_team)
+            if exchange_ball and original_score == (self.lteam.score, self.rteam.score):
+                # 若球权易位且比分未变，允许使用防守反击
+                counter_attack_permitted = True
+            else:
+                counter_attack_permitted = False
+
+        if self.lteam.score > self.rteam.score:
+            self.winner_id = self.lteam.club_id
+        elif self.lteam.score < self.rteam.score:
+            self.winner_id = self.rteam.club_id  # 加时时间胜负关系
+        else:
+            self.penalty()
+
+    def penalty(self):
+        """
+        进行点球
+        """
+        lteam_p, rteam_p =0
+
+
 
     def tactical_start(self, num: int = 20):
         """
@@ -271,7 +338,8 @@ class GameEvE:
             'season': self.season,
             'script': self.script,
             'mvp': self.get_highest_rating_player().player_model.id,
-            'save_id': self.save_id
+            'save_id': self.save_id,
+            'winner_id': self.winner_id
         }
         game_data = schemas.GameCreate(**data)
         return game_data
