@@ -225,7 +225,7 @@ class Team:
         return:是否进球
         """
         goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]
-        return self.final_penalty_and_save(self.get_best_shooter()[num], goal_keeper)
+        return self.final_penalty_and_save(self.get_best_shooter()[11 % num], goal_keeper)
 
     def final_penalty_and_save(self, shooter: game_eve_app.player, keeper: game_eve_app.Player) -> bool:
         """
