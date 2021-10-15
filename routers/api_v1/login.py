@@ -18,8 +18,8 @@ from utils import logger, Date
 
 
 class SaveData(BaseModel):
-    type: str = 'super_leagues'
-    player_club_name: str = '巴塞罗那'
+    type: str = 'five_leagues'
+    player_club_name: str = '阿森纳'
 
 
 router = APIRouter()

@@ -108,7 +108,7 @@ def start_season_games(db: Session, save_id: int, years: int = 0):
 @router.get('/quick_game')
 async def make_50_games(db: Session = Depends(get_db), save_id=1):
     for s in range(50):
-        print('正在进行第' +str(s)  + '场')
+        print('正在进行第' + str(s) + '场')
         game = quick_game(db, s, save_id)
 
 
@@ -128,16 +128,15 @@ async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, y
 
 
 @router.get('/points-table')
-def get_points_table(save_id: int, game_season: int, game_type: str, db: Session = Depends(get_db)):
-    # TODO 此处有sql注入问题
+def get_points_table(save_id: int, game_season: int, game_name: str, game_type: str = None,
+                     db: Session = Depends(get_db)):
     computed_game = computed_data_app.ComputedGame(db=db, save_id=save_id)
-    df = computed_game.get_season_points_table(game_season, game_type)
+    df = computed_game.get_season_points_table(game_season, game_name, game_type)
     return computed_game.switch2json(df)
 
 
 @router.get('/player-chart')
 def get_player_chart(save_id: int, game_season: int, game_type: str, db: Session = Depends(get_db)):
-    # TODO 此处有sql注入问题
     computed_game = computed_data_app.ComputedGame(db=db, save_id=save_id)
     df = computed_game.get_season_player_chart(game_season, game_type)
     return computed_game.switch2json(df)

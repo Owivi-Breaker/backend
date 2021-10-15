@@ -90,7 +90,7 @@ class NextTurner:
 
     def promote_n_relegate_starter(self):
         for league_model in self.save_model.leagues:
-            if not league_model.upper_league:
+            if not league_model.upper_league and league_model.lower_league:
                 lower_league = crud.get_league_by_id(db=self.db, league_id=league_model.lower_league)
                 computed_game = computed_data_app.ComputedGame(self.db, save_id=self.save_model.id)
                 df1 = computed_game.get_season_points_table(
@@ -108,14 +108,14 @@ class NextTurner:
                 for club_id in promote_club_id:
                     # 升级
                     crud.update_club(db=self.db, club_id=club_id, attri={'league_id': league_model.id})
-        logger.info('{}赛季的联赛升降级完成'.format(str(self.save_model.season + 1)))
+        logger.info('{}赛季的联赛升降级完成'.format(str(self.save_model.season)))
 
     def next_calendar_starter(self):
         """
         生成下赛季的日程表
         """
-        calendar_generator = generate_app.CalendarGenerator(db=self.db, save_id=self.save_model.id)
-        calendar_generator.generate()
         self.save_model.season += 1  # 赛季+1
         self.db.commit()
-        logger.info('{}赛季的日程表生成完成'.format(str(self.save_model.season + 1)))
+        calendar_generator = generate_app.CalendarGenerator(db=self.db, save_id=self.save_model.id)
+        calendar_generator.generate()
+        logger.info('{}赛季的日程表生成完成'.format(str(self.save_model.season)))

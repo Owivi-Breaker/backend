@@ -9,7 +9,7 @@ engine = create_engine(
     settings.DB_URL["sqlite"], connect_args={"check_same_thread": False}
 )
 
-# engine = create_engine(settings.DB_URL["sqlite"], encoding="utf-8")
+# engine = create_engine(settings.DB_URL["MySQLLocal"], encoding="utf-8")
 
 SessionFactory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 ScopedSession = scoped_session(SessionFactory)  # 使用安全的线程
