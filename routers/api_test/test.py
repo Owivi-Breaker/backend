@@ -146,7 +146,7 @@ def get_player_chart(save_id: int, game_season: int, game_type: str, db: Session
 def next_turn(save_id: int, turn_num: int, db: Session = Depends(get_db)):
     next_turner = next_turn_app.NextTurner(db=db, save_id=save_id)
     for i in range(turn_num):
-        logger.info('第{}回合'.format(i))
+        logger.info('第{}回合'.format(str(i + 1)))
         next_turner.check()
 
 
