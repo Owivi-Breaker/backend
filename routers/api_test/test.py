@@ -127,27 +127,7 @@ async def imitate_game_season(background_tasks: BackgroundTasks, save_id: int, y
     return {"message": "正在比赛..."}
 
 
-@router.get('/points-table')
-def get_points_table(save_id: int, game_season: int, game_name: str, game_type: str = None,
-                     db: Session = Depends(get_db)):
-    computed_game = computed_data_app.ComputedGame(db=db, save_id=save_id)
-    df = computed_game.get_season_points_table(game_season, game_name, game_type)
-    return computed_game.switch2json(df)
 
-
-@router.get('/player-chart')
-def get_player_chart(save_id: int, game_season: int, game_type: str, db: Session = Depends(get_db)):
-    computed_game = computed_data_app.ComputedGame(db=db, save_id=save_id)
-    df = computed_game.get_season_player_chart(game_season, game_type)
-    return computed_game.switch2json(df)
-
-
-@router.get('/next-turn')
-def next_turn(save_id: int, turn_num: int, db: Session = Depends(get_db)):
-    next_turner = next_turn_app.NextTurner(db=db, save_id=save_id)
-    for i in range(turn_num):
-        logger.info('第{}回合'.format(str(i + 1)))
-        next_turner.check()
 
 
 @router.get('/clear_db')

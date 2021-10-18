@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import or_,and_
+from sqlalchemy import or_, and_
 
 import models
 import schemas
@@ -50,6 +50,15 @@ def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDat
     # db.commit()
     # db.refresh(db_game_player_data)
     return db_game_player_data
+
+
+def get_game_player_data_by_attri(db: Session, attri: str, only_one: bool = False):
+    if only_one:
+        db_game_player_data = db.query(models.GamePlayerData).filter(eval(attri)).first()
+        return db_game_player_data
+    else:
+        db_game_player_data = db.query(models.GamePlayerData).filter(eval(attri)).all()
+        return db_game_player_data
 
 
 def update_game_team_info(db: Session, game_team_info_id: int, attri: dict) -> models.GameTeamInfo:

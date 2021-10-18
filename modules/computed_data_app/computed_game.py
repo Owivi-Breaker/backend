@@ -3,7 +3,8 @@ import models
 from utils import utils, logger
 
 from core.db import engine
-from sqlalchemy.orm import Session
+from sqlalchemy import or_, and_
+from sqlalchemy.orm import Session, joinedload
 import pandas as pd
 from typing import List
 import json
@@ -45,51 +46,58 @@ class ComputedGame:
         else:
             query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.name=='{}')".format(
                 self.save_id, int(game_season), game_name)
-        games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+        # 使用eager load一次性查询到所有子表
+        games = self.db.query(models.Game).options(
+            joinedload(models.Game.teams, innerjoin=True)).filter(
+            eval(query_str)).all()
+
+        # games = crud.get_games_by_attri(db=self.db, query_str=query_str)
         points_dict = dict()
         for game in games:
             team1 = game.teams[0]
             team2 = game.teams[1]
+            club1_name = team1.club.name
+            club2_name = team2.club.name
             if team1.club.name not in points_dict.keys():
-                points_dict[team1.club.name] = dict()
-                points_dict[team1.club.name]['id'] = team1.club_id
-                points_dict[team1.club.name]['名称'] = team1.club.name
-                points_dict[team1.club.name]['胜'] = 0
-                points_dict[team1.club.name]['平'] = 0
-                points_dict[team1.club.name]['负'] = 0
-                points_dict[team1.club.name]['胜球'] = 0
-                points_dict[team1.club.name]['输球'] = 0
-                points_dict[team1.club.name]['积分'] = 0
+                points_dict[club1_name] = dict()
+                points_dict[club1_name]['id'] = team1.club_id
+                points_dict[club1_name]['名称'] = team1.club.name
+                points_dict[club1_name]['胜'] = 0
+                points_dict[club1_name]['平'] = 0
+                points_dict[club1_name]['负'] = 0
+                points_dict[club1_name]['胜球'] = 0
+                points_dict[club1_name]['输球'] = 0
+                points_dict[club1_name]['积分'] = 0
 
             if team2.club.name not in points_dict.keys():
-                points_dict[team2.club.name] = dict()
-                points_dict[team2.club.name]['id'] = team2.club_id
-                points_dict[team2.club.name]['名称'] = team2.club.name
-                points_dict[team2.club.name]['胜'] = 0
-                points_dict[team2.club.name]['平'] = 0
-                points_dict[team2.club.name]['负'] = 0
-                points_dict[team2.club.name]['胜球'] = 0
-                points_dict[team2.club.name]['输球'] = 0
-                points_dict[team2.club.name]['积分'] = 0
+                points_dict[club2_name] = dict()
+                points_dict[club2_name]['id'] = team2.club_id
+                points_dict[club2_name]['名称'] = team2.club.name
+                points_dict[club2_name]['胜'] = 0
+                points_dict[club2_name]['平'] = 0
+                points_dict[club2_name]['负'] = 0
+                points_dict[club2_name]['胜球'] = 0
+                points_dict[club2_name]['输球'] = 0
+                points_dict[club2_name]['积分'] = 0
 
-            points_dict[team1.club.name]['胜球'] += team1.score
-            points_dict[team1.club.name]['输球'] += team2.score
-            points_dict[team2.club.name]['胜球'] += team2.score
-            points_dict[team2.club.name]['输球'] += team1.score
+            points_dict[club1_name]['胜球'] += team1.score
+            points_dict[club1_name]['输球'] += team2.score
+            points_dict[club2_name]['胜球'] += team2.score
+            points_dict[club2_name]['输球'] += team1.score
 
             if team1.score > team2.score:
-                points_dict[team1.club.name]['胜'] += 1
-                points_dict[team2.club.name]['负'] += 1
-                points_dict[team1.club.name]['积分'] += 3
+                points_dict[club1_name]['胜'] += 1
+                points_dict[club2_name]['负'] += 1
+                points_dict[club1_name]['积分'] += 3
             elif team1.score < team2.score:
-                points_dict[team2.club.name]['胜'] += 1
-                points_dict[team1.club.name]['负'] += 1
-                points_dict[team2.club.name]['积分'] += 3
+                points_dict[club2_name]['胜'] += 1
+                points_dict[club1_name]['负'] += 1
+                points_dict[club2_name]['积分'] += 3
             else:
-                points_dict[team1.club.name]['平'] += 1
-                points_dict[team2.club.name]['平'] += 1
-                points_dict[team1.club.name]['积分'] += 1
-                points_dict[team2.club.name]['积分'] += 1
+                points_dict[club1_name]['平'] += 1
+                points_dict[club2_name]['平'] += 1
+                points_dict[club1_name]['积分'] += 1
+                points_dict[club2_name]['积分'] += 1
         points_list = [team for team in points_dict.values()]
         df = self.switch2df(points_list)
         s = df.apply(lambda row: row['胜球'] - row['输球'], axis=1)
@@ -105,7 +113,12 @@ class ComputedGame:
         """
         query_str = "and_(models.Game.save_id=='{}',models.Game.season=='{}', models.Game.name=='{}')".format(
             self.save_id, game_season, game_name)
-        games = crud.get_games_by_attri(db=self.db, query_str=query_str)
+        # 使用eager load一次性查询到所有子表
+        games = self.db.query(models.Game).options(
+            joinedload(models.Game.teams, innerjoin=True).joinedload(models.GameTeamInfo.player_data,
+                                                                     innerjoin=True)).filter(
+            eval(query_str)).all()
+        # games = crud.get_games_by_attri(db=self.db, query_str=query_str, load_type='joined')
         player_data_list = [player_data for game in games for game_team_info in game.teams for player_data in
                             game_team_info.player_data]
         filtered_list = []

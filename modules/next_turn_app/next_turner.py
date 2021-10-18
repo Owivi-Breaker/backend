@@ -52,6 +52,10 @@ class NextTurner:
             self.play_game(game)
 
     def play_game(self, calendar_game):
+        """
+        进行一场比赛，包括战术调整
+        :param calendar_game: 日程表中的比赛信息
+        """
         clubs_id = calendar_game['club_id'].split(',')
         tactic_adjustor = game_app.TacticAdjustor(db=self.db,
                                                   club1_id=clubs_id[0], club2_id=clubs_id[1],

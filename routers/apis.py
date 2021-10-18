@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from routers.api_v1 import games, players, clubs, leagues, game_pve, login
+from routers.api_v1 import games, players, clubs, leagues, game_pve, login, next_turn
 from routers.api_test import test
 
 api_router = APIRouter()
@@ -12,3 +12,4 @@ api_router.include_router(game_pve.router, prefix='/v1/game-pve', tags=['game pv
 
 api_router.include_router(test.router, prefix='/test', tags=['test api'])
 api_router.include_router(login.router, prefix='/v1/login', tags=['login api'])
+api_router.include_router(next_turn.router, prefix='/next-turn', tags=['next turn api'])
