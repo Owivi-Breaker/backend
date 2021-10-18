@@ -46,8 +46,9 @@ def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDat
     """
     db_game_player_data = models.GamePlayerData(**game_player_data.dict())
     db.add(db_game_player_data)
-    db.commit()
-    db.refresh(db_game_player_data)
+    # 为加快速度，不在函数里commit，在具体代码处统一commit
+    # db.commit()
+    # db.refresh(db_game_player_data)
     return db_game_player_data
 
 
