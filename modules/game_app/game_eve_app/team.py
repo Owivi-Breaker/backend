@@ -359,6 +359,10 @@ class Team:
             win_player = utils.select_by_pro(
                 {attacker: attacker.get_capa('anticipation') + attacker.get_capa('strength'),
                  defender: defender.get_capa('anticipation') + defender.get_capa('strength')})
+            if not win_player:
+                print(attacker.get_capa('anticipation') + attacker.get_capa('strength'))
+                print(defender.get_capa('anticipation') + defender.get_capa('strength'))
+                raise ValueError('win_player 不存在！')
             win_player.plus_data('aerial_success')
             if win_player == attacker:
                 defenders.remove(defender)

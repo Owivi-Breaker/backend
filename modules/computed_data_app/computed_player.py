@@ -58,6 +58,8 @@ class ComputedPlayer:
         start_age = 30
         if age >= start_age:
             weight = 1 - (age - 30 + 1) * 0.05
+            if weight <= 0:
+                weight = 0.05
         else:
             weight = 1
         return ori_capa * weight

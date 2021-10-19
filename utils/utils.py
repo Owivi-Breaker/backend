@@ -73,6 +73,9 @@ def select_by_pro(pro_dict: dict):
     num_sum = 0
     for value in pro_dict.values():
         num_sum += value
+    if num_sum == 0:
+        # 如果所有概率均为0，随机选取
+        return random.choice(list(pro_dict.keys()))
     ran = random.random() * num_sum
     sum_ = 0
     for key, value in pro_dict.items():
