@@ -13,9 +13,18 @@ from utils import logger
 router = APIRouter()
 
 
+# noinspection PyIncorrectDocstring
 @router.get('/{league_id}/points-table')
 def get_points_table(save_id: int, game_season: int, league_id: Union[int, str], game_type: str = None,
-                     db: Session = Depends(get_db)):
+                     db: Session = Depends(get_db)) -> dict:
+    """
+    获取指定赛季指定联赛的积分榜
+    :param save_id: 存档id
+    :param game_season: 赛季
+    :param league_id: 联赛id
+    :param game_type: 游戏类型，一般不填
+    :return:
+    """
     if isinstance(league_id, int):
         game_name = crud.get_league_by_id(db=db, league_id=league_id).name
     else:

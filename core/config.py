@@ -24,7 +24,7 @@ class Settings:
               "MySQLIn": "mysql+pymysql://root:1234@172.17.16.11:3306/demo",
               "MySQLLocal": "mysql+pymysql://root:1234@localhost:3306/demo"}
     # 启动端口配置
-    PORT = 8000
+    PORT = 8080
     # 是否热加载
     RELOAD = True
     # 上传文件存储位置

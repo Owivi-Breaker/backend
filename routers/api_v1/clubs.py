@@ -18,7 +18,6 @@ def get_players_by_club(club_id: int, db: Session = Depends(get_db)) -> list:
     """
     获取指定俱乐部的全部球员
     :param club_id: 俱乐部 id
-    :param db: 数据库
     :return: list of schemas.player
     """
     attri = "models.Player.club_id=={}".format(club_id)

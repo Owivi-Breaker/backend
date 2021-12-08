@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -21,13 +23,16 @@ def update_player(db: Session, player_id: int, attri: dict):
     return db_player
 
 
-def get_player_by_id(player_id: int, db: Session):
+def get_player_by_id(player_id: int, db: Session) -> models.Player:
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     return db_player
 
 
-def get_player(db: Session, skip: int, limit: int):
-    db_player = db.query(models.Player).offset(skip).limit(limit).all()
+def get_player(db: Session, save_id: int, skip: int, limit: int) -> List[models.Player]:
+    """
+    获取指定存档的球员db实例
+    """
+    db_player = db.query(models.Player).filter(models.Save.id == save_id).offset(skip).limit(limit).all()
     return db_player
 
 
