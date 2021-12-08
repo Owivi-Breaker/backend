@@ -3,6 +3,10 @@ from typing import List
 import time
 from pathlib import Path
 import os
+import json
+
+with open('./env.json') as f:
+    data = json.load(f)
 
 
 class Settings:
@@ -12,17 +16,14 @@ class Settings:
     # api前缀
     API_PREFIX = "/api"
     # jwt密钥,建议随机生成一个
-    # SECRET_KEY = "ShsUP9qIP2Xui2GpXRY6y74v2JSVS0Q2YOXJ22VjwkI"
+    # SECRET_KEY = "ShsUP9qIP2Xui2GpXRY6y74vSVS0Q2YOXJ22VjwkI"
     # token过期时间
     # ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60
     # 跨域白名单
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:8080", "http://192.168.1.105:8080"]
+        "http://localhost:8080"]
     # db配置
-    DB_URL = {"sqlite": "sqlite:///./sql_apps.db",
-              "MySQLOut": "mysql+pymysql://root:1234@sh-cdb-1q4p2vuy.sql.tencentcdb.com:59484/demo",
-              "MySQLIn": "mysql+pymysql://root:1234@172.17.16.11:3306/demo",
-              "MySQLLocal": "mysql+pymysql://root:1234@localhost:3306/demo"}
+    DB_URL = data['DB_URL']
     # 启动端口配置
     PORT = 8080
     # 是否热加载
