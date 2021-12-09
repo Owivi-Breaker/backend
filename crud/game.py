@@ -5,6 +5,7 @@ from sqlalchemy import or_, and_
 import models
 import schemas
 from utils import logger
+from core.db import engine
 
 
 def create_game(db: Session, game: schemas.GameCreate):
@@ -50,6 +51,24 @@ def create_game_player_data(db: Session, game_player_data: schemas.GamePlayerDat
     # db.commit()
     # db.refresh(db_game_player_data)
     return db_game_player_data
+
+
+def create_game_player_data_bulk(game_player_data: List[schemas.GamePlayerDataCreate], game_team_info_id: int):
+    """
+    批量创建比赛球员信息表，需要提供game_team_info_id以免去更新步骤
+    """
+
+    def add_game_team_info_id(p):
+        p = p.dict()
+        p['game_team_info_id'] = game_team_info_id
+        return p
+
+    game_player_data = list(map(add_game_team_info_id, game_player_data))
+
+    engine.execute(
+        models.GamePlayerData.__table__.insert(),
+        game_player_data
+    )
 
 
 def get_game_player_data_by_attri(db: Session, attri: str, only_one: bool = False):

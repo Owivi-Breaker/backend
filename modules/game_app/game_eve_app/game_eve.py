@@ -14,17 +14,20 @@ import time
 
 class GameEvE:
     def __init__(self, db: Session, club1_id: int, club2_id: int,
-                 date: Date, game_type: str, game_name: str, season: int, save_id: int):
+                 date: Date, game_type: str, game_name: str, season: int, save_id: int,
+                 club1_model: models.Club = None, club2_model: models.Club = None):
         self.db = db
-        self.lteam = game_eve_app.Team(self, club1_id)
-        self.rteam = game_eve_app.Team(self, club2_id)
+        self.season = season
         self.date = str(date)
         self.script = ''
         self.type = game_type
         self.name = game_name
-        self.season = season
         self.save_id = save_id
         self.winner_id = 0
+        self.lteam = game_eve_app.Team(db=self.db, game=self, club_id=club1_id, club_model=club1_model,
+                                       season=self.season)
+        self.rteam = game_eve_app.Team(db=self.db, game=self, club_id=club2_id, club_model=club2_model,
+                                       season=self.season)
 
     def start(self) -> Tuple:
         """
@@ -217,37 +220,6 @@ class GameEvE:
         # 返回队伍战术执行数据
         return self.lteam.data, self.rteam.data
 
-    def adjust_tactic(self, lteam_data, rteam_data, player_club_id: int = 0):
-        """
-        调整两队的战术比重
-        """
-        tactic_pro1 = dict()
-        tactic_pro1['wing_cross'] = int((lteam_data['wing_cross_success'] / lteam_data['wing_cross']) * 1000) + 5
-        tactic_pro1['under_cutting'] = int(
-            (lteam_data['under_cutting_success'] / lteam_data['under_cutting']) * 1000) + 5
-        tactic_pro1['pull_back'] = int((lteam_data['pull_back_success'] / lteam_data['pull_back']) * 1000) + 5
-        tactic_pro1['middle_attack'] = int(
-            (lteam_data['middle_attack_success'] / lteam_data['middle_attack']) * 1000) + 5
-        tactic_pro1['counter_attack'] = int(
-            (lteam_data['counter_attack_success'] / lteam_data['counter_attack']) * 1000) + 5
-
-        tactic_pro2 = dict()
-        tactic_pro2['wing_cross'] = int((rteam_data['wing_cross_success'] / rteam_data['wing_cross']) * 1000) + 5
-        tactic_pro2['under_cutting'] = int(
-            (rteam_data['under_cutting_success'] / rteam_data['under_cutting']) * 1000) + 5
-        tactic_pro2['pull_back'] = int((rteam_data['pull_back_success'] / rteam_data['pull_back']) * 1000) + 5
-        tactic_pro2['middle_attack'] = int(
-            (rteam_data['middle_attack_success'] / rteam_data['middle_attack']) * 1000) + 5
-        tactic_pro2['counter_attack'] = int(
-            (rteam_data['counter_attack_success'] / rteam_data['counter_attack']) * 1000) + 5
-
-        if self.lteam.club_id != player_club_id:
-            coach_id = crud.get_club_by_id(db=self.db, club_id=self.lteam.club_id).coach.id
-            crud.update_coach(db=self.db, coach_id=coach_id, attri=tactic_pro1)
-        if self.rteam.club_id != player_club_id:
-            coach_id = crud.get_club_by_id(db=self.db, club_id=self.rteam.club_id).coach.id
-            crud.update_coach(db=self.db, coach_id=coach_id, attri=tactic_pro2)
-
     def set_full_stamina(self):
         """
         初始化所有球员的体力
@@ -265,7 +237,7 @@ class GameEvE:
             self.update_player_data(player)
         for player in self.rteam.players:
             self.update_player_data(player)
-        self.db.commit()
+        # self.db.commit() # 感觉不用加
 
     def update_player_data(self, player: game_eve_app.Player):
         """
@@ -407,29 +379,36 @@ class GameEvE:
         for team in [self.lteam, self.rteam]:
             game_team_info_schemas = team.export_game_team_info_schemas(created_time)
             game_team_info_model = crud.create_game_team_info(db=self.db, game_team_info=game_team_info_schemas)
-            crud.update_game_team_info(db=self.db, game_team_info_id=game_team_info_model.id,
-                                       attri={"game_id": game_model.id})
+            attri = {"game_id": game_model.id}
+            for key, value in attri.items():
+                setattr(game_team_info_model, key, value)
+
             # 保存GameTeamData
             game_team_data_schemas = team.export_game_team_data_schemas(created_time)
             game_team_data_model = crud.create_game_team_data(db=self.db, game_team_data=game_team_data_schemas)
-            crud.update_game_team_data(db=self.db, game_team_data_id=game_team_data_model.id,
-                                       attri={"game_team_info_id": game_team_info_model.id})
+            attri = {"game_team_info_id": game_team_info_model.id}
+            for key, value in attri.items():
+                setattr(game_team_data_model, key, value)
+
             # 保存GamePlayerData
-            game_player_data_model_list: List[models.GamePlayerData] = []
-            for player in team.players:
-                game_player_data_schemas = player.export_game_player_data_schemas(created_time)
-                game_player_data_model = crud.create_game_player_data(db=self.db,
-                                                                      game_player_data=game_player_data_schemas)
+            # game_player_data_model_list: List[models.GamePlayerData] = []
+            # for player in team.players:
+            #     game_player_data_schemas = player.export_game_player_data_schemas(created_time)
+            #     game_player_data_model = crud.create_game_player_data(db=self.db,
+            #                                                           game_player_data=game_player_data_schemas)
+            #
+            #     # 将game_player_data_model放在一个列表里，统一commit
+            #     attri = {"game_team_info_id": game_team_info_model.id}
+            #     for key, value in attri.items():
+            #         setattr(game_player_data_model, key, value)
+            #     game_player_data_model_list.append(game_player_data_model)
+            # self.db.commit()
 
-                # 将game_player_data_model放在一个列表里，统一commit
-                attri = {"game_team_info_id": game_team_info_model.id}
-                for key, value in attri.items():
-                    setattr(game_player_data_model, key, value)
-                game_player_data_model_list.append(game_player_data_model)
-
-                # crud.update_game_player_data(db=self.db, game_player_data_id=game_player_data_model.id,
-                #                              attri={"game_team_info_id": game_team_info_model.id})
-            self.db.commit()
+            # 更迅速地保存GamePlayerData
+            game_player_data_schemas_list: List[schemas.GamePlayerData] = list(
+                map(lambda p: p.export_game_player_data_schemas(created_time), team.players))
+            crud.create_game_player_data_bulk(game_player_data=game_player_data_schemas_list,
+                                              game_team_info_id=game_team_info_model.id)
 
     def add_script(self, text: str):
         """

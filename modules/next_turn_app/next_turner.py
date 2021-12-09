@@ -1,6 +1,7 @@
 import json
+import time
 from typing import List
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 import threading
 
 import crud
@@ -10,6 +11,10 @@ from modules import game_app, generate_app, computed_data_app
 
 
 class NextTurner:
+    """
+    回合行进的入口类
+    """
+
     def __init__(self, db: Session, save_id: int):
         self.db = db
         self.save_id = save_id
@@ -17,6 +22,9 @@ class NextTurner:
         self.date = None
 
     def plus_days(self):
+        """
+        世界时间加一天
+        """
         date = Date(self.save_model.time)
         date.plus_days(1)
         self.save_model.time = str(date)
@@ -26,6 +34,7 @@ class NextTurner:
     def check(self):
         self.plus_days()
         logger.info(str(self.date))
+        # 一天的事项不一定只存在一条calendar记录中
         query_str = "and_(models.Calendar.save_id=='{}', models.Calendar.date=='{}')".format(
             self.save_model.id, str(self.date))
         calendars: List[models.Calendar] = crud.get_calendars_by_attri(db=self.db, query_str=query_str)
@@ -48,19 +57,38 @@ class NextTurner:
             self.promote_n_relegate_starter()
 
     def eve_starter(self, eve: list):
+        s = time.time()
         for game in eve:
             self.play_game(game)
+        e = time.time()
+        logger.debug('共耗时{}s'.format(e - s))
 
     def play_game(self, calendar_game):
         """
         进行一场比赛，包括战术调整
         :param calendar_game: 日程表中的比赛信息
         """
+        # 战术调整
         clubs_id = calendar_game['club_id'].split(',')
+
+        # 使用eager load一次性查询到所有子表
+        # club1_model = self.db.query(models.Club).options(
+        #     joinedload(models.Club.players, innerjoin=True)).filter(
+        #     models.Club.id == clubs_id[0]).first()
+        # club2_model = self.db.query(models.Club).options(
+        #     joinedload(models.Club.players, innerjoin=True)).filter(
+        #     models.Club.id == clubs_id[1]).first()
+
+        club1_model = self.db.query(models.Club).filter(
+            models.Club.id == clubs_id[0]).first()
+        club2_model = self.db.query(models.Club).filter(
+            models.Club.id == clubs_id[1]).first()
+
         tactic_adjustor = game_app.TacticAdjustor(db=self.db,
                                                   club1_id=clubs_id[0], club2_id=clubs_id[1],
                                                   player_club_id=self.save_model.player_club_id,
-                                                  save_id=self.save_model.id)
+                                                  save_id=self.save_model.id,
+                                                  club1_model=club1_model, club2_model=club2_model)
         tactic_adjustor.adjust()
         # 开始模拟比赛
         game_eve = game_app.GameEvE(db=self.db,
@@ -69,7 +97,8 @@ class NextTurner:
                                     game_name=calendar_game['game_name'],
                                     game_type=calendar_game['game_type'],
                                     season=self.save_model.season,
-                                    save_id=self.save_model.id)
+                                    save_id=self.save_model.id,
+                                    club1_model=club1_model, club2_model=club2_model)
         name1, name2, score1, score2 = game_eve.start()
         logger.info(
             "{} {}: {} {}:{} {}".format(calendar_game['game_name'], calendar_game['game_type'], name1, score1, score2,

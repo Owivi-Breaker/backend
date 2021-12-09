@@ -11,8 +11,8 @@ engine = create_engine(
 
 # engine = create_engine(settings.DB_URL["MySQLLocal"], encoding="utf-8")
 
-SessionFactory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-ScopedSession = scoped_session(SessionFactory)  # 使用安全的线程
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+ScopedSession = scoped_session(SessionLocal)  # 使用安全的线程
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +28,10 @@ def get_db():
     db = ScopedSession()
     try:
         yield db
+        db.commit()
+    except:
+        db.rollback()
+        raise
     finally:
         db.close()
 

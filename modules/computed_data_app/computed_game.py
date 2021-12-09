@@ -6,7 +6,7 @@ from core.db import engine
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session, joinedload
 import pandas as pd
-from typing import List
+from typing import List, Optional, Union
 import json
 
 
@@ -20,7 +20,7 @@ class ComputedGame:
         return pd.DataFrame(data)
 
     @staticmethod
-    def switch2json(data) -> str:
+    def switch2json(data) -> Union[str, dict]:
         if isinstance(data, list):
             return json.dumps(data)
         elif isinstance(data, pd.DataFrame):

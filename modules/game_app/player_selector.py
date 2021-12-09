@@ -16,13 +16,12 @@ import random
 
 
 class PlayerSelector:
-    def __init__(self, club_id: int, db: Session, club_model: Optional[models.Club] = None):
+    def __init__(self, club_id: int, db: Session, club_model: Optional[models.Club] = None, season: int = None):
         self.db = db
         self.club_id = club_id
-        if club_model:
-            self.club_model = club_model
-        else:
-            self.club_model = crud.get_club_by_id(db=self.db, club_id=self.club_id)
+        self.season = season
+
+        self.club_model = club_model if club_model else crud.get_club_by_id(db=self.db, club_id=self.club_id)
 
     def select_players(self, is_random: bool = True) -> (List[models.Player], List[str]):
         """
@@ -103,7 +102,7 @@ class PlayerSelector:
         location_dict: Dict[str, int] = game_configs.formations[formation]  # 记录阵型中各个位置人数
         location_list: List[str] = [name for name in location_dict.keys()]  # 拿到阵型包含的位置列表
 
-        computed_player = ComputedPlayer(player.id, self.db)
+        computed_player = ComputedPlayer(player_id=player.id, db=self.db, player_model=player, season=self.season)
         sorted_location_capa_list = computed_player.get_sorted_location_capa()
         sorted_location_capa_list_filter_by_formation = []  # 筛选后的位置综合能力值列表
         for x in sorted_location_capa_list:
@@ -165,7 +164,8 @@ class PlayerSelector:
             lo_rank = {x: dict() for x in locations}  # 每个位置倒序排序的球员综合能力
             # 构建lo_rank
             for player in selecting_players:
-                computed_player = ComputedPlayer(player_id=player.id, db=self.db, player_model=player)
+                computed_player = ComputedPlayer(player_id=player.id, db=self.db, player_model=player,
+                                                 season=self.season)
                 sorted_location_capa = computed_player.get_sorted_location_capa()
                 for x in sorted_location_capa:
                     if x[0] in locations:
@@ -210,6 +210,6 @@ class PlayerSelector:
         """
         result = 0
         for x in zip(players, locations):
-            computed_player = ComputedPlayer(player_id=x[0].id, db=self.db, player_model=x[0])
+            computed_player = ComputedPlayer(player_id=x[0].id, db=self.db, player_model=x[0], season=self.season)
             result += computed_player.get_location_capa(lo_name=x[1])
         return result

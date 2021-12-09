@@ -21,5 +21,5 @@ app.add_middleware(
 if __name__ == '__main__':
     import uvicorn
     logger.info(settings.CWD_URL)
-    uvicorn.run(app='main:app', host='0.0.0.0',
+    uvicorn.run(app='main:app', host='127.0.0.1',
                 port=settings.PORT, reload=settings.RELOAD)

@@ -1,9 +1,12 @@
+from sqlalchemy.orm import Session
+
 from utils import utils, logger
 import game_configs
 import crud
 import schemas
 from modules.game_app import game_eve_app
 from modules.game_app.player_selector import PlayerSelector
+import models
 
 import random
 from typing import Dict, List, Sequence, Set, Tuple, Optional
@@ -11,10 +14,12 @@ import datetime
 
 
 class Team:
-    def __init__(self, game, club_id: int):
+    def __init__(self, db: Session, game, club_id: int, club_model: models.Club = None, season: int = None):
+        self.db = db
         self.game = game
+        self.season = season
         self.club_id = club_id
-        self.team_model = crud.get_club_by_id(db=self.game.db, club_id=self.club_id)
+        self.team_model = club_model if club_model else crud.get_club_by_id(db=self.game.db, club_id=self.club_id)
         self.name = self.team_model.name  # 解说用
         self.tactic = dict()  # 战术比重字典
         self.init_tactic()
@@ -65,10 +70,12 @@ class Team:
         """
         挑选球员，写入self.players中
         """
-        player_selector = PlayerSelector(club_id=self.club_id, db=self.game.db, club_model=self.team_model)
+        player_selector = PlayerSelector(club_id=self.club_id, db=self.game.db, club_model=self.team_model,
+                                         season=self.season)
         players_model, locations_list = player_selector.select_players()
         for player_model, location in zip(players_model, locations_list):
-            self.players.append(game_eve_app.Player(self.game.db, player_model, location))
+            self.players.append(game_eve_app.Player(
+                db=self.db, player_model=player_model, location=location, season=self.season))
         if len(self.players) != 11:
             logger.warning("队伍仅有{}人！".format(len(self.players)))
 
@@ -93,7 +100,7 @@ class Team:
         """
         data = {
             'created_time': created_time,
-            'club_id': self.team_model.id,
+            'club_id': self.club_id,
             'score': self.score,
         }
         game_team_info = schemas.GameTeamInfoCreate(**data)
@@ -336,8 +343,8 @@ class Team:
             else:
                 pass
 
-    def drop_ball(self, attackers: List[game_eve_app.Player], defenders: List[game_eve_app.Player]) -> Tuple[
-        bool, game_eve_app.Player]:
+    def drop_ball(self, attackers: List[game_eve_app.Player],
+                  defenders: List[game_eve_app.Player]) -> Tuple[bool, game_eve_app.Player]:
         """
         争顶
         :param attackers: 进攻球员组

@@ -1,7 +1,10 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 import models
 import schemas
 from utils import logger
+from core.db import engine
 
 
 # region 球员操作
@@ -13,6 +16,25 @@ def create_player(db: Session, player: schemas.PlayerCreate):
     return db_player
 
 
+def create_player_bulk(players: List[schemas.PlayerCreate], club_id: int):
+    """
+    批量创建球员, 提供club_id一并提交
+    专用于创建大量球员时
+    这个函数跳过ORM过程，直接对sql引擎进行操作，所以不需要db会话
+    """
+    def add_club_id(p):
+        p = p.dict()
+        p['club_id'] = club_id
+        return p
+
+    players = list(map(add_club_id, players))
+    # db.bulk_save_objects(db_players) # 不要用这个啦，这个是基于ORM的
+    engine.execute(
+        models.Player.__table__.insert(),
+        players
+    )
+
+
 def update_player(db: Session, player_id: int, attri: dict):
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     for key, value in attri.items():
@@ -21,13 +43,17 @@ def update_player(db: Session, player_id: int, attri: dict):
     return db_player
 
 
-def get_player_by_id(player_id: int, db: Session):
+def get_player_by_id(player_id: int, db: Session) -> models.Player:
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     return db_player
 
 
-def get_player(db: Session, skip: int, limit: int):
-    db_player = db.query(models.Player).offset(skip).limit(limit).all()
+def get_player(db: Session, save_id: int, skip: int, limit: int) -> List[models.Player]:
+    """
+    获取指定存档的球员db实例
+    """
+    db_player = db.query(models.Player).filter(models.Player.club.league.save.id == save_id).offset(skip).limit(
+        limit).all()
     return db_player
 
 

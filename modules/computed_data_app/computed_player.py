@@ -11,22 +11,57 @@ from typing import Dict, List, Tuple, Optional
 
 
 class ComputedPlayer:
-    def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None):
+    def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None, season: int = None):
         self.db = db
         self.player_id = player_id
+        self.season = season
 
-        if player_model:
-            # 为了减少数据的读操作，可以传入现成的player_model
-            self.player_model = player_model
-        else:
-            self.player_model = crud.get_player_by_id(db=self.db, player_id=self.player_id)
+        # 为了减少数据的读操作，可以传入现成的player_model
+        self.player_model = player_model if player_model else crud.get_player_by_id(db=self.db,
+                                                                                    player_id=self.player_id)
 
     def get_show_data(self) -> schemas.PlayerShow:
         """
         获取返回给前端的球员信息
         :return: schemas.PlayerShow
         """
-        pass
+        data = dict()
+        data['id'] = self.player_model.id
+        data['club_id'] = self.player_model.club_id
+        data['name'] = self.player_model.name
+        data['translated_name'] = self.player_model.translated_name
+        data['translated_nationality'] = self.player_model.translated_nationality
+        data['age'] = self.get_age()
+        data['height'] = self.player_model.height
+        data['weight'] = self.player_model.weight
+        data['birth_date'] = self.player_model.birth_date
+        data['wages'] = self.player_model.wages
+        data['real_stamina'] = self.player_model.real_stamina
+        data.update(self.get_location_num())
+        data.update(self.get_all_capa())
+        data['top_location'] = self.get_top_capa_n_location()[0]
+        data['top_capa'] = self.get_top_capa_n_location()[1]
+        data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa()}
+        return schemas.PlayerShow(**data)
+
+    def get_location_num(self) -> Dict[str, int]:
+        """
+        获取球员各个位置的比赛次数
+        """
+        data = dict()
+        data['ST_num'] = self.player_model.ST_num
+        data['CM_num'] = self.player_model.CM_num
+        data['LW_num'] = self.player_model.LW_num
+        data['RW_num'] = self.player_model.RW_num
+        data['CB_num'] = self.player_model.CB_num
+        data['LB_num'] = self.player_model.LB_num
+        data['RB_num'] = self.player_model.RB_num
+        data['GK_num'] = self.player_model.GK_num
+        data['CAM_num'] = self.player_model.CAM_num
+        data['LM_num'] = self.player_model.LM_num
+        data['RM_num'] = self.player_model.RM_num
+        data['CDM_num'] = self.player_model.CDM_num
+        return data
 
     def get_all_capa(self) -> dict:
         """
@@ -96,13 +131,13 @@ class ComputedPlayer:
         location_capa = sorted(location_capa, key=lambda x: -x[1])
         return location_capa
 
-    def get_top_capa_n_location(self) -> Tuple[float, str]:
+    def get_top_capa_n_location(self) -> Tuple[str, float]:
         """
         获取最佳位置的综合能力以及该位置
         :return: (能力值, 位置名)
         """
-        top_capa, lo_name = self.get_sorted_location_capa()[0]
-        return top_capa, lo_name
+        lo_name, top_capa = self.get_sorted_location_capa()[0]
+        return lo_name, top_capa
 
     def get_value(self) -> int:
         """
@@ -116,4 +151,7 @@ class ComputedPlayer:
         获取年龄
         :return: 年龄
         """
-        return self.player_model.age + self.player_model.club.league.save.season - 1
+        if self.season:
+            return self.player_model.age + self.season - 1
+        else:
+            return self.player_model.age + self.player_model.club.league.save.season - 1
