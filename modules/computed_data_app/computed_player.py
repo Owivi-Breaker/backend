@@ -11,15 +11,14 @@ from typing import Dict, List, Tuple, Optional
 
 
 class ComputedPlayer:
-    def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None):
+    def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None, season: int = None):
         self.db = db
         self.player_id = player_id
+        self.season = season
 
-        if player_model:
-            # 为了减少数据的读操作，可以传入现成的player_model
-            self.player_model = player_model
-        else:
-            self.player_model = crud.get_player_by_id(db=self.db, player_id=self.player_id)
+        # 为了减少数据的读操作，可以传入现成的player_model
+        self.player_model = player_model if player_model else crud.get_player_by_id(db=self.db,
+                                                                                    player_id=self.player_id)
 
     def get_show_data(self) -> schemas.PlayerShow:
         """
@@ -132,7 +131,7 @@ class ComputedPlayer:
         location_capa = sorted(location_capa, key=lambda x: -x[1])
         return location_capa
 
-    def get_top_capa_n_location(self) -> Tuple[str,float]:
+    def get_top_capa_n_location(self) -> Tuple[str, float]:
         """
         获取最佳位置的综合能力以及该位置
         :return: (能力值, 位置名)
@@ -152,4 +151,7 @@ class ComputedPlayer:
         获取年龄
         :return: 年龄
         """
-        return self.player_model.age + self.player_model.club.league.save.season - 1
+        if self.season:
+            return self.player_model.age + self.season - 1
+        else:
+            return self.player_model.age + self.player_model.club.league.save.season - 1

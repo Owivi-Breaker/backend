@@ -1,6 +1,7 @@
 import json
+import time
 from typing import List
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 import threading
 
 import crud
@@ -56,8 +57,11 @@ class NextTurner:
             self.promote_n_relegate_starter()
 
     def eve_starter(self, eve: list):
+        s = time.time()
         for game in eve:
             self.play_game(game)
+        e = time.time()
+        logger.debug('共耗时{}s'.format(e - s))
 
     def play_game(self, calendar_game):
         """
@@ -66,10 +70,25 @@ class NextTurner:
         """
         # 战术调整
         clubs_id = calendar_game['club_id'].split(',')
+
+        # 使用eager load一次性查询到所有子表
+        # club1_model = self.db.query(models.Club).options(
+        #     joinedload(models.Club.players, innerjoin=True)).filter(
+        #     models.Club.id == clubs_id[0]).first()
+        # club2_model = self.db.query(models.Club).options(
+        #     joinedload(models.Club.players, innerjoin=True)).filter(
+        #     models.Club.id == clubs_id[1]).first()
+
+        club1_model = self.db.query(models.Club).filter(
+            models.Club.id == clubs_id[0]).first()
+        club2_model = self.db.query(models.Club).filter(
+            models.Club.id == clubs_id[1]).first()
+
         tactic_adjustor = game_app.TacticAdjustor(db=self.db,
                                                   club1_id=clubs_id[0], club2_id=clubs_id[1],
                                                   player_club_id=self.save_model.player_club_id,
-                                                  save_id=self.save_model.id)
+                                                  save_id=self.save_model.id,
+                                                  club1_model=club1_model, club2_model=club2_model)
         tactic_adjustor.adjust()
         # 开始模拟比赛
         game_eve = game_app.GameEvE(db=self.db,
@@ -78,7 +97,8 @@ class NextTurner:
                                     game_name=calendar_game['game_name'],
                                     game_type=calendar_game['game_type'],
                                     season=self.save_model.season,
-                                    save_id=self.save_model.id)
+                                    save_id=self.save_model.id,
+                                    club1_model=club1_model, club2_model=club2_model)
         name1, name2, score1, score2 = game_eve.start()
         logger.info(
             "{} {}: {} {}:{} {}".format(calendar_game['game_name'], calendar_game['game_type'], name1, score1, score2,
