@@ -16,12 +16,12 @@ def create_player(db: Session, player: schemas.PlayerCreate):
     return db_player
 
 
-def create_player_bulk(db: Session, players: List[schemas.PlayerCreate], club_id: int):
+def create_player_bulk(players: List[schemas.PlayerCreate], club_id: int):
     """
     批量创建球员, 提供club_id一并提交
     专用于创建大量球员时
+    这个函数跳过ORM过程，直接对sql引擎进行操作，所以不需要db会话
     """
-
     def add_club_id(p):
         p = p.dict()
         p['club_id'] = club_id

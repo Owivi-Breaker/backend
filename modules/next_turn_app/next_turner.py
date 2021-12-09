@@ -10,6 +10,10 @@ from modules import game_app, generate_app, computed_data_app
 
 
 class NextTurner:
+    """
+    回合行进的入口类
+    """
+
     def __init__(self, db: Session, save_id: int):
         self.db = db
         self.save_id = save_id
@@ -17,6 +21,9 @@ class NextTurner:
         self.date = None
 
     def plus_days(self):
+        """
+        世界时间加一天
+        """
         date = Date(self.save_model.time)
         date.plus_days(1)
         self.save_model.time = str(date)
@@ -26,6 +33,7 @@ class NextTurner:
     def check(self):
         self.plus_days()
         logger.info(str(self.date))
+        # 一天的事项不一定只存在一条calendar记录中
         query_str = "and_(models.Calendar.save_id=='{}', models.Calendar.date=='{}')".format(
             self.save_model.id, str(self.date))
         calendars: List[models.Calendar] = crud.get_calendars_by_attri(db=self.db, query_str=query_str)
@@ -56,6 +64,7 @@ class NextTurner:
         进行一场比赛，包括战术调整
         :param calendar_game: 日程表中的比赛信息
         """
+        # 战术调整
         clubs_id = calendar_game['club_id'].split(',')
         tactic_adjustor = game_app.TacticAdjustor(db=self.db,
                                                   club1_id=clubs_id[0], club2_id=clubs_id[1],

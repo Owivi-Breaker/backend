@@ -415,21 +415,24 @@ class GameEvE:
             crud.update_game_team_data(db=self.db, game_team_data_id=game_team_data_model.id,
                                        attri={"game_team_info_id": game_team_info_model.id})
             # 保存GamePlayerData
-            game_player_data_model_list: List[models.GamePlayerData] = []
-            for player in team.players:
-                game_player_data_schemas = player.export_game_player_data_schemas(created_time)
-                game_player_data_model = crud.create_game_player_data(db=self.db,
-                                                                      game_player_data=game_player_data_schemas)
+            # game_player_data_model_list: List[models.GamePlayerData] = []
+            # for player in team.players:
+            #     game_player_data_schemas = player.export_game_player_data_schemas(created_time)
+            #     game_player_data_model = crud.create_game_player_data(db=self.db,
+            #                                                           game_player_data=game_player_data_schemas)
+            #
+            #     # 将game_player_data_model放在一个列表里，统一commit
+            #     attri = {"game_team_info_id": game_team_info_model.id}
+            #     for key, value in attri.items():
+            #         setattr(game_player_data_model, key, value)
+            #     game_player_data_model_list.append(game_player_data_model)
+            # self.db.commit()
 
-                # 将game_player_data_model放在一个列表里，统一commit
-                attri = {"game_team_info_id": game_team_info_model.id}
-                for key, value in attri.items():
-                    setattr(game_player_data_model, key, value)
-                game_player_data_model_list.append(game_player_data_model)
-
-                # crud.update_game_player_data(db=self.db, game_player_data_id=game_player_data_model.id,
-                #                              attri={"game_team_info_id": game_team_info_model.id})
-            self.db.commit()
+            # 更迅速地保存GamePlayerData
+            game_player_data_schemas_list: List[schemas.GamePlayerData] = list(
+                map(lambda p: p.export_game_player_data_schemas(created_time), team.players))
+            crud.create_game_player_data_bulk(game_player_data=game_player_data_schemas_list,
+                                              game_team_info_id=game_team_info_model.id)
 
     def add_script(self, text: str):
         """

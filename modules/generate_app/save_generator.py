@@ -84,7 +84,7 @@ class SaveGenerator:
                     players_create_schemas.append(player_create_schemas)
 
                 # 统一提交24名球员的创建
-                crud.create_player_bulk(db=self.db, players=players_create_schemas, club_id=club_model.id)
+                crud.create_player_bulk(players=players_create_schemas, club_id=club_model.id)
 
         for league in league_list:
             # 标记上下游联赛关系
