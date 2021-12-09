@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from utils import logger
+from core.db import engine
 
 
 # region 球员操作
@@ -13,6 +14,25 @@ def create_player(db: Session, player: schemas.PlayerCreate):
     db.commit()
     db.refresh(db_player)
     return db_player
+
+
+def create_player_bulk(db: Session, players: List[schemas.PlayerCreate], club_id: int):
+    """
+    批量创建球员, 提供club_id一并提交
+    专用于创建大量球员时
+    """
+
+    def add_club_id(p):
+        p = p.dict()
+        p['club_id'] = club_id
+        return p
+
+    players = list(map(add_club_id, players))
+    # db.bulk_save_objects(db_players) # 不要用这个啦，这个是基于ORM的
+    engine.execute(
+        models.Player.__table__.insert(),
+        players
+    )
 
 
 def update_player(db: Session, player_id: int, attri: dict):
@@ -32,7 +52,8 @@ def get_player(db: Session, save_id: int, skip: int, limit: int) -> List[models.
     """
     获取指定存档的球员db实例
     """
-    db_player = db.query(models.Player).filter(models.Save.id == save_id).offset(skip).limit(limit).all()
+    db_player = db.query(models.Player).filter(models.Player.club.league.save.id == save_id).offset(skip).limit(
+        limit).all()
     return db_player
 
 

@@ -49,6 +49,8 @@ class SaveGenerator:
                                                          finance=club['finance'],
                                                          reputation=club['reputation'])
                 club_model = club_generator.generate(club_create_schemas)
+                # 为新增的联赛记录更新save_id字段
+                # TODO 创建和添加字段其实可以一气呵成，下同
                 crud.update_club(db=self.db, club_id=club_model.id, attri={"league_id": league_model.id})
                 logger.info("俱乐部{}生成".format(club['name']))
 
@@ -59,35 +61,31 @@ class SaveGenerator:
                 # 随机生成球员
                 # 随机生成11名适配阵型位置的成年球员
                 formation_dict = game_configs.formations[coach_model.formation]
-                player_model_list: List[models.Player] = []
+                players_create_schemas: List[schemas.PlayerCreate] = []
                 for lo, num in formation_dict.items():
                     for i in range(num):
-                        player_model = player_generator.generate(
+                        player_create_schemas: schemas.PlayerCreate = player_generator.generate(
                             ori_mean_capa=club['ori_mean_capa'],
                             ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
                             average_age=26, location=lo)
-                        player_model_list.append(player_model)
-                        # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
+                        players_create_schemas.append(player_create_schemas)
 
                 for _ in range(7):
                     # 随机生成7名任意位置成年球员
-                    player_model = player_generator.generate(
+                    player_create_schemas: schemas.PlayerCreate = player_generator.generate(
                         ori_mean_capa=club['ori_mean_capa'],
                         ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
                         average_age=26)
-                    player_model_list.append(player_model)
-                    # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
+                    players_create_schemas.append(player_create_schemas)
+
                 for _ in range(6):
                     # 随机生成6名年轻球员
-                    player_model = player_generator.generate()
-                    player_model_list.append(player_model)
-                    # crud.update_player(db=db, player_id=player_model.id, attri={"club_id": club_model.id})
-                # 统一提交24名球员的修改
-                attri = {"club_id": club_model.id}
-                for player_model in player_model_list:
-                    for key, value in attri.items():
-                        setattr(player_model, key, value)
-                self.db.commit()
+                    player_create_schemas: schemas.PlayerCreate = player_generator.generate()
+                    players_create_schemas.append(player_create_schemas)
+
+                # 统一提交24名球员的创建
+                crud.create_player_bulk(db=self.db, players=players_create_schemas, club_id=club_model.id)
+
         for league in league_list:
             # 标记上下游联赛关系
             if league['upper_league']:

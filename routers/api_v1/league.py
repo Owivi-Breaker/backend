@@ -13,7 +13,11 @@ from utils import logger
 router = APIRouter()
 
 
-# noinspection PyIncorrectDocstring
+@router.get('/')
+def get_league(save_id: int, db: Session = Depends(get_db)):
+    return crud.get_league(db=db, save_id=save_id)
+
+
 @router.get('/{league_id}/points-table')
 def get_points_table(save_id: int, game_season: int, league_id: Union[int, str], game_type: str = None,
                      db: Session = Depends(get_db)) -> dict:

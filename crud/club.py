@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 import models
@@ -23,6 +25,11 @@ def update_club(db: Session, club_id: int, attri: dict):
 
 def get_club_by_id(db: Session, club_id: int):
     db_club = db.query(models.Club).filter(models.Club.id == club_id).first()
+    return db_club
+
+
+def get_club(db: Session, save_id: int) -> List[models.Club]:
+    db_club = db.query(models.Club).filter(models.Club.league.save.id == save_id).all()
     return db_club
 
 

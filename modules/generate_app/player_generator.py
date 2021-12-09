@@ -4,7 +4,7 @@ import game_configs
 import crud
 import schemas
 from modules import computed_data_app
-
+import copy
 import random
 import json
 from faker import Faker
@@ -144,7 +144,7 @@ class PlayerGenerator:
             return float(utils.retain_decimal(int(utils.normalvariate(ori_mean_capa, 6))))
 
     def generate(self, ori_mean_capa: int = None, ori_mean_potential_capa: int = None,
-                 average_age: int = None, location: str = '') -> models.Player:
+                 average_age: int = None, location: str = '') -> schemas.PlayerCreate:
         """
         随机生成一名球员
         若传入除location外的三个参数，则生成随机位置的成年球员
@@ -214,9 +214,10 @@ class PlayerGenerator:
                 # 先把相应能力值+5，再乘上偏移量
                 self.data[key] = self.adjust_capa(
                     utils.get_offset(self.data[key] + 5, value), self.data[key + '_limit'])
-        player_model = self.save_in_db()
+        # player_model = self.save_in_db() # 不在computed类里写入数据库
+        player_create_schemas = schemas.PlayerCreate(**self.data)
         self.data = dict()  # 清空数据
-        return player_model
+        return player_create_schemas
 
     def generate_data(self, average_age: int = None):
         """
