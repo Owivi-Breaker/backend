@@ -15,8 +15,7 @@ def create_game(db: Session, game: schemas.GameCreate):
     db_game = models.Game(**game.dict())
     db.add(db_game)
     # db.commit()
-    db.flush()
-    db.refresh(db_game)
+    # db.refresh(db_game)
     return db_game
 
 
@@ -27,8 +26,7 @@ def create_game_team_info(db: Session, game_team_info: schemas.GameTeamInfoCreat
     db_game_team_info = models.GameTeamInfo(**game_team_info.dict())
     db.add(db_game_team_info)
     # db.commit()
-    db.flush()
-    db.refresh(db_game_team_info)
+    # db.refresh(db_game_team_info)
     return db_game_team_info
 
 
@@ -39,8 +37,7 @@ def create_game_team_data(db: Session, game_team_data: schemas.GameTeamDataCreat
     db_game_team_data = models.GameTeamData(**game_team_data.dict())
     db.add(db_game_team_data)
     # db.commit()
-    db.flush()
-    db.refresh(db_game_team_data)
+    # db.refresh(db_game_team_data)
     return db_game_team_data
 
 

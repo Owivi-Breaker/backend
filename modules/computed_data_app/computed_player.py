@@ -21,6 +21,7 @@ class ComputedPlayer:
         self.player_model = player_model \
             if player_model \
             else crud.get_player_by_id(db=self.db, player_id=self.player_id)
+        self.age = self.player_model.age
         self.capa = dict()
         self.init_capa()
 
@@ -169,6 +170,6 @@ class ComputedPlayer:
         :return: 年龄
         """
         if self.season:
-            return self.player_model.age + self.season - 1
+            return self.age + self.season - 1
         else:
-            return self.player_model.age + self.player_model.club.league.save.season - 1
+            return self.age + self.player_model.club.league.save.season - 1
