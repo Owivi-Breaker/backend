@@ -45,4 +45,5 @@ def get_db():
 
 
 def get_session():
-    return Session()
+    db = ScopedSession()
+    return db

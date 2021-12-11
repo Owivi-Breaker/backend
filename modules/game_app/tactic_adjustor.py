@@ -13,8 +13,9 @@ class TacticAdjustor:
     """
 
     def __init__(self, db: Session, club1_id: int, club2_id: int, player_club_id: int, save_id: int,
-                 club1_model: models.Club = None, club2_model: models.Club = None):
+                 club1_model: models.Club = None, club2_model: models.Club = None, season: int = None):
         self.db = db
+        self.season = season
         self.club1_id = club1_id
         self.club2_id = club2_id
         self.player_club_id = player_club_id
@@ -29,7 +30,7 @@ class TacticAdjustor:
         game = game_app.GameEvE(db=self.db,
                                 club1_id=self.club1_id, club2_id=self.club2_id,
                                 date=Date(1970, 1, 1), game_type='test', game_name='test',
-                                season=0, save_id=self.save_id,
+                                season=self.season, save_id=self.save_id,
                                 club1_model=self.club1_model, club2_model=self.club2_model)
         lteam_data, rteam_data = game.tactical_start(num=10)
 

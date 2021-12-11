@@ -88,7 +88,8 @@ class NextTurner:
                                                   club1_id=clubs_id[0], club2_id=clubs_id[1],
                                                   player_club_id=self.save_model.player_club_id,
                                                   save_id=self.save_model.id,
-                                                  club1_model=club1_model, club2_model=club2_model)
+                                                  club1_model=club1_model, club2_model=club2_model,
+                                                  season=self.save_model.season)
         tactic_adjustor.adjust()
         # 开始模拟比赛
         game_eve = game_app.GameEvE(db=self.db,

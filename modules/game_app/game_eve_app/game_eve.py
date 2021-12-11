@@ -405,6 +405,7 @@ class GameEvE:
             # self.db.commit()
 
             # 更迅速地保存GamePlayerData
+            self.db.commit()
             game_player_data_schemas_list: List[schemas.GamePlayerData] = list(
                 map(lambda p: p.export_game_player_data_schemas(created_time), team.players))
             crud.create_game_player_data_bulk(game_player_data=game_player_data_schemas_list,

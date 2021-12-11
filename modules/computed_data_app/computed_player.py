@@ -14,11 +14,28 @@ class ComputedPlayer:
     def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None, season: int = None):
         self.db = db
         self.player_id = player_id
+        if not season:
+            raise ValueError("season is zero")
         self.season = season
-
         # 为了减少数据的读操作，可以传入现成的player_model
-        self.player_model = player_model if player_model else crud.get_player_by_id(db=self.db,
-                                                                                    player_id=self.player_id)
+        self.player_model = player_model \
+            if player_model \
+            else crud.get_player_by_id(db=self.db, player_id=self.player_id)
+        self.capa = dict()
+        self.init_capa()
+
+    def init_capa(self):
+        self.capa['shooting'] = self.player_model.shooting
+        self.capa['passing'] = self.player_model.passing
+        self.capa['dribbling'] = self.player_model.dribbling
+        self.capa['interception'] = self.player_model.interception
+        self.capa['pace'] = self.player_model.pace
+        self.capa['strength'] = self.player_model.strength
+        self.capa['aggression'] = self.player_model.aggression
+        self.capa['anticipation'] = self.player_model.anticipation
+        self.capa['free_kick'] = self.player_model.free_kick
+        self.capa['stamina'] = self.player_model.stamina
+        self.capa['goalkeeping'] = self.player_model.goalkeeping
 
     def get_show_data(self) -> schemas.PlayerShow:
         """
@@ -88,7 +105,7 @@ class ComputedPlayer:
         :param capa_name: 能力名
         :return: 能力值
         """
-        ori_capa = eval("self.player_model.{}".format(capa_name))
+        ori_capa = self.capa[capa_name]
         age = self.get_age()
         start_age = 30
         if age >= start_age:
