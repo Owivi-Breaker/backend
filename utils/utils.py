@@ -1,5 +1,7 @@
 import random
+import bisect
 from pathlib import Path
+import numpy as np
 from decimal import *
 from utils import Date
 from typing import List
@@ -82,6 +84,7 @@ def select_by_pro(pro_dict: dict):
         sum_ += value
         if ran <= sum_:
             return key
+
 
 
 def plus_dict(a: dict, b: dict) -> dict:

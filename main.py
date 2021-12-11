@@ -5,9 +5,11 @@ from core.config import settings
 from utils import logger
 
 app = FastAPI(title=settings.APP_NAME)
+
 # 注册路由
 app.include_router(api_router, prefix=settings.API_PREFIX)
 
+# 添加全局的跨域中间件
 app.add_middleware(
     CORSMiddleware,
     # allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
@@ -20,6 +22,7 @@ app.add_middleware(
 
 if __name__ == '__main__':
     import uvicorn
+
     logger.info(settings.CWD_URL)
     uvicorn.run(app='main:app', host='127.0.0.1',
                 port=settings.PORT, reload=settings.RELOAD)

@@ -193,11 +193,12 @@ class Team:
         :param location_tuple: 位置名
         :return: 球员实例列表
         """
-        player_list = []
-        for player in self.players:
-            if player.get_location() in location_tuple:
-                player_list.append(player)
-        return player_list
+        return [player for player in self.players if player.get_location() in location_tuple]
+        # player_list = []
+        # for player in self.players:
+        #     if player.get_location() in location_tuple:
+        #         player_list.append(player)
+        # return player_list
 
     def attack(self, rival_team: 'Team', counter_attack_permitted=False) -> bool:
         """

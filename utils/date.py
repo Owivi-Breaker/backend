@@ -1,3 +1,4 @@
+# 日期处理类
 import datetime
 
 
@@ -12,7 +13,10 @@ class Date:
     def get_date(self):
         return self.date
 
-    def plus_days(self, days: int):
+    def plus_days(self, days: int = 1):
+        """
+        当前日期加days天
+        """
         self.date += datetime.timedelta(days=days)
 
     def __str__(self, date_format: str = "%Y-%m-%d"):

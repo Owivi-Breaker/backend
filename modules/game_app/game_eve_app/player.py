@@ -124,34 +124,36 @@ class Player:
         确定每次战术的场上位置
         TODO 将概率值抽离出来作为可更改的全局变量
         """
-        if self.ori_location == game_configs.Location.CAM:
-            self.real_location = utils.select_by_pro(
-                {game_configs.Location.ST: 40, game_configs.Location.CM: 60}
-            )
-        elif self.ori_location == game_configs.Location.LM:
-            self.real_location = utils.select_by_pro(
-                {game_configs.Location.LW: 25, game_configs.Location.CM: 60, game_configs.Location.LB: 15}
-            )
-        elif self.ori_location == game_configs.Location.RM:
-            self.real_location = utils.select_by_pro(
-                {game_configs.Location.RW: 40, game_configs.Location.CM: 60, game_configs.Location.RB: 15}
-            )
-        elif self.ori_location == game_configs.Location.CDM:
-            self.real_location = utils.select_by_pro(
-                {game_configs.Location.CB: 40, game_configs.Location.CM: 60}
-            )
-        elif self.ori_location == game_configs.Location.CM:
+        location = game_configs.Location
+
+        if self.ori_location == game_configs.Location.CM:
             # 中场有概率前压或后撤
             self.real_location = utils.select_by_pro(
-                {game_configs.Location.ST: 10, game_configs.Location.CB: 10, game_configs.Location.CM: 80}
+                {location.ST: 10, location.CB: 10, location.CM: 80}
             )
-        elif self.ori_location == game_configs.Location.LB:
+        elif self.ori_location == location.LB:
             self.real_location = utils.select_by_pro(
-                {game_configs.Location.LW: 20, game_configs.Location.LB: 80}
+                {location.LW: 20, location.LB: 80}
             )
-        elif self.ori_location == game_configs.Location.RB:
+        elif self.ori_location == location.RB:
             self.real_location = utils.select_by_pro(
-                {game_configs.Location.RW: 20, game_configs.Location.RB: 80}
+                {location.RW: 20, location.RB: 80}
+            )
+        elif self.ori_location == location.CAM:
+            self.real_location = utils.select_by_pro(
+                {location.ST: 40, location.CM: 60}
+            )
+        elif self.ori_location == location.LM:
+            self.real_location = utils.select_by_pro(
+                {location.LW: 25, location.CM: 60, location.LB: 15}
+            )
+        elif self.ori_location == location.RM:
+            self.real_location = utils.select_by_pro(
+                {location.RW: 40, location.CM: 60, location.RB: 15}
+            )
+        elif self.ori_location == location.CDM:
+            self.real_location = utils.select_by_pro(
+                {location.CB: 40, location.CM: 60}
             )
         else:
             self.real_location = self.ori_location

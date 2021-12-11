@@ -16,6 +16,7 @@ class SaveCreate(BaseModel):
 class Save(SaveCreate):
     id: int
     user_id: int
+
     calendars: List[schemas.Calendar] = []
     leagues: List[schemas.League] = []
 
@@ -23,4 +24,4 @@ class Save(SaveCreate):
 class SaveShow(SaveCreate):
     id: int
     user_id: int
-    player_club_id: int = 0  # TODO 暂时设一个默认值
+    player_club_id: int
