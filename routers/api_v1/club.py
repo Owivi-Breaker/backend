@@ -31,7 +31,7 @@ def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubSh
     获取指定存档的所有俱乐部信息
     :param save_id: 存档 id
     """
-    db_clubs: List[models.Club] = crud.get_club(db=db, save_id=save_id)
+    db_clubs: List[models.Club] = crud.get_clubs_by_save(db=db, save_id=save_id)
     club_shows: List[schemas.ClubShow] = [
         computed_data_app.ComputedClub(
             club_id=club_model.id, db=db, club_model=club_model).get_show_data()

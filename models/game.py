@@ -28,6 +28,7 @@ class GameTeamInfo(Base):
     game_id = Column(Integer, ForeignKey('game.id'))  # 外键
     club_id = Column(Integer, ForeignKey('club.id'))  # 与俱乐部类连接的外键
 
+    season = Column(Integer)
     created_time = Column(DateTime)
     score = Column(Integer)
     team_data = relationship("GameTeamData", uselist=False, backref="game_team_info")
@@ -39,6 +40,7 @@ class GameTeamData(Base):
     id = Column(Integer, primary_key=True, index=True)
     game_team_info_id = Column(Integer, ForeignKey('game_team_info.id'))
 
+    season = Column(Integer)
     created_time = Column(DateTime)
     attempts = Column(Integer)
     # 下底传中
@@ -62,10 +64,11 @@ class GamePlayerData(Base):
     __tablename__ = 'game_player_data'
     id = Column(Integer, primary_key=True, index=True)
 
+    season = Column(Integer)
     created_time = Column(DateTime)
     location = Column(Enum(Location))
 
-    real_rating = Column(Float)
+    real_rating = Column(Float)  # 未截取最大值的真实评分
     final_rating = Column(Float)
     actions = Column(Integer)
     shots = Column(Integer)

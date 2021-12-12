@@ -28,8 +28,8 @@ class Club(ClubCreate):
 
 class ClubShow(BaseModel):
     id: int
-    league_id: int
 
+    name: str
     finance: float  # 单位：万
     reputation: float
     assistant: int = 0  # 助理教练

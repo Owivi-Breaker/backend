@@ -22,6 +22,7 @@ def drop_all():
     清空数据库中的所有内容
     """
     Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
 
 def get_db():

@@ -28,7 +28,7 @@ class ComputedClub:
         """
         data = dict()
         data['id'] = self.club_model.id
-        data['league_id'] = self.club_model.league_id
+        data['name'] = self.club_model.name
         data['finance'] = self.club_model.finance
         data['reputation'] = self.club_model.reputation
         data['assistant'] = self.club_model.assistant

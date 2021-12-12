@@ -1,13 +1,12 @@
+from sqlalchemy.orm import Session
+from typing import Dict, List, Tuple, Optional
+
 import game_configs
 import schemas
-from utils import logger
+import utils
+from utils import logger, utils
 import models
 import crud
-
-from sqlalchemy.orm import Session
-from fastapi import Depends
-from core.db import get_db
-from typing import Dict, List, Tuple, Optional
 
 
 class ComputedPlayer:
@@ -43,6 +42,7 @@ class ComputedPlayer:
         获取返回给前端的球员信息
         :return: schemas.PlayerShow
         """
+
         data = dict()
         data['id'] = self.player_model.id
         data['club_id'] = self.player_model.club_id
@@ -115,7 +115,7 @@ class ComputedPlayer:
                 weight = 0.05
         else:
             weight = 1
-        return ori_capa * weight
+        return float(utils.retain_decimal(ori_capa * weight))
 
     def get_location_capa(self, lo_name: str) -> float:
         """
@@ -134,7 +134,7 @@ class ComputedPlayer:
             logger.error('没有找到对应位置！')
         for capa_name, weight in weight_dict.items():
             location_capa += self.get_capa(capa_name) * weight
-        return location_capa
+        return float(utils.retain_decimal(location_capa))
 
     def get_sorted_location_capa(self) -> List[List]:
         """
@@ -173,3 +173,48 @@ class ComputedPlayer:
             return self.age + self.season - 1
         else:
             return self.age + self.player_model.club.league.save.season - 1
+
+    def get_game_player_data(self, start_season: int = None, end_season: int = None) \
+            -> List[schemas.GamePlayerData]:
+        """
+        获取指定球员某赛季的比赛信息
+        :param start_season: 开始赛季，若为空，默认1开始
+        :param end_season: 结束赛季，若为空，默认当前赛季
+        """
+        s_season = start_season if start_season else 1
+        e_season = end_season if end_season else self.season
+        game_player_data: List[models.GamePlayerData] = [
+            game_data for game_data in self.player_model.game_data if \
+            s_season <= game_data.season <= e_season]
+
+        return game_player_data
+
+    def get_total_game_player_data(self, start_season: int = None, end_season: int = None) \
+            -> schemas.GamePlayerDataShow:
+        """
+        获取指定球员某赛季的统计比赛信息
+        :param start_season: 开始赛季，若为空，默认1开始
+        :param end_season: 结束赛季，若为空，默认当前赛季
+        """
+        game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
+            start_season=start_season, end_season=end_season)
+        result = dict()
+        result["final_rating"] = float(
+            utils.retain_decimal(sum([p.final_rating for p in game_player_data]) / len(game_player_data)))
+        result['actions'] = sum([p.actions for p in game_player_data])
+        result['shots'] = sum([p.shots for p in game_player_data])
+        result['goals'] = sum([p.goals for p in game_player_data])
+        result['assists'] = sum([p.assists for p in game_player_data])
+        result['passes'] = sum([p.passes for p in game_player_data])
+        result['pass_success'] = sum([p.pass_success for p in game_player_data])
+        result['dribbles'] = sum([p.dribbles for p in game_player_data])
+        result['dribble_success'] = sum([p.dribble_success for p in game_player_data])
+        result['tackles'] = sum([p.tackles for p in game_player_data])
+        result['tackle_success'] = sum([p.tackle_success for p in game_player_data])
+        result['aerials'] = sum([p.aerials for p in game_player_data])
+        result['aerial_success'] = sum([p.aerial_success for p in game_player_data])
+        result['saves'] = sum([p.saves for p in game_player_data])
+        result['save_success'] = sum([p.save_success for p in game_player_data])
+        result['location'] = 'ST'  # 这里随便填一个进去，在API里剔除
+        logger.debug(result)
+        return schemas.GamePlayerDataShow(**result)
