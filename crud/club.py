@@ -1,7 +1,10 @@
+import operator
 from typing import List
-
+import functools
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
+
+import crud
 import models
 import schemas
 from utils import logger
@@ -24,13 +27,13 @@ def update_club(db: Session, club_id: int, attri: dict):
 
 
 def get_club_by_id(db: Session, club_id: int):
-    db_club = db.query(models.Club).filter(models.Club.id == club_id).first()
+    db_club:models.Club = db.query(models.Club).filter(models.Club.id == club_id).first()
     return db_club
 
 
 def get_club(db: Session, save_id: int) -> List[models.Club]:
-    db_club = db.query(models.Club).filter(models.Club.league.save.id == save_id).all()
-    return db_club
+    db_leagues = crud.get_save_by_id(db=db, save_id=save_id).leagues
+    return list(functools.reduce(operator.concat, [league.clubs for league in db_leagues]))
 
 
 """
