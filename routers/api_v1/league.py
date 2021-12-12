@@ -14,15 +14,30 @@ from utils import logger
 router = APIRouter()
 
 
-@router.get('/')
-def get_league(save_model=Depends(utils.get_current_save), db: Session = Depends(get_db)):
+@router.get('/', response_model=List[schemas.LeagueShow])
+def get_leagues(save_model=Depends(utils.get_current_save),
+                db: Session = Depends(get_db)) -> List[schemas.LeagueShow]:
+    """
+    获取指定存档中的所有俱乐部信息
+    """
     return [computed_data_app.ComputedLeague(
-        league_id=league_model.id, db=db, league_model=league_model)
-        for league_model in save_model.leagues]
+        league_id=league_model.id, db=db, league_model=league_model).get_show_data()
+            for league_model in save_model.leagues]
+
+
+@router.get('/{league_id}', response_model=schemas.LeagueShow)
+def get_league_by_id(league_id: int, db: Session = Depends(get_db)) -> schemas.LeagueShow:
+    """
+    获取指定俱乐部的信息
+    """
+    league_model = crud.get_league_by_id(db=db, league_id=league_id)
+    return computed_data_app.ComputedLeague(
+        league_id=league_model.id, db=db, league_model=league_model).get_show_data()
 
 
 @router.get('/{league_id}/points-table')
-def get_points_table(save_id: int, game_season: int, league_id: Union[int, str], game_type: str = None,
+def get_points_table(save_id: int, game_season: int,
+                     league_id: Union[int, str], game_type: str = None,
                      db: Session = Depends(get_db)) -> dict:
     """
     TODO 改造
@@ -43,7 +58,8 @@ def get_points_table(save_id: int, game_season: int, league_id: Union[int, str],
 
 
 @router.get('/{league_id}/player-chart')
-def get_player_chart(save_id: int, game_season: int, league_id: Union[int, str], db: Session = Depends(get_db)):
+def get_player_chart(save_id: int, game_season: int,
+                     league_id: Union[int, str], db: Session = Depends(get_db)):
     """
     TODO 改造
     获取指定赛季指定联赛的球员数据榜

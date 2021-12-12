@@ -17,7 +17,7 @@ def get_league_by_id(db: Session, league_id: int):
     return db_league
 
 
-def get_league(db: Session, save_id: int):
+def get_league_by_save(db: Session, save_id: int):
     db_league = db.query(models.League).filter(models.League.save.id == save_id).first()
     return db_league
 

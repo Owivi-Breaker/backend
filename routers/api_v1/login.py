@@ -16,8 +16,6 @@ import utils
 router = APIRouter()
 
 
-
-
 class Token(BaseModel):
     """
     token的返回格式
