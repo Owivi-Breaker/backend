@@ -1,3 +1,4 @@
 from modules.computed_data_app.computed_player import ComputedPlayer
 from modules.computed_data_app.computed_game import ComputedGame
 from modules.computed_data_app.computed_club import ComputedClub
+from modules.computed_data_app.computed_league import ComputedLeague

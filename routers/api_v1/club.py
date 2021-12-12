@@ -2,11 +2,12 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
+
 import schemas
 import models
 from core.db import get_db
 import crud
+import utils
 from modules import computed_data_app
 from utils import logger
 
@@ -19,15 +20,18 @@ def get_club_by_id(club_id: int, db: Session = Depends(get_db)) -> schemas.ClubS
     获取指定id的俱乐部信息
     :param club_id: 俱乐部 id
     """
-    pass
+    club_model = crud.get_club_by_id(db=db, club_id=club_id)
+    return computed_data_app.ComputedClub(
+        club_id=club_model.id, db=db, club_model=club_model).get_show_data()
+
 
 @router.get('/', response_model=List[schemas.ClubShow])
 def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubShow]:
     """
-    获取指定存档地所有俱乐部信息
-    :param club_id: 俱乐部 id
+    获取指定存档的所有俱乐部信息
+    :param save_id: 存档 id
     """
-    db_clubs: List[models.Club] = crud.get_club(db=db, save_id=save_id)
+    db_clubs: List[models.Club] = crud.get_clubs_by_save(db=db, save_id=save_id)
     club_shows: List[schemas.ClubShow] = [
         computed_data_app.ComputedClub(
             club_id=club_model.id, db=db, club_model=club_model).get_show_data()
@@ -35,12 +39,18 @@ def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubSh
     return club_shows
 
 
-@router.get('/{club_id}/player', response_model=List[schemas.Player])
-def get_players_by_club(club_id: int, db: Session = Depends(get_db)) -> List[schemas.PlayerShow]:
+@router.get('/{club_id}/player', response_model=List[schemas.PlayerShow])
+def get_players_by_club(
+        club_id: int, db: Session = Depends(get_db),
+        save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
     """
     获取指定俱乐部的球员信息
     :param club_id: 俱乐部 id
-    :return: list of schemas.player
+    :param save_model: 存档实例
+    :return: list of schemas.PlayerShow
     """
-    attri = "models.Player.club_id=={}".format(club_id)
-    return crud.get_players_by_attri(db, attri=attri)
+    club_model = crud.get_club_by_id(db=db, club_id=club_id)
+    return [computed_data_app.ComputedPlayer(
+        player_id=player_model.id, db=db, player_model=player_model,
+        season=save_model.season).get_show_data()
+            for player_model in club_model.players]

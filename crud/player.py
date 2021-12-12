@@ -5,6 +5,7 @@ import models
 import schemas
 from utils import logger
 from core.db import engine
+import crud
 
 
 # region 球员操作
@@ -22,6 +23,7 @@ def create_player_bulk(players: List[schemas.PlayerCreate], club_id: int):
     专用于创建大量球员时
     这个函数跳过ORM过程，直接对sql引擎进行操作，所以不需要db会话
     """
+
     def add_club_id(p):
         p = p.dict()
         p['club_id'] = club_id
@@ -48,13 +50,18 @@ def get_player_by_id(player_id: int, db: Session) -> models.Player:
     return db_player
 
 
-def get_player(db: Session, save_id: int, skip: int, limit: int) -> List[models.Player]:
+def get_players_by_save(db: Session, save_id: int, skip: int, limit: int) -> List[models.Player]:
     """
     获取指定存档的球员db实例
     """
-    db_player = db.query(models.Player).filter(models.Player.club.league.save.id == save_id).offset(skip).limit(
-        limit).all()
-    return db_player
+    db_clubs = crud.get_clubs_by_save(db=db, save_id=save_id)
+    player_list: List[models.Player] = []
+    for club in db_clubs:
+        player_list.extend(club.players)
+    # db_player = db.query(models.Player) \
+    #     .filter(models.Player.club.league.save.id == save_id) \
+    #     .offset(skip).limit(limit).all()
+    return player_list[skip:skip + limit]
 
 
 # TODO 需要重写

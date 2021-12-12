@@ -380,10 +380,12 @@ class GameEvE:
         for team in [self.lteam, self.rteam]:
             game_team_info_schemas = team.export_game_team_info_schemas(created_time)
             game_team_info_model = crud.create_game_team_info(db=self.db, game_team_info=game_team_info_schemas)
+            game_team_info_model.season = game_model.season  # 添加赛季
             game_team_info_model_list.append(game_team_info_model)
             # 保存GameTeamData
             game_team_data_schemas = team.export_game_team_data_schemas(created_time)
             game_team_data_model = crud.create_game_team_data(db=self.db, game_team_data=game_team_data_schemas)
+            game_team_data_model.season = game_model.season  # 添加赛季
             game_team_info_model.team_data = game_team_data_model
 
             # 保存GamePlayerData
@@ -392,7 +394,7 @@ class GameEvE:
                 game_player_data_schemas = player.export_game_player_data_schemas(created_time)
                 game_player_data_model = crud.create_game_player_data(db=self.db,
                                                                       game_player_data=game_player_data_schemas)
-
+                game_player_data_model.season = game_model.season  # 添加赛季
                 game_player_data_model_list.append(game_player_data_model)
             game_team_info_model.player_data = game_player_data_model_list
         game_model.teams = game_team_info_model_list
