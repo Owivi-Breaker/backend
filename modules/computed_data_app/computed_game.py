@@ -100,8 +100,11 @@ class ComputedGame:
                 points_dict[club2_name]['积分'] += 1
         points_list = [team for team in points_dict.values()]
         df = self.switch2df(points_list)
+        if df.empty:
+            return pd.DataFrame([])
         s = df.apply(lambda row: row['胜球'] - row['输球'], axis=1)
         df.insert(7, '净胜球', s)
+
         return df.sort_values(by=['积分', '净胜球', '胜球'], ascending=[False, False, False])
 
     def get_season_player_chart(self, game_season: int, game_name: str) -> pd.DataFrame:
@@ -142,6 +145,8 @@ class ComputedGame:
             }
             filtered_list.append(one_piece)
         df = self.switch2df(filtered_list)
+        if df.empty:
+            return pd.DataFrame([])
         df = df.groupby(by=['id', '姓名', '俱乐部']).agg(
             {
                 '进球数': 'sum', '助攻数': 'sum',

@@ -7,8 +7,8 @@ from schemas.club import Club
 class LeagueCreate(BaseModel):
     created_time: datetime
 
-    cup: str  # 杯赛名称
     name: str
+    cup: str  # 杯赛名称
     points: float
 
     class Config:
@@ -21,3 +21,10 @@ class League(LeagueCreate):
     lower_league: int = None
 
     clubs: List[Club] = []
+
+
+class LeagueShow(BaseModel):
+    id: int
+    name: str
+    cup: str  # 杯赛名称
+    points: float
