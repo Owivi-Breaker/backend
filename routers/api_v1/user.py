@@ -30,7 +30,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@router.get("/{user_id}/save/", response_model=List[schemas.SaveShow], dependencies=[Depends(utils.verify_token)])
+# 不要在路径中加入user_id,因为user_id的传入依赖于token,前端难以直接将user_id返回
+@router.get("/save", response_model=List[schemas.SaveShow], dependencies=[Depends(utils.verify_token)])
 async def get_saves_by_user(user_id: int, db: Session = Depends(get_db)) -> List[models.Save]:
     """
     获取用户存档
@@ -44,7 +45,7 @@ class SaveData(BaseModel):
     player_club_name: str = '阿森纳'
 
 
-@router.post("/{user_id}/save/", response_model=schemas.SaveShow, dependencies=[Depends(utils.verify_token)])
+@router.post("/save", response_model=schemas.SaveShow, dependencies=[Depends(utils.verify_token)])
 async def create_save(save_data: SaveData,
                       current_user: models.User = Depends(utils.get_current_user),
                       db: Session = Depends(get_db)):
