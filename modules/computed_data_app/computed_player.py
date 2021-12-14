@@ -4,6 +4,7 @@ from typing import Dict, List, Tuple, Optional
 import game_configs
 import schemas
 import utils
+import utils.utils
 from utils import logger, utils
 import models
 import crud
@@ -42,7 +43,6 @@ class ComputedPlayer:
         获取返回给前端的球员信息
         :return: schemas.PlayerShow
         """
-
         data = dict()
         data['id'] = self.player_model.id
         data['club_id'] = self.player_model.club_id
@@ -81,10 +81,11 @@ class ComputedPlayer:
         data['CDM_num'] = self.player_model.CDM_num
         return data
 
-    def get_all_capa(self) -> dict:
+    def get_all_capa(self, is_retain_decimal: bool = False) -> dict:
         """
         获取所有能力值
         :return: 能力值字典
+        :param is_retain_decimal: 是否保留小数
         """
         data = dict()
         data['shooting'] = self.get_capa('shooting')
@@ -98,12 +99,15 @@ class ComputedPlayer:
         data['free_kick'] = self.get_capa('free_kick')
         data['stamina'] = self.get_capa('stamina')  # 注意，这个是体力“能力”，不是真正的体力！
         data['goalkeeping'] = self.get_capa('goalkeeping')
+        if is_retain_decimal:
+            return {k: float(utils.retain_decimal(v)) for k, v in data.items()}
         return data
 
-    def get_capa(self, capa_name: str) -> float:
+    def get_capa(self, capa_name: str, is_retain_decimal: bool = False) -> float:
         """
         获取年龄滤镜过的能力值
         :param capa_name: 能力名
+        :param is_retain_decimal: 是否保留小数
         :return: 能力值
         """
         ori_capa = self.capa[capa_name]
@@ -115,13 +119,16 @@ class ComputedPlayer:
                 weight = 0.05
         else:
             weight = 1
-        return float(utils.retain_decimal(ori_capa * weight))
+        if is_retain_decimal:
+            return float(utils.retain_decimal(ori_capa * weight))
+        return ori_capa * weight
 
-    def get_location_capa(self, lo_name: str) -> float:
+    def get_location_capa(self, lo_name: str, is_retain_decimal: bool = False) -> float:
         """
         获取球员指定位置的综合能力
         :param lo_name: 位置名
         :return: 位置能力值
+        :param is_retain_decimal: 是否保留小数
         """
         weight_dict = dict()
         for lo in game_configs.location_capability:
@@ -134,35 +141,58 @@ class ComputedPlayer:
             logger.error('没有找到对应位置！')
         for capa_name, weight in weight_dict.items():
             location_capa += self.get_capa(capa_name) * weight
-        return float(utils.retain_decimal(location_capa))
+        if is_retain_decimal:
+            return float(utils.retain_decimal(location_capa))
+        return location_capa
 
-    def get_sorted_location_capa(self) -> List[List]:
+    def get_sorted_location_capa(self, is_retain_decimal: bool = False) -> List[List]:
         """
         获取各个位置能力的降序列表
         :return: List[List[lo_name, lo_capa]]
+        :param is_retain_decimal: 是否保留小数
         """
         location_capa = []
-        for location in game_configs.location_capability:
-            location_capa.append(
-                [location['name'], self.get_location_capa(location['name'])]
-            )
+        if is_retain_decimal:
+            for location in game_configs.location_capability:
+                location_capa.append(
+                    [location['name'], self.get_location_capa(location['name'], True)]
+                )
+        else:
+            for location in game_configs.location_capability:
+                location_capa.append(
+                    [location['name'], self.get_location_capa(location['name'])]
+                )
         location_capa = sorted(location_capa, key=lambda x: -x[1])
         return location_capa
 
-    def get_top_capa_n_location(self) -> Tuple[str, float]:
+    def get_top_capa_n_location(self, is_retain_decimal: bool = False) -> Tuple[str, float]:
         """
         获取最佳位置的综合能力以及该位置
         :return: (能力值, 位置名)
+        :param is_retain_decimal: 是否保留小数
         """
         lo_name, top_capa = self.get_sorted_location_capa()[0]
+        if is_retain_decimal:
+            top_capa = float(utils.retain_decimal(top_capa))
         return lo_name, top_capa
+
+    def get_rating_in_recent_year(self) -> float:
+        start_season = self.season - 1 if self.season - 1 != 0 else self.season
+        game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
+            start_season=start_season, end_season=self.season)
+        if not game_player_data:
+            return 6.0
+        rating = float(
+            utils.retain_decimal(sum([p.real_rating for p in game_player_data]) / len(game_player_data)))
+        rating = rating if rating <= 10 else 10
 
     def get_value(self) -> int:
         """
         获取球员身价
         :return: 身价
         """
-        pass
+        basic_value = int(self.get_top_capa_n_location()[1] ** 3 / 70)
+        return basic_value
 
     def get_age(self) -> int:
         """
@@ -198,6 +228,8 @@ class ComputedPlayer:
         """
         game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
             start_season=start_season, end_season=end_season)
+        if not game_player_data:
+            return schemas.GamePlayerDataShow()
         result = dict()
         result["final_rating"] = float(
             utils.retain_decimal(sum([p.final_rating for p in game_player_data]) / len(game_player_data)))
@@ -215,6 +247,5 @@ class ComputedPlayer:
         result['aerial_success'] = sum([p.aerial_success for p in game_player_data])
         result['saves'] = sum([p.saves for p in game_player_data])
         result['save_success'] = sum([p.save_success for p in game_player_data])
-        result['location'] = 'ST'  # 这里随便填一个进去，在API里剔除
         logger.debug(result)
         return schemas.GamePlayerDataShow(**result)

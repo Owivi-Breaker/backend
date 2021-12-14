@@ -64,8 +64,11 @@ def get_game_player_data(player_id: int,
     computed_player = computed_data_app.ComputedPlayer(player_id=player_id,
                                                        db=db, season=save_model.season)
 
-    return computed_player.get_game_player_data(
+    game_player_data = computed_player.get_game_player_data(
         start_season=start_season, end_season=end_season)
+    if not game_player_data:
+        raise HTTPException(status_code=404, detail="GamePlayerData not found")
+    return game_player_data
 
 
 @router.get('/{player_id}/total-game-data',
@@ -84,5 +87,9 @@ def get_total_game_player_data(player_id: int, start_season: int = None, end_sea
     computed_player = computed_data_app.ComputedPlayer(player_id=player_id,
                                                        db=db, season=save_model.season)
 
-    return computed_player.get_total_game_player_data(
+    total_game_player_data: schemas.GamePlayerDataShow = computed_player.get_total_game_player_data(
         start_season=start_season, end_season=end_season)
+    logger.info(total_game_player_data)
+    if total_game_player_data.final_rating == -1:
+        raise HTTPException(status_code=404, detail="TotalGamePlayerData not found")
+    return total_game_player_data
