@@ -35,7 +35,7 @@ def get_league_by_id(league_id: int, db: Session = Depends(get_db)) -> schemas.L
         league_id=league_model.id, db=db, league_model=league_model).get_show_data()
 
 
-@router.get('/{league_id}/club', response_model=List[schemas.ClubShow])
+@router.get('/{league_id}/club', response_model=List[schemas.ClubShow], tags=['club api'])
 def get_clubs_by_league(league_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubShow]:
     """
     获取指定联赛的所有俱乐部信息

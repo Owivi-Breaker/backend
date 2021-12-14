@@ -39,7 +39,7 @@ def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubSh
     return club_shows
 
 
-@router.get('/{club_id}/player', response_model=List[schemas.PlayerShow])
+@router.get('/{club_id}/player', response_model=List[schemas.PlayerShow], tags=['player api'])
 def get_players_by_club(
         club_id: int, db: Session = Depends(get_db),
         save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
