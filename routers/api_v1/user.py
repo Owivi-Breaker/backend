@@ -31,13 +31,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 # 不要在路径中加入user_id,因为user_id的传入依赖于token,前端难以直接将user_id返回
-@router.get("/save", response_model=List[schemas.SaveShow], dependencies=[Depends(utils.verify_token)])
-async def get_saves_by_user(user_id: int, db: Session = Depends(get_db)) -> List[models.Save]:
+@router.get("/save", response_model=List[schemas.SaveShow],
+            dependencies=[Depends(utils.verify_token)])
+async def get_saves_by_user(current_user: models.User = Depends(utils.get_current_user),
+                            db: Session = Depends(get_db)) -> List[models.Save]:
     """
     获取用户存档
     """
-    user_model = crud.get_user_by_id(db=db, user_id=user_id)
-    return user_model.saves
+    return current_user.saves
 
 
 class SaveData(BaseModel):
