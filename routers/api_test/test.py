@@ -6,7 +6,7 @@ from core.db import engine, get_db, drop_all
 from pydantic import BaseModel
 import datetime
 import random
-
+import string
 import schemas
 import models
 import crud
@@ -32,6 +32,9 @@ def clear_db():
     清空数据库中的所有内容
     """
     drop_all()
+
+
+
 
 # def quick_game(db: Session, fake_season, save_id):
 #     game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=Date(2021, 8, 14),
