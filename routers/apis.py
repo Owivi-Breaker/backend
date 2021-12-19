@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from routers.api_v1 import game, player, club, league, game_pve, login, next_turn, user, front_page
+from routers.api_v1 import game, player, club, league, game_pve, login, next_turn, user
 from routers.api_test import test
 
 import utils
@@ -34,10 +34,6 @@ api_router.include_router(
 
 api_router.include_router(
     login.router, prefix='/v1/login', tags=['login api'])
-
-api_router.include_router(
-    front_page.router, prefix='/v1/front_page',tags=['front page api'],
-    dependencies=[Depends(utils.verify_token)])
 
 api_router.include_router(
     next_turn.router, prefix='/v1/next-turn', tags=['next turn api'],
