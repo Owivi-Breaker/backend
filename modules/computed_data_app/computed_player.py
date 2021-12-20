@@ -55,8 +55,8 @@ class ComputedPlayer:
         data['birth_date'] = self.player_model.birth_date
         data['wages'] = self.player_model.wages
         data['real_stamina'] = self.player_model.real_stamina
-        data.update(self.get_location_num())
-        data.update(self.get_all_capa())
+        data['location_num'] = self.get_location_num()
+        data['capa'] = self.get_all_capa()
         data['top_location'] = self.get_top_capa_n_location()[0]
         data['top_capa'] = self.get_top_capa_n_location()[1]
         data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa()}

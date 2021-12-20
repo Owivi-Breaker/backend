@@ -42,14 +42,18 @@ def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubSh
 @router.get('/{club_id}/player', response_model=List[schemas.PlayerShow], tags=['player api'])
 def get_players_by_club(
         club_id: int, db: Session = Depends(get_db),
-        save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
+        save_model=Depends(utils.get_current_save), is_player_club: bool = False) -> List[schemas.PlayerShow]:
     """
     获取指定俱乐部的球员信息
     :param club_id: 俱乐部 id
     :param save_model: 存档实例
+    :param is_player_club: 是否是玩家俱乐部
     :return: list of schemas.PlayerShow
     """
-    club_model = crud.get_club_by_id(db=db, club_id=club_id)
+    if is_player_club:
+        club_model = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+    else:
+        club_model = crud.get_club_by_id(db=db, club_id=club_id)
     return [computed_data_app.ComputedPlayer(
         player_id=player_model.id, db=db, player_model=player_model,
         season=save_model.season).get_show_data()
