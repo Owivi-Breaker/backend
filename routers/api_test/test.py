@@ -34,13 +34,23 @@ def clear_db():
     drop_all()
 
 
+@router.get('/game_process_demo')
+async def quick_game(fake_season =1, save_id =1,db: Session = Depends(get_db)):
+    """
+    展示一场 eve 比赛的过程，
+    默认为曼城与曼联的英超比赛
+    """
+    game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=Date(2021, 8, 30), game_name='英超',
+                            game_type='league', season=int(fake_season), save_id=save_id)
+    result = game_eve.start()
+    query_str = "and_(models.Game.season=='{}', models.Game.type=='{}', models.Game.date=='{}')".format(fake_season, 'league', Date(2021, 8, 30))
+    game = crud.get_games_by_attri(db=db, query_str=query_str)
+    process = game[-1].script
+    temp_events = process.split("\n")
+    events = [i for i in temp_events if i != '']
+    return events
 
 
-# def quick_game(db: Session, fake_season, save_id):
-#     game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=Date(2021, 8, 14),
-#                                 game_name='国王杯', game_type='cup4to2',
-#                                 season=fake_season, save_id=save_id)
-#     score = game_eve.start()
 #
 #
 # def start_season_game(league_model: models.League, save_model: models.Save, db: Session):
