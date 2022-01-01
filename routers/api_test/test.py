@@ -13,6 +13,7 @@ import crud
 import game_configs
 from modules import generate_app, game_app, computed_data_app, next_turn_app
 from utils import logger, Date
+import utils
 
 router = APIRouter()
 
@@ -26,7 +27,7 @@ async def show_protocol():
     return p
 
 
-@router.get('/clear_db')
+@router.get('/clear-db')
 def clear_db():
     """
     清空数据库中的所有内容
@@ -34,16 +35,19 @@ def clear_db():
     drop_all()
 
 
-@router.get('/game_process_demo')
-async def quick_game(fake_season =1, save_id =1,db: Session = Depends(get_db)):
+@router.get('/game-process-demo')
+async def quick_game(fake_season=1, save_id=1, db: Session = Depends(get_db)):
     """
     展示一场 eve 比赛的过程，
     默认为曼城与曼联的英超比赛
     """
     game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=Date(2021, 8, 30), game_name='英超',
-                            game_type='league', season=int(fake_season), save_id=save_id)
+                                game_type='league', season=int(fake_season), save_id=save_id)
     result = game_eve.start()
-    query_str = "and_(models.Game.season=='{}', models.Game.type=='{}', models.Game.date=='{}')".format(fake_season, 'league', Date(2021, 8, 30))
+    query_str = "and_(models.Game.season=='{}', models.Game.type=='{}', models.Game.date=='{}')".format(fake_season,
+                                                                                                        'league',
+                                                                                                        Date(2021, 8,
+                                                                                                             30))
     game = crud.get_games_by_attri(db=db, query_str=query_str)
     process = game[-1].script
     temp_events = process.split("\n")
@@ -51,7 +55,14 @@ async def quick_game(fake_season =1, save_id =1,db: Session = Depends(get_db)):
     return events
 
 
-#
+@router.get('/incoming-games-info')
+async def get_incoming_games_info(db: Session = Depends(get_db),
+                                  save_model=Depends(utils.get_current_save)):
+    """
+    获取即将到来的比赛信息
+    """
+    computed_calendar = computed_data_app.ComputedCalendar(save_id=save_model.id, db=db, save_model=save_model)
+    return computed_calendar.get_incoming_games(cur_date_str=save_model.time)
 #
 # def start_season_game(league_model: models.League, save_model: models.Save, db: Session):
 #     """

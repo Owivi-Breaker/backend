@@ -72,6 +72,11 @@ async def create_save(save_data: SaveData,
             detail="Incorrect club name",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # 生成日程表
+    calendar_generator = generate_app.CalendarGenerator(db=db, save_id=save_model.id)
+    calendar_generator.generate()
+    logger.info("日程表生成")
     return save_model
 
 
