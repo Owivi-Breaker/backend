@@ -489,7 +489,7 @@ class Team:
             wing_backs = rival_team.get_location_players((game_configs.Location.LB,))
         else:
             raise ValueError('边锋不存在！')  # 之前都判定过的，应该不会出现这种情况
-        self.add_script('{}拿球，尝试人'.format(wing.name))
+        self.add_script('{}拿球，尝试过人'.format(wing.name))
         state, win_player = self.sprint_dribble_and_block([wing], wing_backs)  # 一对一或一对多
         if state:
             # 边锋内切

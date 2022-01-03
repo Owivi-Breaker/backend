@@ -57,7 +57,7 @@ class ComputedCalendar:
         for calendar in self.calendars:
             event = json.loads(calendar.event_str)
             if 'pve' in event.keys() and event["pve"]:
-                game_info_dict = event["eve"][0]
+                game_info_dict = event["pve"][0]
                 game_info = {
                     "date": calendar.date,
                     "game_name": self.translate_game_type(
