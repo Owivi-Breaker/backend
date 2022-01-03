@@ -99,11 +99,6 @@ class SaveGenerator:
                         crud.update_league(db=self.db, league_id=league['id'],
                                            attri={"lower_league": target_league['id']})
         logger.info("联赛上下游关系标记完成")
-        # 生成日程表
-        calendar_generator = generate_app.CalendarGenerator(db=self.db, save_id=save_model.id)
-        calendar_generator.generate()
-        logger.info("日程表生成")
-
         self.data = dict()  # 清空数据
         return save_model
 

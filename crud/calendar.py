@@ -28,6 +28,14 @@ def get_calendar_by_id(db: Session, calendar_id: int):
     return db_calendar
 
 
+def get_calendar_by_save_id(db: Session, save_id: int) -> List[models.Calendar]:
+    """
+    获取指定存档id中的所有日程表项
+    """
+    db_calendars = db.query(models.Calendar).filter(models.Calendar.save_id == save_id).all()
+    return db_calendars
+
+
 def get_calendars_by_attri(db: Session, query_str: str, only_one: bool = False) -> List[models.Calendar]:
     if only_one:
         db_calendar = db.query(models.Calendar).filter(eval(query_str)).first()

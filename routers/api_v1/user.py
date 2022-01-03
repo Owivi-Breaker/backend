@@ -33,8 +33,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 # 不要在路径中加入user_id,因为user_id的传入依赖于token,前端难以直接将user_id返回
 @router.get("/save", response_model=List[schemas.SaveShow],
             dependencies=[Depends(utils.verify_token)])
-async def get_saves_by_user(current_user: models.User = Depends(utils.get_current_user),
-                            db: Session = Depends(get_db)) -> List[models.Save]:
+async def get_saves_by_user(current_user: models.User = Depends(utils.get_current_user)) -> List[models.Save]:
     """
     获取用户存档
     """
@@ -73,4 +72,18 @@ async def create_save(save_data: SaveData,
             detail="Incorrect club name",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # 生成日程表
+    calendar_generator = generate_app.CalendarGenerator(db=db, save_id=save_model.id)
+    calendar_generator.generate()
+    logger.info("日程表生成")
     return save_model
+
+
+@router.get('/save/date', dependencies=[Depends(utils.verify_token)])
+def get_save_date(save_id: int, db: Session = Depends(get_db)):
+    """
+    获取当前存档内的时间
+    """
+    save_model = crud.get_save_by_id(db, save_id)
+    return {'date': str(save_model.time)}
