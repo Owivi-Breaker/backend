@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 
 from core.db import get_db
-from utils import get_current_user, TokenData, oauth2_scheme
+from utils import get_current_user, TokenData, oauth2_scheme, logger
 import game_configs
 import crud
 import models

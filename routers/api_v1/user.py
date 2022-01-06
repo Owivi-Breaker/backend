@@ -40,6 +40,15 @@ async def get_saves_by_user(current_user: models.User = Depends(utils.get_curren
     return current_user.saves
 
 
+@router.get("/save/me", response_model=schemas.SaveShow,
+            dependencies=[Depends(utils.verify_token)])
+async def get_save_by_user(save_model: models.User = Depends(utils.get_current_save)) -> models.Save:
+    """
+    获取玩家现在的存档信息
+    """
+    return save_model
+
+
 class SaveData(BaseModel):
     type: str = 'five_leagues'
     player_club_name: str = '阿森纳'
