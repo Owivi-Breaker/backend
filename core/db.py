@@ -11,7 +11,7 @@ engine = create_engine(
 
 # engine = create_engine(settings.DB_URL["MySQLLocal"], encoding="utf-8")
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 ScopedSession = scoped_session(SessionLocal)  # 使用安全的线程
 
 Base.metadata.create_all(bind=engine)
@@ -26,7 +26,7 @@ def drop_all():
 
 
 def get_db():
-    db = ScopedSession()
+    db = SessionLocal()
     try:
         yield db
         db.commit()
