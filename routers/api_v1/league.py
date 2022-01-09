@@ -25,6 +25,17 @@ def get_leagues(save_model=Depends(utils.get_current_save),
             for league_model in save_model.leagues]
 
 
+@router.get('/me', response_model=schemas.LeagueShow)
+def get_league_by_user(save_model=Depends(utils.get_current_save),
+                       db: Session = Depends(get_db)) -> schemas.LeagueShow:
+    """
+    获取玩家俱乐部所在的联赛信息
+    """
+    club_model: models.Club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+    return computed_data_app.ComputedLeague(
+        league_id=club_model.league_id, db=db).get_show_data()
+
+
 @router.get('/{league_id}', response_model=schemas.LeagueShow)
 def get_league_by_id(league_id: int, db: Session = Depends(get_db)) -> schemas.LeagueShow:
     """

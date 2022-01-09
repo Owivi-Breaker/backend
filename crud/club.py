@@ -32,8 +32,11 @@ def get_club_by_id(db: Session, club_id: int):
 
 
 def get_clubs_by_save(db: Session, save_id: int) -> List[models.Club]:
+    """
+    获取存档中所有俱乐部的db实例
+    """
     db_leagues = crud.get_save_by_id(db=db, save_id=save_id).leagues
-    return list(functools.reduce(operator.concat, [league.clubs for league in db_leagues]))
+    return list(functools.reduce(operator.concat, [league.clubs for league in db_leagues]))  # 这个函数好高级，我好强
 
 
 """

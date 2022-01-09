@@ -42,4 +42,5 @@ class ComputedClub:
         data['pull_back'] = self.club_model.coach.pull_back
         data['middle_attack'] = self.club_model.coach.middle_attack
         data['counter_attack'] = self.club_model.coach.counter_attack
+        logger.debug(data)
         return schemas.ClubShow(**data)

@@ -14,19 +14,8 @@ from utils import logger
 router = APIRouter()
 
 
-@router.get('/{club_id}', response_model=schemas.ClubShow)
-def get_club_by_id(club_id: int, db: Session = Depends(get_db)) -> schemas.ClubShow:
-    """
-    获取指定id的俱乐部信息
-    :param club_id: 俱乐部 id
-    """
-    club_model = crud.get_club_by_id(db=db, club_id=club_id)
-    return computed_data_app.ComputedClub(
-        club_id=club_model.id, db=db, club_model=club_model).get_show_data()
-
-
 @router.get('/', response_model=List[schemas.ClubShow])
-def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubShow]:
+def get_clubs(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubShow]:
     """
     获取指定存档的所有俱乐部信息
     :param save_id: 存档 id
@@ -37,6 +26,28 @@ def get_club(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubSh
             club_id=club_model.id, db=db, club_model=club_model).get_show_data()
         for club_model in db_clubs]
     return club_shows
+
+
+@router.get('/me', response_model=schemas.ClubShow)
+def get_club_by_user(save_model=Depends(utils.get_current_save), db: Session = Depends(get_db)) -> schemas.ClubShow:
+    """
+    获取玩家俱乐部信的信息
+    """
+    logger.debug("cnm")
+    club_model: models.Club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+
+    return computed_data_app.ComputedClub(
+        club_id=club_model.id, db=db).get_show_data()
+
+
+@router.get('/{club_id}', response_model=schemas.ClubShow)
+def get_club_by_id(club_id: int, db: Session = Depends(get_db)) -> schemas.ClubShow:
+    """
+    获取指定id的俱乐部信息
+    """
+    club_model = crud.get_club_by_id(db=db, club_id=club_id)
+    return computed_data_app.ComputedClub(
+        club_id=club_model.id, db=db, club_model=club_model).get_show_data()
 
 
 @router.get('/{club_id}/player', response_model=List[schemas.PlayerShow], tags=['player api'])
