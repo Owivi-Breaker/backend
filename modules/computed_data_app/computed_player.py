@@ -60,6 +60,8 @@ class ComputedPlayer:
         data['top_location'] = self.get_top_capa_n_location()[0]
         data['top_capa'] = self.get_top_capa_n_location()[1]
         data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa()}
+        data['style_tag'] = ["就地反抢", "前插", "防守内收"]  # TODO 挂个假数据
+        data['talent_tag'] = ["大心脏", "偷猎者"]  # TODO 挂个假数据
         return schemas.PlayerShow(**data)
 
     def get_location_num(self) -> Dict[str, int]:
@@ -176,7 +178,20 @@ class ComputedPlayer:
             top_capa = float(utils.retain_decimal(top_capa))
         return lo_name, top_capa
 
-    def get_rating_in_recent_year(self) -> float:
+    # def get_ratings_in_recent_games(self, game_num: int = 5) -> List[float]:
+    #     """
+    #     获取近n场比赛的评分列表
+    #     """
+    #     game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
+    #         start_season=self.season, end_season=self.season)
+    #     if not game_player_data:
+    #         return []
+    #     ratings = sorted(game_player_data, key=lambda x: x)
+
+    def get_avg_rating_in_recent_year(self) -> float:
+        """
+        获取近一年比赛的评分数据
+        """
         start_season = self.season - 1 if self.season - 1 != 0 else self.season
         game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
             start_season=start_season, end_season=self.season)
@@ -185,6 +200,7 @@ class ComputedPlayer:
         rating = float(
             utils.retain_decimal(sum([p.real_rating for p in game_player_data]) / len(game_player_data)))
         rating = rating if rating <= 10 else 10
+        return rating
 
     def get_value(self) -> int:
         """

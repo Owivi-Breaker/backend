@@ -118,4 +118,6 @@ class PlayerShow(BaseModel):
 
     top_capa: float
     top_location: str
-    location_capa: Dict[str, float]  # 每个位置上的能力值
+    location_capa: Dict[str, float]  # 每个位置上的能力值 如 'ST':97
+    style_tag: List[str]  # 风格标签
+    talent_tag: List[str]  # 天赋标签
