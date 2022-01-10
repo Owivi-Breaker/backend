@@ -249,8 +249,8 @@ class ComputedPlayer:
 
         return game_player_data
 
-    def get_total_game_player_data(self, start_season: int = None, end_season: int = None) \
-            -> schemas.GamePlayerDataShow:
+    def get_total_game_player_data(self, start_season: int = None,
+                                   end_season: int = None) -> schemas.TotalGamePlayerDataShow:
         """
         获取指定球员某赛季的统计比赛信息
         :param start_season: 开始赛季，若为空，默认1开始
@@ -259,8 +259,9 @@ class ComputedPlayer:
         game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
             start_season=start_season, end_season=end_season)
         if not game_player_data:
-            return schemas.GamePlayerDataShow()
+            return schemas.TotalGamePlayerDataShow()
         result = dict()
+        result['appearance'] = len(game_player_data)
         result["final_rating"] = float(
             utils.retain_decimal(sum([p.final_rating for p in game_player_data]) / len(game_player_data)))
         result['actions'] = sum([p.actions for p in game_player_data])
@@ -277,7 +278,7 @@ class ComputedPlayer:
         result['aerial_success'] = sum([p.aerial_success for p in game_player_data])
         result['saves'] = sum([p.saves for p in game_player_data])
         result['save_success'] = sum([p.save_success for p in game_player_data])
-        return schemas.GamePlayerDataShow(**result)
+        return schemas.TotalGamePlayerDataShow(**result)
 
     def get_values(self) -> int:
         """

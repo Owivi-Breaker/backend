@@ -73,13 +73,10 @@ def get_game_player_data(player_id: int,
     return game_player_data
 
 
-@router.get('/{player_id}/total-game-data',
-            response_model=schemas.GamePlayerDataShow,
-            response_model_exclude={'location'})
+@router.get('/{player_id}/total-game-data', response_model=schemas.TotalGamePlayerDataShow)
 def get_total_game_player_data(player_id: int, start_season: int = None, end_season: int = None,
                                db: Session = Depends(get_db),
-                               save_model=Depends(utils.get_current_save)) \
-        -> schemas.GamePlayerDataShow:
+                               save_model=Depends(utils.get_current_save)) -> schemas.TotalGamePlayerDataShow:
     """
     获取指定球员某赛季的统计比赛信息
     :param player_id: 球员id
@@ -89,6 +86,6 @@ def get_total_game_player_data(player_id: int, start_season: int = None, end_sea
     computed_player = computed_data_app.ComputedPlayer(
         player_id=player_id, db=db, season=save_model.season, date=save_model.date)
 
-    total_game_player_data: schemas.GamePlayerDataShow = computed_player.get_total_game_player_data(
+    total_game_player_data: schemas.TotalGamePlayerDataShow = computed_player.get_total_game_player_data(
         start_season=start_season, end_season=end_season)
     return total_game_player_data
