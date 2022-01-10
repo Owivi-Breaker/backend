@@ -19,24 +19,24 @@ class NextTurner:
         self.db = db
         self.save_id = save_id
         self.save_model = crud.get_save_by_id(db=self.db, save_id=self.save_id)
-        self.date = None
+        self.date: str = ''
 
     def plus_days(self):
         """
         世界时间加一天
         """
-        date = Date(self.save_model.time)
+        date = Date(self.save_model.date)
         date.plus_days(1)
-        self.save_model.time = str(date)
+        self.save_model.date = str(date)
         self.db.commit()
-        self.date = date
+        self.date = str(date)
 
     def check(self):
         self.plus_days()
-        logger.info(str(self.date))
+        logger.info(self.date)
         # 一天的事项不一定只存在一条calendar记录中
         query_str = "and_(models.Calendar.save_id=='{}', models.Calendar.date=='{}')".format(
-            self.save_model.id, str(self.date))
+            self.save_model.id, self.date)
         calendars: List[models.Calendar] = crud.get_calendars_by_attri(db=self.db, query_str=query_str)
         total_events = dict()
         for calendar in calendars:
@@ -89,7 +89,8 @@ class NextTurner:
                                                   player_club_id=self.save_model.player_club_id,
                                                   save_id=self.save_model.id,
                                                   club1_model=club1_model, club2_model=club2_model,
-                                                  season=self.save_model.season)
+                                                  season=self.save_model.season,
+                                                  date=self.date)
         tactic_adjustor.adjust()
         # 开始模拟比赛
         game_eve = game_app.GameEvE(db=self.db,
@@ -113,6 +114,9 @@ class NextTurner:
         pass
 
     def game_generation_starter(self, game_generation):
+        """
+        后续比赛生成入口
+        """
         calendar_generator = generate_app.CalendarGenerator(db=self.db, save_id=self.save_id)
         for game_event in game_generation:
             if 'cup' in game_event:
@@ -123,6 +127,9 @@ class NextTurner:
                 calendar_generator.save_in_db()
 
     def promote_n_relegate_starter(self):
+        """
+        联赛升降级入口
+        """
         for league_model in self.save_model.leagues:
             if not league_model.upper_league and league_model.lower_league:
                 lower_league = crud.get_league_by_id(db=self.db, league_id=league_model.lower_league)

@@ -19,6 +19,7 @@ class Player(Base):
     weight = Column(Integer)
     birth_date = Column(String(1000))
 
+    last_game_date = Column(String(1000))
     wages = Column(Float)
 
     real_stamina = Column(Float)

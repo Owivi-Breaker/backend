@@ -95,4 +95,4 @@ def get_save_date(save_id: int, db: Session = Depends(get_db)):
     获取当前存档内的时间
     """
     save_model = crud.get_save_by_id(db, save_id)
-    return {'date': str(save_model.time)}
+    return {'date': str(save_model.date)}

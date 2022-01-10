@@ -6,7 +6,7 @@ import schemas
 
 class SaveCreate(BaseModel):
     created_time: datetime = datetime.now()
-    time: str = "2020-08-01"
+    date: str = "2020-08-01"
     season: int = 1  # 赛季
 
     class Config:

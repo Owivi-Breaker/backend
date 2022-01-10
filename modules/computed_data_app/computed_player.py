@@ -12,12 +12,13 @@ import crud
 
 
 class ComputedPlayer:
-    def __init__(self, player_id: int, db: Session, player_model: Optional[models.Player] = None, season: int = None):
+    def __init__(self, player_id: int, db: Session,
+                 season: int, date: str,
+                 player_model: Optional[models.Player] = None):
         self.db = db
         self.player_id = player_id
-        if not season:
-            raise ValueError("season is zero")
         self.season = season
+        self.date = date
         # 为了减少数据的读操作，可以传入现成的player_model
         self.player_model = player_model \
             if player_model \
@@ -57,9 +58,9 @@ class ComputedPlayer:
         data['wages'] = self.player_model.wages
         data['values'] = self.get_values()
         data['number'] = random.randint(1, 50)  # TODO 号码
-        data['real_stamina'] = self.player_model.real_stamina
+        data['real_stamina'] = self.get_real_stamina()
         data['location_num'] = self.get_location_num()
-        data['capa'] = self.get_all_capa()
+        data['capa'] = self.get_all_capa(is_retain_decimal=True)
         data['top_location'] = self.get_top_capa_n_location()[0]
         data['top_capa'] = self.get_top_capa_n_location()[1]
         data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa()}
@@ -109,11 +110,13 @@ class ComputedPlayer:
             return {k: float(utils.retain_decimal(v)) for k, v in data.items()}
         return data
 
-    def get_capa(self, capa_name: str, is_retain_decimal: bool = False) -> float:
+    def get_capa(self, capa_name: str, is_retain_decimal: bool = False,
+                 is_filtered_by_stamina: bool = False) -> float:
         """
         获取年龄滤镜过的能力值
         :param capa_name: 能力名
         :param is_retain_decimal: 是否保留小数
+        :param is_filtered_by_stamina: 是否考虑体力因素，专门用于ai选人策略中
         :return: 能力值
         """
         ori_capa = self.capa[capa_name]
@@ -209,13 +212,17 @@ class ComputedPlayer:
         rating = rating if rating <= 10 else 10
         return rating
 
-    def get_value(self) -> int:
+    def get_real_stamina(self) -> int:
         """
-        获取球员身价
-        :return: 身价
+        获取真实体力值
         """
-        basic_value = int(self.get_top_capa_n_location()[1] ** 3 / 70)
-        return basic_value
+        if not self.player_model.last_game_date:
+            return 100
+        last_stamina = self.player_model.real_stamina
+        days: int = (utils.Date(self.date).date - utils.Date(
+            self.player_model.last_game_date).date).days
+        re = int(days * 3 + last_stamina) if int(days * 3 + last_stamina) <= 100 else 100
+        return re
 
     def get_age(self) -> int:
         """

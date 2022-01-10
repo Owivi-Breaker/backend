@@ -11,16 +11,20 @@ from sqlalchemy.orm import Session
 
 class Player:
     # 比赛球员类
-    def __init__(self, db: Session, player_model: models.Player, location: str, season: int):
+    def __init__(self, db: Session, player_model: models.Player, location: str, season: int, date: str):
         self.db = db
         self.season = season
+        self.date = date
         self.player_model = player_model
+        self.computed_player = computed_data_app.ComputedPlayer(
+            player_id=self.player_model.id, db=self.db,
+            player_model=self.player_model, season=self.season, date=self.date)
         self.name = player_model.translated_name  # 解说用
         self.ori_location = location  # 原本位置，不会变
         self.real_location = location  # 每个回合变化后的实时位置
         self.capa = dict()  # 球员能力字典
         self.init_capa()
-        self.stamina = player_model.real_stamina  # 初始体力，会随着比赛进行而减少
+        self.stamina = self.computed_player.get_real_stamina()  # 初始体力，会随着比赛进行而减少
         # self.data记录球员场上数据
         self.data = dict()
         self.init_data()
@@ -55,9 +59,7 @@ class Player:
         """
         将球员的各项能力值读入self.rating中
         """
-        computed_player = computed_data_app.ComputedPlayer(player_id=self.player_model.id, db=self.db,
-                                                           player_model=self.player_model, season=self.season)
-        self.capa = computed_player.get_all_capa()
+        self.capa = self.computed_player.get_all_capa()
 
     def export_game_player_data_schemas(self, created_time=datetime.datetime.now()) -> schemas.GamePlayerDataCreate:
         """

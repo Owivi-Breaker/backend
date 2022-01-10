@@ -64,7 +64,7 @@ class CalendarGenerator:
         """
         生成联赛赛程
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         # 记录联赛日
         for league_model in self.save_model.leagues:
             clubs: List[models.Club] = league_model.clubs
@@ -106,7 +106,7 @@ class CalendarGenerator:
         生成杯赛赛程
         适用于两级联赛的杯赛
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         if game_type == "cup32to16":
             # 一般是在赛季开始初始化日程表时，生成32进16的赛事
             for league_model in self.save_model.leagues:
@@ -330,7 +330,7 @@ class CalendarGenerator:
         :param game_type: 比赛类型
         :return:
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         if game_type == "champions_group":
             if self.save_model.season == 1:
                 # 第一赛季无欧冠
@@ -702,7 +702,7 @@ class CalendarGenerator:
         """
         生成转会日
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         # 夏窗
         date_range = utils.date_range(int(year), 6, 1, int(year), 8, 31)
         for date_str in date_range:
@@ -719,7 +719,7 @@ class CalendarGenerator:
         """
         生成下赛季的日程表日
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         date = Date(int(year) + 1, 5, 29)
         next_calendar_dict = {'next_calendar': []}
         self.add_dict(str(date), next_calendar_dict)
@@ -728,7 +728,7 @@ class CalendarGenerator:
         """
         生成未决定的赛事日
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         # 杯赛
         date = Date(int(year), 8, 26)  # cup16to8
         game_dict = {'game_generation': ['cup16to8']}
@@ -761,7 +761,7 @@ class CalendarGenerator:
         """
         生成联赛升降日
         """
-        year, month, day = self.save_model.time.split('-')
+        year, month, day = self.save_model.date.split('-')
         date = Date(int(year) + 1, 5, 20)
         promote_n_relegate_dict = {'promote_n_relegate': []}
         self.add_dict(str(date), promote_n_relegate_dict)

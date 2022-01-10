@@ -33,6 +33,7 @@ def clear_db():
     清空数据库中的所有内容
     """
     drop_all()
+    return 'successfully clear db'
 
 
 @router.get('/game-process-demo')
@@ -62,7 +63,7 @@ async def get_incoming_games_info(db: Session = Depends(get_db),
     获取即将到来的比赛信息
     """
     computed_calendar = computed_data_app.ComputedCalendar(save_id=save_model.id, db=db, save_model=save_model)
-    return computed_calendar.get_incoming_games(cur_date_str=save_model.time)
+    return computed_calendar.get_incoming_games(cur_date_str=save_model.date)
 #
 # def start_season_game(league_model: models.League, save_model: models.Save, db: Session):
 #     """
