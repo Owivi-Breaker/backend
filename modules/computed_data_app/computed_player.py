@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import Dict, List, Tuple, Optional
+import random
 
 import game_configs
 import schemas
@@ -55,6 +56,7 @@ class ComputedPlayer:
         data['birth_date'] = self.player_model.birth_date
         data['wages'] = self.player_model.wages
         data['values'] = self.get_values()
+        data['number'] = random.randint(1, 50)  # TODO 号码
         data['real_stamina'] = self.player_model.real_stamina
         data['location_num'] = self.get_location_num()
         data['capa'] = self.get_all_capa()

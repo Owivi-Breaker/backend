@@ -110,6 +110,7 @@ class PlayerShow(BaseModel):
     birth_date: str
     wages: float  # 周薪
     values: float  # 身价
+    number: int  # TODO 号码，以后加到数据库里去
 
     real_stamina: float = 100  # 实时体力
     # Location num
