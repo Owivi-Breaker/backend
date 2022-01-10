@@ -48,26 +48,26 @@ class GamePlayerData(GamePlayerDataCreate):
 class GamePlayerDataShow(BaseModel):
     location: Location = 'ST'
 
-    final_rating: float = -1
-    actions: int = -1
-    shots: int = -1
-    goals: int = -1
-    assists: int = -1
+    final_rating: float = 6.0
+    actions: int = 0
+    shots: int = 0
+    goals: int = 0
+    assists: int = 0
     # 传球
-    passes: int = -1
-    pass_success: int = -1
+    passes: int = 0
+    pass_success: int = 0
     # 过人
-    dribbles: int = -1
-    dribble_success: int = -1
+    dribbles: int = 0
+    dribble_success: int = 0
     # 抢断
-    tackles: int = -1
-    tackle_success: int = -1
+    tackles: int = 0
+    tackle_success: int = 0
     # 争顶
-    aerials: int = -1
-    aerial_success: int = -1
+    aerials: int = 0
+    aerial_success: int = 0
     # 扑救
-    saves: int = -1
-    save_success: int = -1
+    saves: int = 0
+    save_success: int = 0
 
     class Config:
         orm_mode = True

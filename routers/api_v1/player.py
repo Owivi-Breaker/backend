@@ -35,7 +35,8 @@ def get_player(save_id: int, skip: int = 0, limit: int = 100,
 
 
 @router.get('/{player_id}', response_model=schemas.PlayerShow)
-def get_player_by_id(player_id: int, db: Session = Depends(get_db)) -> schemas.PlayerShow:
+def get_player_by_id(player_id: int, db: Session = Depends(get_db),
+                     save_model=Depends(utils.get_current_save)) -> schemas.PlayerShow:
     """
     获取指定id的球员
     :param player_id: 球员id
@@ -44,7 +45,7 @@ def get_player_by_id(player_id: int, db: Session = Depends(get_db)) -> schemas.P
     db_player: models.Player = crud.get_player_by_id(player_id=player_id, db=db)
     player_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
         player_id=db_player.id, db=db,
-        player_model=db_player, season=-1).get_show_data()
+        player_model=db_player, season=save_model.season).get_show_data()
     return player_show
 
 
@@ -64,10 +65,8 @@ def get_game_player_data(player_id: int,
     computed_player = computed_data_app.ComputedPlayer(player_id=player_id,
                                                        db=db, season=save_model.season)
 
-    game_player_data = computed_player.get_game_player_data(
+    game_player_data: List[schemas.GamePlayerData] = computed_player.get_game_player_data(
         start_season=start_season, end_season=end_season)
-    if not game_player_data:
-        raise HTTPException(status_code=404, detail="GamePlayerData not found")
     return game_player_data
 
 
@@ -89,7 +88,4 @@ def get_total_game_player_data(player_id: int, start_season: int = None, end_sea
 
     total_game_player_data: schemas.GamePlayerDataShow = computed_player.get_total_game_player_data(
         start_season=start_season, end_season=end_season)
-    logger.info(total_game_player_data)
-    if total_game_player_data.final_rating == -1:
-        raise HTTPException(status_code=404, detail="TotalGamePlayerData not found")
     return total_game_player_data

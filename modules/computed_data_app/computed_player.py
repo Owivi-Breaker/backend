@@ -270,7 +270,6 @@ class ComputedPlayer:
         result['aerial_success'] = sum([p.aerial_success for p in game_player_data])
         result['saves'] = sum([p.saves for p in game_player_data])
         result['save_success'] = sum([p.save_success for p in game_player_data])
-        logger.debug(result)
         return schemas.GamePlayerDataShow(**result)
 
     def get_values(self) -> int:
