@@ -14,10 +14,13 @@ import datetime
 
 
 class Team:
-    def __init__(self, db: Session, game, club_id: int, club_model: models.Club = None, season: int = None):
+    def __init__(self, db: Session, game, club_id: int,
+                 season: int, date: str,
+                 club_model: models.Club = None):
         self.db = db
         self.game = game
         self.season = season
+        self.date = date
         self.club_id = club_id
         self.team_model = club_model if club_model else crud.get_club_by_id(db=self.game.db, club_id=self.club_id)
         self.name = self.team_model.name  # 解说用
@@ -68,14 +71,14 @@ class Team:
 
     def init_players(self):
         """
-        挑选球员，写入self.players中
+        挑选球员 并写入self.players中
         """
         player_selector = PlayerSelector(club_id=self.club_id, db=self.game.db, club_model=self.team_model,
-                                         season=self.season)
+                                         season=self.season, date=self.date)
         players_model, locations_list = player_selector.select_players()
         for player_model, location in zip(players_model, locations_list):
             self.players.append(game_eve_app.Player(
-                db=self.db, player_model=player_model, location=location, season=self.season))
+                db=self.db, player_model=player_model, location=location, season=self.season, date=self.date))
         if len(self.players) != 11:
             logger.warning("队伍仅有{}人！".format(len(self.players)))
 

@@ -16,6 +16,7 @@ class PlayerCreate(BaseModel):
     birth_date: str
     wages: float  # 周薪
 
+    last_game_date: str = ''
     real_stamina: float = 100  # 实时体力
     # Location num
     ST_num: int = 0

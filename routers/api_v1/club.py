@@ -67,5 +67,5 @@ def get_players_by_club(
         club_model = crud.get_club_by_id(db=db, club_id=club_id)
     return [computed_data_app.ComputedPlayer(
         player_id=player_model.id, db=db, player_model=player_model,
-        season=save_model.season).get_show_data()
+        season=save_model.season, date=save_model.date).get_show_data()
             for player_model in club_model.players]

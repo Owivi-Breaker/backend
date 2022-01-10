@@ -14,20 +14,20 @@ import time
 
 class GameEvE:
     def __init__(self, db: Session, club1_id: int, club2_id: int,
-                 date: Date, game_type: str, game_name: str, season: int, save_id: int,
+                 date: str, game_type: str, game_name: str, season: int, save_id: int,
                  club1_model: models.Club = None, club2_model: models.Club = None):
         self.db = db
         self.season = season
-        self.date = str(date)
+        self.date = date
         self.script = ''
         self.type = game_type
         self.name = game_name
         self.save_id = save_id
         self.winner_id = 0
         self.lteam = game_eve_app.Team(db=self.db, game=self, club_id=club1_id, club_model=club1_model,
-                                       season=self.season)
+                                       season=self.season, date=self.date)
         self.rteam = game_eve_app.Team(db=self.db, game=self, club_id=club2_id, club_model=club2_model,
-                                       season=self.season)
+                                       season=self.season, date=self.date)
 
     def start(self) -> Tuple:
         """
@@ -75,7 +75,7 @@ class GameEvE:
             winner_name = self.rteam.name
         self.add_script('胜者为{}！'.format(winner_name))
         self.rate()  # 球员评分
-        self.save_in_db()  # 保存比赛
+        self.save_game_data()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
 
         return self.lteam.team_model.name, self.rteam.team_model.name, self.lteam.score, self.rteam.score
@@ -304,7 +304,10 @@ class GameEvE:
             logger.error('没有球员相对应的评分！')
         # endregion
 
-        # region TODO 剩余体力保存
+        # region  剩余体力保存
+        self.update_player(player.player_model,
+                           attri={'real_stamina': player.stamina, 'last_game_date': self.date})
+
         # endregion
 
     @staticmethod
@@ -367,7 +370,7 @@ class GameEvE:
         game_data = schemas.GameCreate(**data)
         return game_data
 
-    def save_in_db(self):
+    def save_game_data(self):
         """
         将比赛数据写入数据库
         """

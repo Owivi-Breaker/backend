@@ -73,6 +73,31 @@ class GamePlayerDataShow(BaseModel):
         orm_mode = True
 
 
+class TotalGamePlayerDataShow(BaseModel):
+    appearance: int = 0
+
+    final_rating: float = 6.0
+    actions: int = 0
+    shots: int = 0
+    goals: int = 0
+    assists: int = 0
+    # 传球
+    passes: int = 0
+    pass_success: int = 0
+    # 过人
+    dribbles: int = 0
+    dribble_success: int = 0
+    # 抢断
+    tackles: int = 0
+    tackle_success: int = 0
+    # 争顶
+    aerials: int = 0
+    aerial_success: int = 0
+    # 扑救
+    saves: int = 0
+    save_success: int = 0
+
+
 class GameTeamDataCreate(BaseModel):
     created_time: datetime
     attempts: int
