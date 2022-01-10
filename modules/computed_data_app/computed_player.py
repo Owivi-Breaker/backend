@@ -54,6 +54,7 @@ class ComputedPlayer:
         data['weight'] = self.player_model.weight
         data['birth_date'] = self.player_model.birth_date
         data['wages'] = self.player_model.wages
+        data['values'] = self.get_values()
         data['real_stamina'] = self.player_model.real_stamina
         data['location_num'] = self.get_location_num()
         data['capa'] = self.get_all_capa()
@@ -62,6 +63,7 @@ class ComputedPlayer:
         data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa()}
         data['style_tag'] = ["就地反抢", "前插", "防守内收"]  # TODO 挂个假数据
         data['talent_tag'] = ["大心脏", "偷猎者"]  # TODO 挂个假数据
+        data['recent_ratings'] = self.get_ratings_in_recent_games()
         return schemas.PlayerShow(**data)
 
     def get_location_num(self) -> Dict[str, int]:
@@ -178,15 +180,18 @@ class ComputedPlayer:
             top_capa = float(utils.retain_decimal(top_capa))
         return lo_name, top_capa
 
-    # def get_ratings_in_recent_games(self, game_num: int = 5) -> List[float]:
-    #     """
-    #     获取近n场比赛的评分列表
-    #     """
-    #     game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
-    #         start_season=self.season, end_season=self.season)
-    #     if not game_player_data:
-    #         return []
-    #     ratings = sorted(game_player_data, key=lambda x: x)
+    def get_ratings_in_recent_games(self, game_num: int = 5) -> List[float]:
+        """
+        获取近n场比赛的评分列表 排序由远到近
+        :param game_num: 欲获取的比赛次数
+        """
+        game_player_data: List[models.GamePlayerData] = self.get_game_player_data(
+            start_season=self.season, end_season=self.season)
+        if not game_player_data:
+            return []
+        game_player_data_sorted = sorted(game_player_data, key=lambda x: x.id, reverse=True)
+        ratings = [x.final_rating for x in game_player_data_sorted]
+        return ratings[:game_num][::-1] if len(ratings) >= game_num else ratings[::-1]
 
     def get_avg_rating_in_recent_year(self) -> float:
         """
@@ -265,3 +270,13 @@ class ComputedPlayer:
         result['save_success'] = sum([p.save_success for p in game_player_data])
         logger.debug(result)
         return schemas.GamePlayerDataShow(**result)
+
+    def get_values(self) -> int:
+        """
+        获取身价
+        """
+        top_capa = self.get_top_capa_n_location()[1]
+        basic_values = top_capa ** 3 / 70.0
+        avg_rating = self.get_avg_rating_in_recent_year()
+        extra_values = avg_rating * 2000 - 12000
+        return int(basic_values + extra_values)

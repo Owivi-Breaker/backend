@@ -118,9 +118,17 @@ class PlayerGenerator:
         """
         return int(utils.normalvariate(75, 5))
 
+    @staticmethod
+    def get_wages():
+        """
+        生成初始周薪
+        TODO 暂时随机化
+        """
+        return random.randint(2, 30)
+
     def get_capa_potential(self, local_nationality: str = '', ) -> int:
         """
-        获能力属性的潜力值
+        生成潜力值
         :param local_nationality: 国籍
         :return: 潜力值
         """
@@ -245,6 +253,7 @@ class PlayerGenerator:
         self.data['height'] = self.get_height()
         self.data['weight'] = self.get_weight()
         self.data['birth_date'] = self.get_birthday()
+        self.data['wages'] = self.get_wages()
         # capa limit generation
         self.data['shooting_limit'] = self.get_capa_potential(self.data['translated_nationality'])
         self.data['passing_limit'] = self.get_capa_potential(self.data['translated_nationality'])

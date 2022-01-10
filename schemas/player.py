@@ -14,7 +14,7 @@ class PlayerCreate(BaseModel):
     height: int
     weight: int
     birth_date: str
-    wages: float = 0  # 周薪
+    wages: float  # 周薪
 
     real_stamina: float = 100  # 实时体力
     # Location num
@@ -108,7 +108,8 @@ class PlayerShow(BaseModel):
     height: int
     weight: int
     birth_date: str
-    wages: float = 0  # 周薪
+    wages: float  # 周薪
+    values: float  # 身价
 
     real_stamina: float = 100  # 实时体力
     # Location num
@@ -121,3 +122,4 @@ class PlayerShow(BaseModel):
     location_capa: Dict[str, float]  # 每个位置上的能力值 如 'ST':97
     style_tag: List[str]  # 风格标签
     talent_tag: List[str]  # 天赋标签
+    recent_ratings: List[float]  # 近五场比赛的评分
