@@ -103,7 +103,7 @@ class PlayerShow(BaseModel):
     """
     id: int
     club_id: int
-    name: str
+    club_name: str  # 俱乐部名
     translated_name: str
     translated_nationality: str
     age: int

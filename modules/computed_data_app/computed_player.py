@@ -48,6 +48,7 @@ class ComputedPlayer:
         data = dict()
         data['id'] = self.player_model.id
         data['club_id'] = self.player_model.club_id
+        data['club_name'] = self.player_model.club.name
         data['name'] = self.player_model.name
         data['translated_name'] = self.player_model.translated_name
         data['translated_nationality'] = self.player_model.translated_nationality
