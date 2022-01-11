@@ -22,15 +22,16 @@ class PlayerGenerator:
         self.cn_names = []
         self.en_names = []
         self.jp_names = []
-        self.import_names()
+        self.import_files()
         self.fake = Faker()
 
         self.ori_mean_capa = game_configs.ori_mean_capa
         self.ori_mean_potential_capa = game_configs.ori_mean_potential_capa
+        self.avatar_style = game_configs.avatar_style
 
-    def import_names(self):
+    def import_files(self):
         """
-        导入人名文件
+        导入人名、国家名和头像风格文件
         """
         with open('./assets/country_names.json', encoding='utf-8') as file_obj:
             self.country_names = json.load(file_obj)
@@ -254,6 +255,7 @@ class PlayerGenerator:
         self.data['weight'] = self.get_weight()
         self.data['birth_date'] = self.get_birthday()
         self.data['wages'] = self.get_wages()
+        self.data['avatar'] = self.get_avatar()
         # capa limit generation
         self.data['shooting_limit'] = self.get_capa_potential(self.data['translated_nationality'])
         self.data['passing_limit'] = self.get_capa_potential(self.data['translated_nationality'])
@@ -310,3 +312,14 @@ class PlayerGenerator:
         capa = capa if capa > 0 else 1  # 底限为1
         capa = capa if capa <= capa_limit else capa_limit  # 上限为潜力
         return capa
+
+    def get_avatar(self) -> str:
+        """
+        随机生成头像json字符串
+        """
+        style = dict()
+        for key, value in self.avatar_style.items():
+            style[key] = utils.select_by_pro(value)
+        style['facialHairColor'] = style['hairColor']
+        style['topColor'] = style['clotheColor']
+        return utils.turn_dict2str(style)

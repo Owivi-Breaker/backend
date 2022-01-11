@@ -16,6 +16,7 @@ class PlayerCreate(BaseModel):
     birth_date: str
     wages: float  # 周薪
 
+    avatar: str  # 头像 json格式字符串
     last_game_date: str = ''
     real_stamina: float = 100  # 实时体力
     # Location num
@@ -112,6 +113,7 @@ class PlayerShow(BaseModel):
     wages: float  # 周薪
     values: float  # 身价
     number: int  # TODO 号码，以后加到数据库里去
+    avatar: Dict[str, str]  # 头像参数
 
     real_stamina: float = 100  # 实时体力
     # Location num

@@ -21,6 +21,7 @@ class Player(Base):
 
     last_game_date = Column(String(1000))
     wages = Column(Float)
+    avatar = Column(String(1000))
 
     real_stamina = Column(Float)
     # Location

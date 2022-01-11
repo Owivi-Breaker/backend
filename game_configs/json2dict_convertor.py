@@ -17,3 +17,6 @@ with open("./game_configs/data/formations.json", encoding='utf-8') as f_obj:
 
 with open("./game_configs/data/capa_potential.json", encoding='utf-8') as f_obj:
     capa_potential = json.load(f_obj)
+
+with open("./game_configs/data/avatar.json", encoding='utf-8') as f_obj:
+    avatar_style = json.load(f_obj)

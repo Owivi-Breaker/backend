@@ -58,6 +58,7 @@ class ComputedPlayer:
         data['wages'] = self.player_model.wages
         data['values'] = self.get_values()
         data['number'] = random.randint(1, 50)  # TODO 号码
+        data['avatar'] = utils.turn_str2dict(self.player_model.avatar)
         data['real_stamina'] = self.get_real_stamina()
         data['location_num'] = self.get_location_num()
         data['capa'] = self.get_all_capa(is_retain_decimal=True)

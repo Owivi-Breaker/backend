@@ -1,10 +1,9 @@
 import random
-import bisect
-from pathlib import Path
-import numpy as np
+import json
 from decimal import *
-from utils import Date
 from typing import List
+
+from utils import Date
 
 
 def get_mean_range(*value, per_range: float = 0.1) -> float:
@@ -86,7 +85,6 @@ def select_by_pro(pro_dict: dict):
             return key
 
 
-
 def plus_dict(a: dict, b: dict) -> dict:
     """
     将两个字典相加
@@ -141,3 +139,17 @@ def get_key_with_max_value(_dict: dict):
     """
     result = max(_dict, key=lambda x: _dict[x])
     return result
+
+
+def turn_dict2str(_dict: dict) -> str:
+    """
+    将字典转换成字符串
+    """
+    return json.dumps(_dict, ensure_ascii=False)
+
+
+def turn_str2dict(json_str: str) -> dict:
+    """
+    将字符串转换为字典
+    """
+    return json.loads(json_str)
