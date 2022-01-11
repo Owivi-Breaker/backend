@@ -67,7 +67,7 @@ class SaveGenerator:
                         player_create_schemas: schemas.PlayerCreate = player_generator.generate(
                             ori_mean_capa=club['ori_mean_capa'],
                             ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                            average_age=26, location=lo)
+                            average_age=27, location=lo)
                         players_create_schemas.append(player_create_schemas)
 
                 for _ in range(7):

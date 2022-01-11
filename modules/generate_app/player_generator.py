@@ -247,7 +247,7 @@ class PlayerGenerator:
             self.data['nationality'], self.data['translated_nationality'] = self.get_nationality()
         # 年龄
         if average_age:
-            self.data['age'] = utils.get_mean_range(average_age, per_range=0.2)
+            self.data['age'] = utils.normalvariate(average_age, 3)
         else:
             self.data['age'] = 15
         self.data['height'] = self.get_height()
