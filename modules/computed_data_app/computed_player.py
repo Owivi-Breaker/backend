@@ -62,8 +62,9 @@ class ComputedPlayer:
         data['location_num'] = self.get_location_num()
         data['capa'] = self.get_all_capa(is_retain_decimal=True)
         data['top_location'] = self.get_top_capa_n_location()[0]
+        data['superior_location'] = self.get_superior_location()
         data['top_capa'] = self.get_top_capa_n_location()[1]
-        data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa()}
+        data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa(True)}
         data['style_tag'] = ["就地反抢", "前插", "防守内收"]  # TODO 挂个假数据
         data['talent_tag'] = ["大心脏", "偷猎者"]  # TODO 挂个假数据
         data['recent_ratings'] = self.get_ratings_in_recent_games()
@@ -289,3 +290,11 @@ class ComputedPlayer:
         avg_rating = self.get_avg_rating_in_recent_year()
         extra_values = avg_rating * 2000 - 12000
         return int(basic_values + extra_values)
+
+    def get_superior_location(self) -> List[str]:
+        """
+        获取优势位置
+        暂时的策略是返回能力前三的位置
+        TODO 优化算法
+        """
+        return [x[0] for x in self.get_sorted_location_capa()[:3]]
