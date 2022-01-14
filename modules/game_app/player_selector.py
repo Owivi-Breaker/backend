@@ -33,9 +33,9 @@ class PlayerSelector:
         """
         return {player_model.id: lo_name for player_model, lo_name in zip(players_model, lo_names)}
 
-    def select_players(
-            self, is_random: bool = True,
-            is_save_mode=False) -> Union[Tuple[List[models.Player], List[str]], Dict[int, str]]:
+    def select_players(self,
+                       is_random: bool = True,
+                       is_save_mode=False) -> Union[Tuple[List[models.Player], List[str]], Dict[int, str]]:
         """
         选人
         :param is_random: 是否随机选择算人算法

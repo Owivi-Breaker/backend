@@ -9,33 +9,33 @@ class PlayerPvECreate(BaseModel):
     created_time: datetime
     player_id: int
     ori_location: game_configs.Location
-    real_location: game_configs.Location
+    real_location: game_configs.Location = None
 
-    real_rating: float
-    final_rating: float
+    real_rating: float = 0
+    final_rating: float = 0
 
-    actions: int
-    shots: int
-    goals: int
-    assists: int
+    actions: int = 0
+    shots: int = 0
+    goals: int = 0
+    assists: int = 0
     # 传球
-    passes: int
-    pass_success: int
+    passes: int = 0
+    pass_success: int = 0
     # 过人
-    dribbles: int
-    dribble_success: int
+    dribbles: int = 0
+    dribble_success: int = 0
     # 抢断
-    tackles: int
-    tackle_success: int
+    tackles: int = 0
+    tackle_success: int = 0
     # 争顶
-    aerials: int
-    aerial_success: int
+    aerials: int = 0
+    aerial_success: int = 0
     # 扑救
-    saves: int
-    save_success: int
+    saves: int = 0
+    save_success: int = 0
     # 体力
-    original_stamina: int
-    final_stamina: int  # 场上的真实体力值
+    original_stamina: int = 0
+    final_stamina: int = 0  # 场上的真实体力值
 
     class Config:
         orm_mode = True

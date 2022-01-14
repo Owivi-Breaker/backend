@@ -125,7 +125,10 @@ class NextTurner:
         computer_club_id = clubs_id[0]
 
         game_pve_generator = generate_app.GamePvEGenerator(
-            db=self.db, player_club_id=self.save_model.player_club_id, computer_club_id=computer_club_id)
+            db=self.db,
+            player_club_id=self.save_model.player_club_id,
+            computer_club_id=computer_club_id,
+            save_model=self.save_model)
         game_pve_generator.create_game_pve(
             game=game, date=self.save_model.date, season=self.save_model.season)
 

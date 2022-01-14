@@ -26,7 +26,7 @@ def update_club(db: Session, club_id: int, attri: dict):
     return db_club
 
 
-def get_club_by_id(db: Session, club_id: int):
+def get_club_by_id(db: Session, club_id: int) -> models.Club:
     db_club: models.Club = db.query(models.Club).filter(models.Club.id == club_id).first()
     return db_club
 

@@ -1,7 +1,7 @@
 import schemas
 import models
 import crud
-import utils.utils
+from utils import logger, utils
 from core.db import engine, get_db
 from modules import game_app
 
@@ -30,7 +30,7 @@ def commit_lineup_n_start_game(lineup: Optional[Dict[int, str]] = None,
         lineup_str = player_selector.select_players(is_random=True, is_save_mode=True)
         save_model.lineup = lineup_str
     else:
-        lineup_str = utils.utils.turn_dict2str(lineup)
+        lineup_str = utils.turn_dict2str(lineup)
         save_model.lineup = lineup_str
     # TODO 保存战术比重
     if not tactic_weight:

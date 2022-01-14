@@ -12,9 +12,10 @@ class TacticAdjustor:
     最终结果，修改Coach表中的战术比重
     """
 
-    def __init__(self, db: Session, club1_id: int, club2_id: int, player_club_id: int, save_id: int,
-                 club1_model: models.Club, club2_model: models.Club,
-                 season: int, date: str):
+    def __init__(self, db: Session, save_id: int,
+                 club1_id: int, club2_id: int, player_club_id: int,
+                 season: int, date: str,
+                 club1_model: models.Club = None, club2_model: models.Club = None):
         self.db = db
         self.season = season
         self.date = date
@@ -22,8 +23,8 @@ class TacticAdjustor:
         self.club2_id = club2_id
         self.player_club_id = player_club_id
         self.save_id = save_id
-        self.club1_model = club1_model
-        self.club2_model = club2_model
+        self.club1_model = club1_model if club1_model else crud.get_club_by_id(db, club1_id)
+        self.club2_model = club2_model if club2_model else crud.get_club_by_id(db, club2_id)
 
     def adjust(self):
         """
