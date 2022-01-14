@@ -9,9 +9,9 @@ class Game(Base):
     __tablename__ = 'game'
     id = Column(Integer, primary_key=True, index=True)
 
+    created_time = Column(DateTime)
     name = Column(String(1000))
     type = Column(String(1000))
-    created_time = Column(DateTime)
     date = Column(String(1000))
     season = Column(String(1000))
     script = Column(String(5000))

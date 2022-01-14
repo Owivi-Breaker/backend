@@ -3,8 +3,7 @@ from utils import utils, logger
 import game_configs
 import crud
 import schemas
-from modules import computed_data_app
-import copy
+
 import random
 import json
 from faker import Faker

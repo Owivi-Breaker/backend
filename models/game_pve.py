@@ -8,14 +8,19 @@ class GamePvE(Base):
     __tablename__ = 'game_pve'
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
+    # 一些在比赛结束后保存的字段
+    name = Column(String(1000))
+    type = Column(String(1000))
+    date = Column(String(1000))
+    season = Column(String(1000))
 
-    player_club_id = Column(Integer)
-    computer_club_id = Column(Integer)
+    player_club_id = Column(Integer, ForeignKey('club.id'))
+    computer_club_id = Column(Integer, ForeignKey('club.id'))
 
     turns = Column(Integer)
     scripts = Column(String(1000))
 
-    teams = relationship("TeamPvE", backref="game_pve")
+    teams = relationship("TeamPvE", backref="game_pve", passive_deletes=True)
 
 
 class TeamPvE(Base):
@@ -23,7 +28,7 @@ class TeamPvE(Base):
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
 
-    team_id = Column(Integer)
+    club_id = Column(Integer, ForeignKey('club.id'))
     score = Column(Integer)
 
     attempts = Column(Integer)
@@ -43,8 +48,8 @@ class TeamPvE(Base):
     counter_attack = Column(Integer)
     counter_attack_success = Column(Integer)
 
-    game_pve_id = Column(Integer, ForeignKey('game_pve.id'))
-    players = relationship("PlayerPvE", backref="team_pve")
+    game_pve_id = Column(Integer, ForeignKey('game_pve.id', ondelete='CASCADE'))
+    players = relationship("PlayerPvE", backref="team_pve", passive_deletes=True)
 
 
 class PlayerPvE(Base):
@@ -81,4 +86,4 @@ class PlayerPvE(Base):
     original_stamina = Column(Integer)
     final_stamina = Column(Integer)
 
-    team_pve_id = Column(Integer, ForeignKey('team_pve.id'))
+    team_pve_id = Column(Integer, ForeignKey('team_pve.id', ondelete='CASCADE'))

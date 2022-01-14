@@ -1,3 +1,4 @@
+import datetime
 import json
 import time
 from typing import List
@@ -6,6 +7,7 @@ import threading
 
 import crud
 import models
+import schemas
 from utils import Date, utils, logger
 from modules import game_app, generate_app, computed_data_app
 
@@ -57,6 +59,9 @@ class NextTurner:
             self.promote_n_relegate_starter()
 
     def eve_starter(self, eve: list):
+        """
+        eve入口
+        """
         s = time.time()
         for game in eve:
             self.play_game(game)
@@ -107,10 +112,27 @@ class NextTurner:
                                         name2))
 
     def pve_starter(self, pve: list):
+        """
+        pve入口
+        """
         # 暂时跟eve作相同处理
-        self.eve_starter(pve)
+        # self.eve_starter(pve)
+
+        # 创建game_pve表
+        game = pve[0]
+        clubs_id = game['club_id'].split(',')
+        clubs_id.remove(self.save_model.player_club_id)
+        computer_club_id = clubs_id[0]
+
+        game_pve_generator = generate_app.GamePvEGenerator(
+            db=self.db, player_club_id=self.save_model.player_club_id, computer_club_id=computer_club_id)
+        game_pve_generator.create_game_pve(
+            game=game, date=self.save_model.date, season=self.save_model.season)
 
     def transfer_starter(self, transfer: list):
+        """
+        转会入口
+        """
         pass
 
     def game_generation_starter(self, game_generation):

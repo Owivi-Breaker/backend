@@ -8,7 +8,7 @@ import game_configs
 from utils import logger, utils
 from modules.computed_data_app import ComputedPlayer
 
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union, Tuple
 from fastapi import Depends
 from core.db import get_db
 from sqlalchemy.orm import Session
@@ -24,9 +24,22 @@ class PlayerSelector:
         self.date = date
         self.club_model = club_model if club_model else crud.get_club_by_id(db=self.db, club_id=self.club_id)
 
-    def select_players(self, is_random: bool = True) -> (List[models.Player], List[str]):
+    @staticmethod
+    def turn_lineup_from_id2models(
+            players_model: List[models.Player], lo_names: List[str]) -> Dict[int, str]:
+        """
+        将选人结果的(List[models.Player], List[str])转换成id:lo_name键值对格式
+        以便保存至save表中
+        """
+        return {player_model.id: lo_name for player_model, lo_name in zip(players_model, lo_names)}
+
+    def select_players(
+            self, is_random: bool = True,
+            is_save_mode=False) -> Union[Tuple[List[models.Player], List[str]], Dict[int, str]]:
         """
         选人
+        :param is_random: 是否随机选择算人算法
+        :param is_save_mode: 是否将结果转换为save表可识别的数据结构
         :return: (选定球员, 选定球员对应的位置)
         """
         if is_random:
@@ -49,7 +62,8 @@ class PlayerSelector:
                 players_model, locations_list = players_model1, locations_list1
             else:
                 players_model, locations_list = players_model2, locations_list2
-
+        if is_save_mode:
+            return self.turn_lineup_from_id2models(players_model, locations_list)
         return players_model, locations_list
 
     def select_players1(self, players: List[models.Player], formation: str) -> (List[models.Player], List[str]):

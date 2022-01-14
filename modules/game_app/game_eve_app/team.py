@@ -1,5 +1,3 @@
-from sqlalchemy.orm import Session
-
 from utils import utils, logger
 import game_configs
 import crud
@@ -11,6 +9,7 @@ import models
 import random
 from typing import Dict, List, Sequence, Set, Tuple, Optional
 import datetime
+from sqlalchemy.orm import Session
 
 
 class Team:

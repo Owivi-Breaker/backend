@@ -7,3 +7,4 @@ from crud.save import *
 from crud.calendar import *
 from crud.user import *
 from crud.save import *
+from crud.game_pve import *

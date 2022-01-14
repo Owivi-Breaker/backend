@@ -18,7 +18,7 @@ class Coach(Base):
     values = Column(Integer)
     wages = Column(Integer)
     # 战术
-    formation = Column(String(1000)) # 阵型
+    formation = Column(String(1000))  # 阵型
     wing_cross = Column(Integer)
     under_cutting = Column(Integer)
     pull_back = Column(Integer)
