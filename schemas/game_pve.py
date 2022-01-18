@@ -81,6 +81,7 @@ class TeamPvE(TeamPvECreate):
 
 class GamePvECreate(BaseModel):
     created_time: datetime
+    save_id: int
     player_club_id: int  # 玩家俱乐部id外键
     computer_club_id: int  # 电脑俱乐部id外键
 
@@ -89,6 +90,7 @@ class GamePvECreate(BaseModel):
     date: str
     season: int
 
+    cur_attacker: int  # 进攻方club_id
     turns: int = 0  # 进行的回合数
     script: str = ""  # 解说
 

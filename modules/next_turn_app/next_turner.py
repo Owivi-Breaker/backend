@@ -121,15 +121,14 @@ class NextTurner:
         # 创建game_pve表
         game = pve[0]
         clubs_id = game['club_id'].split(',')
-        clubs_id.remove(self.save_model.player_club_id)
-        computer_club_id = clubs_id[0]
+        computer_club_id = list(set(clubs_id) & {self.save_model.player_club_id})[0]
 
         game_pve_generator = generate_app.GamePvEGenerator(
             db=self.db,
-            player_club_id=self.save_model.player_club_id,
-            computer_club_id=computer_club_id,
             save_model=self.save_model)
         game_pve_generator.create_game_pve(
+            player_club_id=self.save_model.player_club_id,
+            computer_club_id=computer_club_id,
             game=game, date=self.save_model.date, season=self.save_model.season)
 
     def transfer_starter(self, transfer: list):

@@ -14,10 +14,12 @@ class GamePvE(Base):
     date = Column(String(1000))
     season = Column(String(1000))
 
+    save_id = Column(Integer, ForeignKey('save.id'))
     player_club_id = Column(Integer, ForeignKey('club.id'))
     computer_club_id = Column(Integer, ForeignKey('club.id'))
 
     turns = Column(Integer)
+    cur_attacker = Column(Integer)
     scripts = Column(String(1000))
 
     teams = relationship("TeamPvE", backref="game_pve", passive_deletes=True)

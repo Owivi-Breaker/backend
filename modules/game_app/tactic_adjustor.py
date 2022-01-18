@@ -28,7 +28,7 @@ class TacticAdjustor:
 
     def adjust(self):
         """
-        调整战术比重
+        调整战术比重 保存至coach表中
         """
         game = game_app.GameEvE(db=self.db,
                                 club1_id=self.club1_id, club2_id=self.club2_id,

@@ -2,26 +2,28 @@ import schemas
 import models
 import crud
 from utils import logger, utils
+import utils
 from core.db import engine, get_db
-from modules import game_app
+from modules import game_app, generate_app
 
 from typing import List, Dict, Union, Optional
-import json
 from fastapi import APIRouter
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
+import random
 
 router = APIRouter()
 
 
 @router.post('/start-game')
-def commit_lineup_n_start_game(lineup: Optional[Dict[int, str]] = None,
-                               tactic_weight: Optional[Dict[str, int]] = None,
-                               db: Session = Depends(get_db),
-                               save_model: models.Save = Depends(utils.get_current_save)):
+def commit_lineup_n_start_game(
+        lineup: Optional[Dict[int, str]] = None,
+        tactic_weight: Optional[Dict[str, int]] = None,
+        db: Session = Depends(get_db),
+        save_model: models.Save = Depends(utils.get_current_save)):
     """
     保存阵容选择并且准备开始pve比赛
+    :return: 进攻方club_id
     """
     if not lineup:
         # 自动选人
@@ -37,4 +39,14 @@ def commit_lineup_n_start_game(lineup: Optional[Dict[int, str]] = None,
         pass
     else:
         pass
-    return 'successfully save lineup n tactic_weight n ready to start pve game'
+    # 创建附属的球队和球员临时表
+    game_pve_generator = generate_app.GamePvEGenerator(
+        db=db, save_model=save_model)
+    cur_attacker = game_pve_generator.create_team_n_player_pve()
+    return {'attacker': cur_attacker}
+
+
+@router.get('/next-turn')
+def next_turn(db: Session = Depends(get_db),
+              save_model: models.Save = Depends(utils.get_current_save)):
+    pass

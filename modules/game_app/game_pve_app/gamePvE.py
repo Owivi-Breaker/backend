@@ -11,9 +11,8 @@ import datetime
 
 
 class GamePvE(game_eve_app.GameEvE):
-    def __init__(self, db: Session, club1_id: int, club2_id: int,
-                 date: str, game_type: str, game_name: str, season: int, save_id: int,
-                 club1_model: models.Club = None, club2_model: models.Club = None):
+    def __init__(self, db: Session, club1_id: int, club2_id: int, date: str, game_type: str, game_name: str,
+                 season: int, save_id: int, club1_model: models.Club = None, club2_model: models.Club = None):
         # super().__init__(db=db, club1_id=club1_id, club2_id=club2_id, date=date,
         #                  game_type=game_type, game_name=game_name, season=season, save_id=save_id,
         #                  club1_model=club1_model, club2_model=club2_model)
