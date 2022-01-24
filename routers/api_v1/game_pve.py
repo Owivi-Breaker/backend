@@ -1,3 +1,9 @@
+from typing import List, Dict, Union, Optional
+from fastapi import APIRouter
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
+import random
+
 import schemas
 import models
 import crud
@@ -5,12 +11,7 @@ from utils import logger, utils
 import utils
 from core.db import engine, get_db
 from modules import game_app, generate_app
-
-from typing import List, Dict, Union, Optional
-from fastapi import APIRouter
-from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy.orm import Session
-import random
+import game_configs
 
 router = APIRouter()
 
@@ -47,6 +48,14 @@ def commit_lineup_n_start_game(
 
 
 @router.get('/next-turn')
-def next_turn(db: Session = Depends(get_db),
+def next_turn(tactic: game_configs.Tactic,
+              db: Session = Depends(get_db),
               save_model: models.Save = Depends(utils.get_current_save)):
+    """
+    下一回合
+    """
     pass
+    # 从临时表中回复球员和球队数据
+    # 开始回合
+    # 保存数据
+    # 返回数据

@@ -144,7 +144,7 @@ class Team:
             self.data['attempts'] += 1
         self.data[data_name] += 1
 
-    def select_tactic(self, counter_attack_permitted):
+    def select_tactic(self, counter_attack_permitted: bool):
         """
         选择进攻战术
         :param counter_attack_permitted: 是否允许使用防反
@@ -154,8 +154,9 @@ class Team:
         tactic_pro = self.tactic.copy()
         tactic_pro.pop("counter_attack")  # 无防反
         while True:
-            tactic_name = utils.select_by_pro(tactic_pro_total) if counter_attack_permitted else utils.select_by_pro(
-                tactic_pro)
+            tactic_name = utils.select_by_pro(tactic_pro_total) \
+                if counter_attack_permitted \
+                else utils.select_by_pro(tactic_pro)
             if tactic_name == 'wing_cross' and not self.get_location_players(
                     (game_configs.Location.LW, game_configs.Location.RW, game_configs.Location.LB,
                      game_configs.Location.RB)):

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Boolean
 from sqlalchemy.orm import relationship
 from models.base import Base
 import game_configs
@@ -12,7 +12,7 @@ class GamePvE(Base):
     name = Column(String(1000))
     type = Column(String(1000))
     date = Column(String(1000))
-    season = Column(String(1000))
+    season = Column(Integer)
 
     save_id = Column(Integer, ForeignKey('save.id'))
     player_club_id = Column(Integer, ForeignKey('club.id'))
@@ -21,8 +21,10 @@ class GamePvE(Base):
     turns = Column(Integer)
     cur_attacker = Column(Integer)
     scripts = Column(String(1000))
+    counter_attack_permitted = Column(Boolean, default=False)
 
-    teams = relationship("TeamPvE", backref="game_pve", passive_deletes=True)
+    player_team = relationship("TeamPvE", backref="game_pve", passive_deletes=True)
+    computer_team = relationship("TeamPvE", backref="game_pve", passive_deletes=True)
 
 
 class TeamPvE(Base):

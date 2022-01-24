@@ -33,9 +33,10 @@ class NextTurner:
         self.db.commit()
         self.date = str(date)
 
-    def check(self):
-        self.plus_days()
-        logger.info(self.date)
+    def get_total_events(self) -> dict:
+        """
+        获取字典格式的日程表
+        """
         # 一天的事项不一定只存在一条calendar记录中
         query_str = "and_(models.Calendar.save_id=='{}', models.Calendar.date=='{}')".format(
             self.save_model.id, self.date)
@@ -44,6 +45,22 @@ class NextTurner:
         for calendar in calendars:
             event = json.loads(calendar.event_str)
             total_events = utils.merge_dict_with_list_items(total_events, event)
+        return total_events
+
+    def check_if_exists_pve(self) -> bool:
+        """
+        检查是否有pve比赛
+        """
+        total_events = self.get_total_events()
+        if 'pve' in total_events.keys():
+            return True
+        return False
+
+    def check(self):
+        self.plus_days()
+        logger.info(self.date)
+
+        total_events = self.get_total_events()
         # logger.debug(total_events)
         if 'pve' in total_events.keys():
             self.pve_starter(total_events['pve'])
@@ -113,12 +130,8 @@ class NextTurner:
 
     def pve_starter(self, pve: list):
         """
-        pve入口
+        pve入口 创建game_pve表
         """
-        # 暂时跟eve作相同处理
-        # self.eve_starter(pve)
-
-        # 创建game_pve表
         game = pve[0]
         clubs_id = game['club_id'].split(',')
         computer_club_id = list(set(clubs_id) & {self.save_model.player_club_id})[0]

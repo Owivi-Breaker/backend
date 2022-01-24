@@ -64,7 +64,9 @@ class GamePvEGenerator:
         computer_team_pve.created_time = datetime.datetime.now()
         computer_team_pve_model: models.TeamPvE = crud.create_team_pve(db=self.db, team_pve=computer_team_pve)
 
-        game_pve_models.teams = [player_team_pve_model, computer_team_pve_model]
+        game_pve_models.player_team = player_team_pve_model
+        game_pve_models.computer_team = computer_team_pve_model
+
         # 电脑自动选人
         player_selector = PlayerSelector(club_id=computer_club_id, db=self.db,
                                          season=self.save_model.season, date=self.save_model.date)

@@ -11,8 +11,8 @@ class PlayerPvECreate(BaseModel):
     ori_location: game_configs.Location
     real_location: game_configs.Location = None
 
-    real_rating: float = 0
-    final_rating: float = 0
+    real_rating: float = 6.0
+    final_rating: float = 6.0
 
     actions: int = 0
     shots: int = 0
@@ -34,8 +34,8 @@ class PlayerPvECreate(BaseModel):
     saves: int = 0
     save_success: int = 0
     # 体力
-    original_stamina: int = 0
-    final_stamina: int = 0  # 场上的真实体力值
+    original_stamina: int = 0  # 初始体力值 在第一回合被初始化 之后不会改变
+    final_stamina: int = 0  # 场上的真实体力值 一直会改变
 
     class Config:
         orm_mode = True
@@ -81,6 +81,7 @@ class TeamPvE(TeamPvECreate):
 
 class GamePvECreate(BaseModel):
     created_time: datetime
+
     save_id: int
     player_club_id: int  # 玩家俱乐部id外键
     computer_club_id: int  # 电脑俱乐部id外键
@@ -94,10 +95,13 @@ class GamePvECreate(BaseModel):
     turns: int = 0  # 进行的回合数
     script: str = ""  # 解说
 
+    counter_attack_permitted: bool = False  # 下一回合是否允许打防反
+
     class Config:
         orm_mode = True
 
 
 class GamePvE(GamePvECreate):
     id: int
-    teams: List[TeamPvE]
+    player_team: TeamPvE
+    computer_team: TeamPvE

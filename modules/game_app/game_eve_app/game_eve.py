@@ -34,12 +34,6 @@ class GameEvE:
         开始比赛
         :return: 比分元组
         """
-        # 战术调整
-        # self.adjust_tactic(*self.tactical_start(num=10))
-        # # 重置队伍、球员信息
-        # self.lteam.reset()
-        # self.rteam.reset()
-
         self.add_script('比赛开始！')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
@@ -58,22 +52,31 @@ class GameEvE:
                 counter_attack_permitted = True
             else:
                 counter_attack_permitted = False
-
+        # 记录胜者id
         if self.lteam.score > self.rteam.score:
             self.winner_id = self.lteam.club_id
         elif self.lteam.score < self.rteam.score:
             self.winner_id = self.rteam.club_id  # 常规时间胜负关系
         else:
+            # 比分相同
             pass
 
-        self.judge_extra_time()  # 加时判断&点球判断
+        self.judge_extra_time()  # 加时判断与点球判断 最后修改self.winner_id
         self.add_script('比赛结束！ {} {}:{} {}'.format(
             self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name))
+
         if self.winner_id == self.lteam.club_id:
             winner_name = self.lteam.name
-        else:
+        elif self.winner_id == self.rteam.club_id:
             winner_name = self.rteam.name
-        self.add_script('胜者为{}！'.format(winner_name))
+        else:
+            winner_name = None
+
+        if winner_name:
+            self.add_script('胜者为{}！'.format(winner_name))
+        else:
+            self.add_script('平局')
+
         self.rate()  # 球员评分
         self.save_game_data()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
@@ -462,6 +465,7 @@ class GameEvE:
         average_aerial_success = \
             self.get_average_capa('aerial_success', action_name='aerials') / \
             self.get_average_capa('aerials', is_action=True)
+
         for player in self.lteam.players:
             if player.ori_location != game_configs.Location.GK:
                 if player.data['passes'] >= 5:
@@ -504,12 +508,12 @@ class GameEvE:
             goals = player.data['goals']
             assists = player.data['assists']
             saves = player.data['save_success']
-            player.data['real_rating'] += goals * 1.5 + assists * 1.1 + saves * 0.4
+            player.data['real_rating'] += goals * 1.1 + assists * 0.7 + saves * 0.4
         for player in self.rteam.players:
             goals = player.data['goals']
             assists = player.data['assists']
             saves = player.data['save_success']
-            player.data['real_rating'] += goals * 1.5 + assists * 1.1 + saves * 0.4
+            player.data['real_rating'] += goals * 1.1 + assists * 0.7 + saves * 0.4
         for player in self.lteam.players:
             self.perf_rating(player.data['real_rating'], player)
         for player in self.rteam.players:
