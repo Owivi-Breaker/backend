@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Index
 from sqlalchemy.orm import relationship
 from models.base import Base
 from game_configs.game_config import Location
@@ -94,6 +94,5 @@ class GamePlayerData(Base):
     final_stamina = Column(Integer)
 
     game_team_info_id = Column(Integer, ForeignKey('game_team_info.id'))
-    player_id = Column(Integer, ForeignKey('player.id'))
-
+    player_id = Column('player_id', Integer, ForeignKey('player.id'), index=True)
 # endregion

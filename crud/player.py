@@ -1,5 +1,7 @@
+import time
 from typing import List
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -84,5 +86,20 @@ def get_players_by_attri(db: Session, attri: str, only_one: bool = False):
 def delete_player(player_id: int, db: Session):
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     db.delete(db_player)
+
+
+def get_player_game_data(
+        player_id: int, db: Session, start_season: int, end_season: int) -> List[models.GamePlayerData]:
+    """
+    获取指定球员某赛季的比赛信息
+    """
+    s = time.time()
+    db_game_player_data: List[models.GamePlayerData] = db.query(models.GamePlayerData).filter(
+        and_(models.GamePlayerData.player_id == player_id,
+             models.GamePlayerData.season >= start_season,
+             models.GamePlayerData.season <= end_season)).all()
+    e = time.time()
+    print(e - s)
+    return db_game_player_data
 
 # endregion

@@ -7,13 +7,13 @@
     "points": 85,
     "clubs": [
       {
-        "name": "曼城",
+        "name": "曼彻斯特城",
         "finance": 30000,
         "reputation": 78,
         "ori_mean_capa": 71
       },
       {
-        "name": "曼联",
+        "name": "曼彻斯特联",
         "finance": 22000,
         "reputation": 81,
         "ori_mean_capa": 67
