@@ -50,6 +50,7 @@ class TeamPvECreate(BaseModel):
     created_time: datetime
     club_id: int  # 俱乐部id外键
     score: int = 0  # 比分
+    is_player: bool = False
 
     # 球队比赛数据
     attempts: int = 0
@@ -103,5 +104,4 @@ class GamePvECreate(BaseModel):
 
 class GamePvE(GamePvECreate):
     id: int
-    player_team: TeamPvE
-    computer_team: TeamPvE
+    teams: List[TeamPvE]

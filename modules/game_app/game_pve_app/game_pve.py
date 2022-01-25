@@ -11,7 +11,7 @@ import datetime
 
 
 class GamePvE(game_eve_app.GameEvE):
-    def __init__(self, game_pve_models: models.GamePvE, db: Session, player_tactic: game_configs.Tactic = None):
+    def __init__(self, game_pve_models: models.GamePvE, db: Session, player_tactic: str):
         # 新添加的成员变量
         self.game_pve_models = game_pve_models
         self.new_script = ''  # 本回合的解说
@@ -23,14 +23,17 @@ class GamePvE(game_eve_app.GameEvE):
         self.db = db
         self.season = game_pve_models.season
         self.date = game_pve_models.date
-        self.script = game_pve_models.scripts
+        self.script = game_pve_models.script
         self.type = game_pve_models.type
         self.name = game_pve_models.name
         self.save_id = game_pve_models.save_id
         self.winner_id = 0
         # 默认lteam为玩家球队 rteam为电脑球队
-        self.lteam = game_pve_app.TeamPvE(db=self.db, game=self, team_pve_model=game_pve_models.player_team)
-        self.rteam = game_pve_app.TeamPvE(db=self.db, game=self, team_pve_model=game_pve_models.computer_team)
+        for t in game_pve_models.teams:
+            if t.is_player:
+                self.lteam = game_pve_app.TeamPvE(db=self.db, game=self, team_pve_model=t)
+            else:
+                self.rteam = game_pve_app.TeamPvE(db=self.db, game=self, team_pve_model=t)
 
     def add_script(self, text: str):
         """
@@ -60,8 +63,9 @@ class GamePvE(game_eve_app.GameEvE):
         else:
             return self.rteam, self.lteam
 
-    def start_one_turn(self):
-        self.add_script('比赛开始！')
+    def start_one_turn(self) -> bool:
+        if self.turns == 1:
+            self.add_script('比赛开始！')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = self.game_pve_models.counter_attack_permitted
 
@@ -91,7 +95,7 @@ class GamePvE(game_eve_app.GameEvE):
         self.rate()
         # 保存到临时表
         self.save_temporary_table(exchange_ball, original_score)
-        
+
         # 比赛结束后的处理
         if self.game_pve_models.turns == 50:
             # TODO 加时判断
@@ -122,13 +126,15 @@ class GamePvE(game_eve_app.GameEvE):
             self.rate()  # 球员评分
             self.save_game_data()  # 保存比赛
             self.update_players_data()  # 保存球员数据的改变
+            return False
+        return True
 
-    def save_temporary_table(self, exchange_ball, original_score):
+    def save_temporary_table(self, exchange_ball: bool, original_score: Tuple[int, int]):
         """
         保存临时表
         """
         self.game_pve_models.turns += 1
-        self.game_pve_models.scripts += self.script
+        self.game_pve_models.script = self.script
         if exchange_ball:
             self.game_pve_models.cur_attacker = self.game_pve_models.computer_club_id \
                 if self.is_player_turn \

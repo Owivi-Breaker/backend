@@ -19,6 +19,7 @@ class TeamPvE(game_eve_app.Team):
         self.game = game
         self.season = game.season
         self.date = game.date
+        self.club_id = team_pve_model.club_id
         self.team_model = crud.get_club_by_id(db=self.db, club_id=self.team_pve_model.club_id)
         self.name = self.team_model.name  # 解说用
         self.tactic = dict()  # 战术比重字典
@@ -26,7 +27,9 @@ class TeamPvE(game_eve_app.Team):
 
         self.players: List[game_pve_app.PlayerPvE] = [
             game_pve_app.PlayerPvE(
-                db=self.db, player_pve_model=player_pve_model, season=self.season, date=self.date)
+                db=self.db, player_pve_model=player_pve_model,
+                season=self.season, date=self.date,
+                is_first_turn=True if self.game.turns == 1 else False)
             for player_pve_model in self.team_pve_model.players]
         self.score: int = self.team_pve_model.score  # 本方比分
 

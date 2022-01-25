@@ -12,7 +12,11 @@ from sqlalchemy.orm import Session
 
 
 class PlayerPvE(game_eve_app.Player):
-    def __init__(self, db: Session, player_pve_model: models.PlayerPvE, season: int, date: str, is_first_turn: bool):
+    def __init__(self, db: Session, player_pve_model: models.PlayerPvE, season: int, date: str,
+                 is_first_turn: bool = False):
+        """
+        :param is_first_turn: 是否为第一回合 关乎体力的初始化操作
+        """
         self.player_pve_model: models.PlayerPvE = player_pve_model
 
         self.db = db
@@ -62,8 +66,8 @@ class PlayerPvE(game_eve_app.Player):
             "aerial_success": self.player_pve_model.aerial_success,
             "saves": self.player_pve_model.saves,
             "save_success": self.player_pve_model.save_success,
-            'final_rating': self.player_pve_model.final_rating,  # 初始评分为6.0
-            'real_rating': self.player_pve_model.real_rating  # 未取顶值的真实评分
+            'final_rating': 6.0,  # 每次评分重置为默认值
+            'real_rating': 6.0
         }
 
     def save_temporary_table(self):
@@ -85,5 +89,5 @@ class PlayerPvE(game_eve_app.Player):
         self.player_pve_model.real_rating = self.data['real_rating']
 
         self.player_pve_model.real_location = self.real_location
-        self.player_pve_model.final_rating = self.stamina
+        self.player_pve_model.final_stamina = self.stamina
         # TODO 实时评分

@@ -487,6 +487,7 @@ class GameEvE:
                     self.rate_by_capa(player, offset)
         for player in self.rteam.players:
             if player.ori_location != game_configs.Location.GK:
+                # 动作次数不小于5次才计入评分
                 if player.data['passes'] >= 5:
                     offset = self.get_offset_per(player.data['pass_success'] / player.data['passes'],
                                                  average_pass_success)
@@ -508,12 +509,12 @@ class GameEvE:
             goals = player.data['goals']
             assists = player.data['assists']
             saves = player.data['save_success']
-            player.data['real_rating'] += goals * 1.1 + assists * 0.7 + saves * 0.4
+            player.data['real_rating'] += goals * 1.3 + assists * 0.8 + saves * 0.4
         for player in self.rteam.players:
             goals = player.data['goals']
             assists = player.data['assists']
             saves = player.data['save_success']
-            player.data['real_rating'] += goals * 1.1 + assists * 0.7 + saves * 0.4
+            player.data['real_rating'] += goals * 1.3 + assists * 0.8 + saves * 0.4
         for player in self.lteam.players:
             self.perf_rating(player.data['real_rating'], player)
         for player in self.rteam.players:
@@ -527,7 +528,9 @@ class GameEvE:
         _sum = 0
         for player in self.lteam.players:
             _sum += player.data['actions']
-        return _sum / 11
+        for player in self.rteam.players:
+            _sum += player.data['actions']
+        return _sum / 22
 
     def get_average_capa(self, capa_name: str, is_action=False, action_name: str = None) -> float:
         """
@@ -568,7 +571,7 @@ class GameEvE:
     @staticmethod
     def get_offset_per(a, b) -> float:
         """
-        获取a比b高或低的比例
+        获取a比b高或低的比例 可能为负
         """
         if b == 0:
             return 0

@@ -20,17 +20,17 @@ class GamePvE(Base):
 
     turns = Column(Integer)
     cur_attacker = Column(Integer)
-    scripts = Column(String(1000))
+    script = Column(String(1000))
     counter_attack_permitted = Column(Boolean, default=False)
 
-    player_team = relationship("TeamPvE", backref="game_pve", passive_deletes=True)
-    computer_team = relationship("TeamPvE", backref="game_pve", passive_deletes=True)
+    teams = relationship("TeamPvE", backref="game_pve", cascade='all, delete-orphan')
 
 
 class TeamPvE(Base):
     __tablename__ = 'team_pve'
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
+    is_player = Column(Boolean, default=False)
 
     club_id = Column(Integer, ForeignKey('club.id'))
     score = Column(Integer)
@@ -52,8 +52,8 @@ class TeamPvE(Base):
     counter_attack = Column(Integer)
     counter_attack_success = Column(Integer)
 
-    game_pve_id = Column(Integer, ForeignKey('game_pve.id', ondelete='CASCADE'))
-    players = relationship("PlayerPvE", backref="team_pve", passive_deletes=True)
+    game_pve_id = Column(Integer, ForeignKey('game_pve.id'))
+    players = relationship("PlayerPvE", backref="team_pve", cascade='all, delete-orphan')
 
 
 class PlayerPvE(Base):
@@ -90,4 +90,4 @@ class PlayerPvE(Base):
     original_stamina = Column(Integer)
     final_stamina = Column(Integer)
 
-    team_pve_id = Column(Integer, ForeignKey('team_pve.id', ondelete='CASCADE'))
+    team_pve_id = Column(Integer, ForeignKey('team_pve.id'))

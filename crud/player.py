@@ -86,6 +86,7 @@ def get_players_by_attri(db: Session, attri: str, only_one: bool = False):
 def delete_player(player_id: int, db: Session):
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     db.delete(db_player)
+    db.commit()
 
 
 def get_player_game_data(

@@ -19,14 +19,23 @@ def create_game_pve(db: Session, game_pve: schemas.GamePvECreate) -> models.Game
     return db_game_pve
 
 
+def delete_all_game_temp_table(db: Session, save_id: int):
+    """
+    删除指定存档中所有比赛临时表
+    """
+    db_games_pve = db.query(models.GamePvE).filter(models.GamePvE.save_id == save_id).all()
+    [db.delete(x) for x in db_games_pve]
+    db.commit()
+
+
 def get_game_pve_by_save_id(db: Session, save_id: int) -> models.GamePvE:
     """
     获取指定存档下的临时比赛表
     由于一个存档只严格存在一张临时比赛表 故此法可行 且比较快捷
     """
     db_game_pve = db.query(models.GamePvE).filter(models.GamePvE.save_id == save_id).first()
-    if not db_game_pve:
-        logger.error("Can't find models.GamePvE")
+    # if not db_game_pve:
+    #     logger.error("Can't find models.GamePvE")
     return db_game_pve
 
 

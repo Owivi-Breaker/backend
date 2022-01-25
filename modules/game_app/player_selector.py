@@ -1,6 +1,7 @@
 """
 选人算法
 """
+import json
 
 import models
 import crud
@@ -35,7 +36,7 @@ class PlayerSelector:
 
     def select_players(self,
                        is_random: bool = True,
-                       is_save_mode=False) -> Union[Tuple[List[models.Player], List[str]], Dict[int, str]]:
+                       is_save_mode=False) -> Union[Tuple[List[models.Player], List[str]], str]:
         """
         选人
         :param is_random: 是否随机选择算人算法
@@ -63,7 +64,7 @@ class PlayerSelector:
             else:
                 players_model, locations_list = players_model2, locations_list2
         if is_save_mode:
-            return self.turn_lineup_from_id2models(players_model, locations_list)
+            return json.dumps(self.turn_lineup_from_id2models(players_model, locations_list))
         return players_model, locations_list
 
     def select_players1(self, players: List[models.Player], formation: str) -> (List[models.Player], List[str]):
