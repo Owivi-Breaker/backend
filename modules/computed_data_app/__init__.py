@@ -3,3 +3,4 @@ from modules.computed_data_app.computed_game import ComputedGame
 from modules.computed_data_app.computed_club import ComputedClub
 from modules.computed_data_app.computed_league import ComputedLeague
 from modules.computed_data_app.computed_calendar import ComputedCalendar
+from modules.computed_data_app.computed_game_pve import ComputedGamePvE

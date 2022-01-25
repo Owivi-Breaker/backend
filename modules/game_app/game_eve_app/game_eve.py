@@ -444,14 +444,16 @@ class GameEvE:
         # 动作次数评分
         average_actions = self.get_average_actions()
         # 按动作数偏移值评分
-        for player in self.lteam.players:
-            if player.ori_location != game_configs.Location.GK:
-                offset = self.get_offset_per(player.data['actions'], average_actions)
-                self.rate_by_actions(player, offset)
-        for player in self.rteam.players:
-            if player.ori_location != game_configs.Location.GK:
-                offset = self.get_offset_per(player.data['actions'], average_actions)
-                self.rate_by_actions(player, offset)
+        if average_actions > 7:
+            # 总动作书超过7次 才开始为动作数评分 以免造成比赛初期评分波动较大的情况出现
+            for player in self.lteam.players:
+                if player.ori_location != game_configs.Location.GK:
+                    offset = self.get_offset_per(player.data['actions'], average_actions)
+                    self.rate_by_actions(player, offset)
+            for player in self.rteam.players:
+                if player.ori_location != game_configs.Location.GK:
+                    offset = self.get_offset_per(player.data['actions'], average_actions)
+                    self.rate_by_actions(player, offset)
         # 各项动作准确率评分
         average_pass_success = \
             self.get_average_capa('pass_success', action_name='passes') / \
@@ -588,23 +590,23 @@ class GameEvE:
         if 0.1 <= offset < 0.2:
             player.data['real_rating'] += 0.3
         if 0.2 <= offset < 0.4:
-            player.data['real_rating'] += 0.7
+            player.data['real_rating'] += 0.5
         if 0.4 <= offset < 0.6:
-            player.data['real_rating'] += 1.0
+            player.data['real_rating'] += 0.8
         if 0.6 <= offset < 0.8:
-            player.data['real_rating'] += 1.5
+            player.data['real_rating'] += 1.2
         if 0.8 <= offset:
-            player.data['real_rating'] += 2
+            player.data['real_rating'] += 1.6
         if -0.2 < offset <= -0.1:
             player.data['real_rating'] -= 0.3
         if -0.4 < offset <= -0.2:
-            player.data['real_rating'] -= 0.7
+            player.data['real_rating'] -= 0.5
         if -0.6 < offset <= -0.4:
-            player.data['real_rating'] -= 1.0
+            player.data['real_rating'] -= 0.8
         if -0.8 < offset <= -0.6:
-            player.data['real_rating'] -= 1.5
+            player.data['real_rating'] -= 1.2
         if offset <= -0.8:
-            player.data['real_rating'] -= 2
+            player.data['real_rating'] -= 1.6
 
     @staticmethod
     def rate_by_capa(player, offset):

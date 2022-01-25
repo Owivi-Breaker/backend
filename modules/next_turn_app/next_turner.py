@@ -17,11 +17,12 @@ class NextTurner:
     回合行进的入口类
     """
 
-    def __init__(self, db: Session, save_id: int):
+    def __init__(self, db: Session, save_id: int, skip: bool = False):
         self.db = db
         self.save_id = save_id
         self.save_model = crud.get_save_by_id(db=self.db, save_id=self.save_id)
         self.date: str = ''
+        self.skip = skip
 
     def plus_days(self):
         """
@@ -57,7 +58,6 @@ class NextTurner:
         return False
 
     def check(self):
-        self.plus_days()
         logger.info(self.date)
 
         total_events = self.get_total_events()
@@ -93,14 +93,6 @@ class NextTurner:
         # 战术调整
         clubs_id = calendar_game['club_id'].split(',')
 
-        # 使用eager load一次性查询到所有子表
-        # club1_model = self.db.query(models.Club).options(
-        #     joinedload(models.Club.players, innerjoin=True)).filter(
-        #     models.Club.id == clubs_id[0]).first()
-        # club2_model = self.db.query(models.Club).options(
-        #     joinedload(models.Club.players, innerjoin=True)).filter(
-        #     models.Club.id == clubs_id[1]).first()
-
         club1_model = self.db.query(models.Club).filter(
             models.Club.id == clubs_id[0]).first()
         club2_model = self.db.query(models.Club).filter(
@@ -132,10 +124,16 @@ class NextTurner:
         """
         pve入口 创建game_pve表
         """
+        if self.skip:
+            self.eve_starter(pve)
+            return
+
         game = pve[0]
         clubs_id = game['club_id'].split(',')
-        computer_club_id = list(set(clubs_id) & {self.save_model.player_club_id})[0]
-
+        if int(clubs_id[0]) != self.save_model.player_club_id:
+            computer_club_id = int(clubs_id[0])
+        else:
+            computer_club_id = int(clubs_id[1])
         game_pve_generator = generate_app.GamePvEGenerator(
             db=self.db,
             save_model=self.save_model)

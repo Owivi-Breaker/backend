@@ -21,6 +21,7 @@ class GamePvE(Base):
     turns = Column(Integer)
     cur_attacker = Column(Integer)
     script = Column(String(1000))
+    new_script = Column(String(1000))
     counter_attack_permitted = Column(Boolean, default=False)
 
     teams = relationship("TeamPvE", backref="game_pve", cascade='all, delete-orphan')

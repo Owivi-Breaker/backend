@@ -93,8 +93,9 @@ class GamePvECreate(BaseModel):
     season: int
 
     cur_attacker: int  # 进攻方club_id
-    turns: int = 0  # 进行的回合数
+    turns: int = 1  # 进行的回合数
     script: str = ""  # 解说
+    new_script: str = ""  # 最近一回合的解说
 
     counter_attack_permitted: bool = False  # 下一回合是否允许打防反
 
@@ -105,3 +106,87 @@ class GamePvECreate(BaseModel):
 class GamePvE(GamePvECreate):
     id: int
     teams: List[TeamPvE]
+
+
+class GamePvEShow(BaseModel):
+    player_club_id: int  # 玩家俱乐部id外键
+    computer_club_id: int  # 电脑俱乐部id外键
+
+    name: str
+    type: str
+    date: str
+    season: int
+
+    cur_attacker: int
+    turns: int
+    script: str
+    new_script: str
+
+    counter_attack_permitted: bool = False  # 下一回合是否允许打防反
+
+
+class TeamPvEShow(BaseModel):
+    club_id: int  # 俱乐部id外键
+    score: int  # 比分
+    is_player: bool
+
+    # 球队比赛数据
+    attempts: int
+    # 下底传中
+    wing_cross: int
+    wing_cross_success: int
+    # 内切
+    under_cutting: int
+    under_cutting_success: int
+    # 倒三角
+    pull_back: int
+    pull_back_success: int
+    # 中路渗透
+    middle_attack: int
+    middle_attack_success: int
+    # 防反
+    counter_attack: int
+    counter_attack_success: int
+
+
+class PlayerPvEShow(BaseModel):
+    player_id: int
+    ori_location: game_configs.Location
+    real_location: game_configs.Location
+
+    real_rating: float
+    final_rating: float
+
+    actions: int
+    shots: int
+    goals: int
+    assists: int
+    # 传球
+    passes: int
+    pass_success: int
+    # 过人
+    dribbles: int
+    dribble_success: int
+    # 抢断
+    tackles: int
+    tackle_success: int
+    # 争顶
+    aerials: int
+    aerial_success: int
+    # 扑救
+    saves: int
+    save_success: int
+    # 体力
+    original_stamina: int
+    final_stamina: int
+
+
+class GamePvEInfo(BaseModel):
+    """
+    发送给前端的整合数据
+    """
+    game_info: GamePvEShow
+    player_team_info: TeamPvEShow
+    computer_team_info: TeamPvEShow
+    player_players_info: List[PlayerPvEShow]
+    computer_players_info: List[PlayerPvEShow]
