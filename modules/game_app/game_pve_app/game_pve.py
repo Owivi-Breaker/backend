@@ -15,6 +15,7 @@ class GamePvE(game_eve_app.GameEvE):
     def __init__(self, save_id: int, db: Session, player_tactic: str = ''):
         # 新添加的成员变量
         self.game_pve_models = crud.get_game_pve_by_save_id(db=db, save_id=save_id)
+        self.is_extra_time = self.game_pve_models.is_extra_time
         self.new_script = ''  # 本回合的解说
         self.player_tactic = player_tactic  # 本回合玩家选择的战术名
         self.turns = self.game_pve_models.turns  # 本回合的序号
@@ -29,6 +30,8 @@ class GamePvE(game_eve_app.GameEvE):
         self.name = self.game_pve_models.name
         self.save_id = self.game_pve_models.save_id
         self.winner_id = 0
+
+        self.total_turns = 50 if not self.is_extra_time else 70  # 总比赛回合数
         # 默认lteam为玩家球队 rteam为电脑球队
         for t in self.game_pve_models.teams:
             if t.is_player:
@@ -76,7 +79,6 @@ class GamePvE(game_eve_app.GameEvE):
 
         original_score = (self.lteam.score, self.rteam.score)
         if self.is_player_turn:
-
             if not self.player_tactic:
                 # 只可能发生在跳过比赛中
                 tactic_name = self.lteam.select_tactic(counter_attack_permitted)
@@ -104,43 +106,80 @@ class GamePvE(game_eve_app.GameEvE):
         self.rteam.shift_location()
 
         # 比赛结束后的处理
-        if self.game_pve_models.turns == 50:
-            # TODO 加时判断
-            # 记录胜者id
-            if self.lteam.score > self.rteam.score:
-                self.winner_id = self.lteam.club_id
-            elif self.lteam.score < self.rteam.score:
-                self.winner_id = self.rteam.club_id  # 常规时间胜负关系
+        if self.game_pve_models.turns == self.total_turns:
+            if self.is_need_extra_time():
+                if self.is_extra_time:
+                    # 此时加时赛结束 两队仍然平分 需要进入点球阶段
+                    self.add_script('\n开始点球！')
+                    self.penalty()
+                    self.end_game(exchange_ball, original_score)
+                    return False
+                else:
+                    # 常规比赛时间结束 需要进入加时阶段
+                    self.is_extra_time = True
+                    self.add_script('\n开始加时比赛！')
             else:
-                # 比分相同
-                pass
+                # 结束比赛
+                self.end_game(exchange_ball, original_score)
+                return False
 
-            self.add_script('比赛结束！ {} {}:{} {}'.format(
-                self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name))
-            # 记录胜者队名
-            if self.winner_id == self.lteam.club_id:
-                winner_name = self.lteam.name
-            elif self.winner_id == self.rteam.club_id:
-                winner_name = self.rteam.name
-            else:
-                winner_name = None
+        # 记录球员实时评分
+        self.rate()
+        # 保存到临时表
+        self.save_temporary_table(exchange_ball, original_score)
+        return True
 
-            if winner_name:
-                self.add_script('胜者为{}！'.format(winner_name))
-            else:
-                self.add_script('平局')
+    def end_game(self, exchange_ball: bool, original_score: Tuple[int, int]):
+        """
+        比赛结束后的处理
+        """
+        # 记录胜者id
+        if self.lteam.score > self.rteam.score:
+            self.winner_id = self.lteam.club_id
+        elif self.lteam.score < self.rteam.score:
+            self.winner_id = self.rteam.club_id  # 常规时间胜负关系
 
-            self.rate()  # 球员评分
-            self.save_temporary_table(exchange_ball, original_score)  # 保存到临时表
-            self.save_game_data()  # 保存比赛
-            self.update_players_data()  # 保存球员数据的改变
-            return False
+        self.add_script('比赛结束！ {} {}:{} {}'.format(
+            self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name))
+        # 记录胜者队名
+        if self.winner_id == self.lteam.club_id:
+            winner_name = self.lteam.name
+        elif self.winner_id == self.rteam.club_id:
+            winner_name = self.rteam.name
         else:
-            # 记录球员实时评分
-            self.rate()
-            # 保存到临时表
-            self.save_temporary_table(exchange_ball, original_score)
-            return True
+            winner_name = None
+
+        if winner_name:
+            self.add_script('胜者为{}！'.format(winner_name))
+        else:
+            self.add_script('平局')
+
+        self.rate()  # 球员评分
+        self.save_temporary_table(exchange_ball, original_score)  # 保存到临时表
+        self.save_game_data()  # 保存比赛
+        self.update_players_data()  # 保存球员数据的改变
+
+    def is_need_extra_time(self) -> bool:
+        """
+        判断是否需要进行加时比赛
+        """
+        if self.rteam.score == self.lteam.score:
+            if 'cup' in self.type:
+                return True
+            if 'champion' in self.type and 'group' not in self.type:
+                if self.type == 'champions2to1':
+                    return True
+                else:
+                    query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.type=='{}')".format(
+                        self.save_id, int(self.season), self.type)
+                    games = crud.get_games_by_attri(db=self.db, query_str=query_str)  # 查找同阶段的其他比赛
+                    for game in games:
+                        team1 = game.teams[0]
+                        team2 = game.teams[1]
+                        if self.lteam.club_id == team2.club_id or self.lteam.club_id == team1.club_id:  # 查找这两队上一次比赛
+                            # 上一轮打平，这一轮加时
+                            return True
+        return False
 
     def save_temporary_table(self, exchange_ball: bool, original_score: Tuple[int, int]):
         """
@@ -151,6 +190,7 @@ class GamePvE(game_eve_app.GameEvE):
         self.game_pve_models.turns += 1
         self.game_pve_models.script = self.script
         self.game_pve_models.new_script = self.new_script
+        self.game_pve_models.is_extra_time = self.is_extra_time
         if exchange_ball:
             self.game_pve_models.cur_attacker = self.game_pve_models.computer_club_id \
                 if self.is_player_turn \
