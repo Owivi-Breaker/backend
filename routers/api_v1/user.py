@@ -13,6 +13,7 @@ import models
 import crud
 import utils
 from utils import logger
+import game_configs
 
 router = APIRouter()
 
@@ -64,6 +65,17 @@ async def create_save(save_data: SaveData,
     :param current_user: 用户
     :return: 生成的存档信息
     """
+    try:
+        # 检查联赛模式名字合法性
+        eval("game_configs.{}".format(save_data.type))
+    except AttributeError as e:
+        logger.error('请求联赛模式名不合法! '.format(e))
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Incorrect league type name",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     save_generator = generate_app.SaveGenerator(db)
     save_schema = schemas.SaveCreate(created_time=datetime.datetime.now())
     save_model = save_generator.generate(save_schema, current_user.id, save_data.type)
@@ -78,6 +90,7 @@ async def create_save(save_data: SaveData,
     if not break_flag:
         # 无法找不到正确的俱乐部名 删除save
         crud.delete_save_by_id(db=db, save_id=save_model.id)
+        logger.info('请求俱乐部名不合法！')
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Incorrect club name",

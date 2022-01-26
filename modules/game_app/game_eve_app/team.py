@@ -244,8 +244,9 @@ class Team:
         :return: 是否进球
         """
         self.add_script('{}罚出点球！'.format(shooter.name))
+        # 点球 为射手增加30点能力
         win_player = utils.select_by_pro(
-            {shooter: shooter.get_capa('shooting'), keeper: keeper.get_capa('goalkeeping')})
+            {shooter: shooter.get_capa('shooting') + 30, keeper: keeper.get_capa('goalkeeping')})
         if win_player == shooter:
             return True
         else:
@@ -474,6 +475,7 @@ class Team:
                         self.add_script('{}拿到球权'.format(rival_team.name))
             else:
                 self.add_script('{}抢到球权'.format(rival_team.name))
+
         return True
 
     def under_cutting(self, rival_team: 'Team') -> bool:
@@ -583,7 +585,7 @@ class Team:
                 if not midfielders:
                     self.add_script('{}丢失了球权'.format(self.name))
                     return True
-        # 助攻者取成功数最多次的球员
+        # 取成功数最多次的球员为助攻者
         assister = sorted(count_dict.items(), key=lambda x: x[1], reverse=True)[0][0]
         # 争顶
         strikers = self.get_location_players((game_configs.Location.ST,))
@@ -649,5 +651,6 @@ class Team:
                 state = self.shot_and_save(win_player, goal_keeper, assister)
                 if state:
                     self.plus_data('counter_attack_success')
+        self.add_script('{}策动的长传被拦截'.format(passing_player.name))
         self.add_script('{}持球'.format(rival_team.name))
         return True

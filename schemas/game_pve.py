@@ -121,6 +121,7 @@ class GamePvEShow(BaseModel):
     turns: int
     script: str
     new_script: str
+    is_extra_time: bool = False
 
     counter_attack_permitted: bool = False  # 下一回合是否允许打防反
 

@@ -23,6 +23,7 @@ class GamePvE(Base):
     script = Column(String(1000))
     new_script = Column(String(1000))
     counter_attack_permitted = Column(Boolean, default=False)
+    is_extra_time = Column(Boolean, default=False)
 
     teams = relationship("TeamPvE", backref="game_pve", cascade='all, delete-orphan')
 
