@@ -76,8 +76,10 @@ async def create_save(save_data: SaveData,
                 current_club = {'player_club_id': current_club_id}
                 crud.update_save(db, save_model.id, current_club)  # 玩家俱乐部ID加入save
     if not break_flag:
+        # 无法找不到正确的俱乐部名 删除save
+        crud.delete_save_by_id(db=db, save_id=save_model.id)
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Incorrect club name",
             headers={"WWW-Authenticate": "Bearer"},
         )
