@@ -114,6 +114,11 @@ def get_games_by_attri(db: Session, query_str: str, only_one: bool = False) -> L
         return db_games
 
 
+def get_game_by_id(db: Session, game_id: int) -> models.Game:
+    db_game = db.query(models.Game).filter(models.Game.id == game_id).first()
+    return db_game
+
+
 def delete_game_by_attri(db: Session, query_str: str):
     db_games = db.query(models.Game).filter(eval(query_str)).all()
     if not db_games:

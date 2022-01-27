@@ -1,9 +1,12 @@
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
+
+import schemas
 from game_configs.game_config import Location
 
 
+# region 比赛表
 class GamePlayerDataCreate(BaseModel):
     player_id: int
 
@@ -148,14 +151,16 @@ class GameTeamInfo(GameTeamInfoCreate):
 class GameCreate(BaseModel):
     created_time: datetime
     date: str
-
-    name: str
-    type: str
-    season: str
-    script: str
-    mvp: int
     save_id: int
-    winner_id: int = 0
+
+    name: str  # 比赛名
+    type: str  # 比赛类型
+    season: str
+    script: str  # 解说
+    mvp: int  # mvp球员id
+
+    winner_id: int = 0  # 胜利球队id 平局为0
+    goal_record: str = ''  # 进球纪录
 
     class Config:
         orm_mode = True
@@ -164,3 +169,88 @@ class GameCreate(BaseModel):
 class Game(BaseModel):
     id: int
     teams: List[GameTeamInfo]
+
+
+# endregion
+
+# region 比赛中出现的数据结构
+class GoalRecord(BaseModel):
+    player_id: int
+    player_name: str
+    turns: int
+    club_id: int
+    club_name: str
+
+
+# endregion
+
+# region 比赛展示
+class GamePlayerShow(BaseModel):
+    player_id: int
+    player_name: str
+
+    location: Location
+
+    final_rating: float
+    actions: int
+    shots: int
+    goals: int
+    assists: int
+    # 传球
+    passes: int
+    pass_success: int
+    # 过人
+    dribbles: int
+    dribble_success: int
+    # 抢断
+    tackles: int
+    tackle_success: int
+    # 争顶
+    aerials: int
+    aerial_success: int
+    # 扑救
+    saves: int
+    save_success: int
+    # 体力
+    original_stamina: int
+    final_stamina: int
+
+
+class GameTeamShow(BaseModel):
+    club_id: int
+    club_name: str
+    score: int
+    players_info: List[GamePlayerShow]
+
+    attempts: int
+    # 下底传中
+    wing_cross: int
+    wing_cross_success: int
+    # 内切
+    under_cutting: int
+    under_cutting_success: int
+    # 倒三角
+    pull_back: int
+    pull_back_success: int
+    # 中路渗透
+    middle_attack: int
+    middle_attack_success: int
+    # 防反
+    counter_attack: int
+    counter_attack_success: int
+
+
+class GameShow(BaseModel):
+    id: int
+    season: int
+    name: str
+    type: str
+    date: str
+    script: str
+    mvp: int
+    winner_id: int
+    goal_record: List[GoalRecord]
+
+    teams_info: List[GameTeamShow]
+
+# endregion

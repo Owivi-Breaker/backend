@@ -15,6 +15,8 @@ class Game(Base):
     date = Column(String(1000))
     season = Column(String(1000))
     script = Column(String(5000))
+    goal_record = Column(String(2000))
+
     teams = relationship("GameTeamInfo", backref="game")
     save_id = Column(Integer)
 

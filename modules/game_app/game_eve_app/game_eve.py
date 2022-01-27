@@ -1,3 +1,6 @@
+import json
+from functools import reduce
+
 from utils import Date, utils, logger
 import game_configs
 import crud
@@ -24,6 +27,8 @@ class GameEvE:
         self.name = game_name
         self.save_id = save_id
         self.winner_id = 0
+        self.goal_record: List[schemas.GoalRecord] = []  # 进球记录
+        self.turns = 0  # 比赛进行的回合数 用于记录进球回合
         self.lteam = game_eve_app.Team(db=self.db, game=self, club_id=club1_id, club_model=club1_model,
                                        season=self.season, date=self.date)
         self.rteam = game_eve_app.Team(db=self.db, game=self, club_id=club2_id, club_model=club2_model,
@@ -38,7 +43,8 @@ class GameEvE:
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
 
-        for _ in range(50):
+        for turns in range(50):
+            self.turns = turns
             # 确定本次战术组织每个球员的场上位置
             self.lteam.shift_location()
             self.rteam.shift_location()
@@ -368,7 +374,8 @@ class GameEvE:
             'script': self.script,
             'mvp': self.get_highest_rating_player().player_model.id,
             'save_id': self.save_id,
-            'winner_id': self.winner_id
+            'winner_id': self.winner_id,
+            'goal_record': self.goal_record_to_str()
         }
         game_data = schemas.GameCreate(**data)
         return game_data
@@ -661,3 +668,11 @@ class GameEvE:
         player_list = [(p, p.data['real_rating']) for p in player_list]
         highest_rating_player = max(player_list, key=lambda x: x[1])[0]
         return highest_rating_player
+
+    def goal_record_to_str(self) -> str:
+        """
+        将goal_record中的数据转换为字符串
+        """
+        if self.goal_record:
+            return '[]'
+        return json.dumps([g.dict() for g in self.goal_record], ensure_ascii=False)

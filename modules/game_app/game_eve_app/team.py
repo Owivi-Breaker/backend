@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 
 class Team:
-    def __init__(self, db: Session, game, club_id: int,
+    def __init__(self, db: Session, game: 'game_eve_app.GameEvE', club_id: int,
                  season: int, date: str,
                  club_model: models.Club = None):
         self.db = db
@@ -114,6 +114,22 @@ class Team:
         :param text: 解说词
         """
         self.game.add_script(text)
+
+    def record_goal(self, player: game_eve_app.Player):
+        """
+        记录一个进球
+        :param player: 进球球员
+        """
+        goal_record = schemas.GoalRecord(
+            **{
+                'player_id': player.player_model.id,
+                'player_name': player.name,
+                'club_id': self.club_id,
+                'club_name': self.name,
+                'turns': self.game.turns,
+            }
+        )
+        self.game.goal_record.append(goal_record)
 
     def set_capa(self, capa_name: str, num):
         """
@@ -281,6 +297,8 @@ class Team:
                 self.add_script('{}帽子戏法！'.format(attacker.name))
             if attacker.get_data('goals') == 4:
                 self.add_script('{}大四喜！'.format(attacker.name))
+            # 记录进球
+            self.record_goal(player=attacker)
             return True
         else:
             defender.plus_data('save_success')

@@ -1,5 +1,6 @@
 import crud
 import models
+import schemas
 from utils import utils, logger
 
 from core.db import engine
@@ -209,7 +210,7 @@ class ComputedGame:
 
     def get_game_winners(self, season: int, game_type: str, game_name: str) -> List[int]:
         """
-        获取指定比赛中的胜者
+        获取指定比赛中的(一批)胜者 用于创建淘汰赛日程
         :param season: 赛季
         :param game_type: 比赛性质
         :param game_name: 比赛名
@@ -229,3 +230,65 @@ class ComputedGame:
             else:
                 logger.error("淘汰赛平局！")
         return clubs_id
+
+    def get_show_data(self, game_id: int) -> schemas.GameShow:
+        """
+        获取一场比赛的数据
+        """
+        game: models.Game = crud.get_game_by_id(db=self.db, game_id=game_id)
+        g_data = dict()
+        g_data['id'] = game.id
+        g_data['season'] = game.season
+        g_data['name'] = game.name
+        g_data['type'] = game.type
+        g_data['date'] = game.date
+        g_data['script'] = game.script
+        g_data['mvp'] = game.mvp
+        g_data['winner_id'] = game.winner_id
+        g_data['goal_record'] = [schemas.GoalRecord(**g) for g in json.loads(game.goal_record)]
+        teams: List[schemas.GameTeamShow] = []
+        for team in game.teams:
+            t_data = dict()
+            t_data['score'] = team.score
+            t_data['club_id'] = team.club_id
+            t_data['club_name'] = team.club.name
+
+            t_data['attempts'] = team.team_data.attempts
+            t_data['wing_cross'] = team.team_data.wing_cross
+            t_data['wing_cross_success'] = team.team_data.wing_cross_success
+            t_data['under_cutting'] = team.team_data.under_cutting
+            t_data['under_cutting_success'] = team.team_data.under_cutting_success
+            t_data['pull_back'] = team.team_data.pull_back
+            t_data['pull_back_success'] = team.team_data.pull_back_success
+            t_data['middle_attack'] = team.team_data.middle_attack
+            t_data['middle_attack_success'] = team.team_data.middle_attack_success
+            t_data['counter_attack'] = team.team_data.counter_attack
+            t_data['counter_attack_success'] = team.team_data.counter_attack_success
+            players: List[schemas.GamePlayerShow] = []
+            for player in team.player_data:
+                p_data = dict()
+                p_data['player_id'] = player.player_id
+                p_data['player_name'] = player.player.translated_name
+                p_data['location'] = player.location
+                p_data['final_rating'] = player.final_rating
+                p_data['actions'] = player.actions
+                p_data['shots'] = player.shots
+                p_data['goals'] = player.goals
+                p_data['assists'] = player.assists
+                p_data['passes'] = player.passes
+                p_data['pass_success'] = player.pass_success
+                p_data['dribbles'] = player.dribbles
+                p_data['dribble_success'] = player.dribble_success
+                p_data['tackles'] = player.tackles
+                p_data['tackle_success'] = player.tackle_success
+                p_data['aerials'] = player.aerials
+                p_data['aerial_success'] = player.aerial_success
+                p_data['saves'] = player.saves
+                p_data['save_success'] = player.save_success
+                p_data['original_stamina'] = player.original_stamina
+                p_data['final_stamina'] = player.final_stamina
+                players.append(schemas.GamePlayerShow(**p_data))
+            t_data['players_info'] = players
+            teams.append(schemas.GameTeamShow(**t_data))
+        g_data['teams_info'] = teams
+        return schemas.GameShow(**g_data)
