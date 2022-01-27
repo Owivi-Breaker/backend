@@ -62,6 +62,7 @@ class ComputedGamePvE:
         data = dict()
         data['player_club_id'] = game_pve_model.player_club_id
         data['computer_club_id'] = game_pve_model.computer_club_id
+        data['home_club_id'] = game_pve_model.home_club_id
         data['name'] = game_pve_model.name
         data['type'] = game_pve_model.type
         data['date'] = game_pve_model.date

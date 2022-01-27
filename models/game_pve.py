@@ -18,6 +18,8 @@ class GamePvE(Base):
     player_club_id = Column(Integer, ForeignKey('club.id'))
     computer_club_id = Column(Integer, ForeignKey('club.id'))
 
+    home_club_id = Column(Integer)
+
     turns = Column(Integer)
     cur_attacker = Column(Integer)
     script = Column(String(1000))
