@@ -7,7 +7,7 @@ import threading
 import crud
 import models
 from utils import Date, utils, logger
-from modules import game_app, generate_app, computed_data_app
+from modules import game_app, generate_app, computed_data_app,transfer_app
 
 
 class NextTurner:
@@ -47,6 +47,8 @@ class NextTurner:
             self.pve_starter(total_events['pve'])
         if 'eve' in total_events.keys():
             self.eve_starter(total_events['eve'])
+        if 'transfer prepare' in total_events.keys():
+            self.transfer_prepare_starter(total_events['transfer prepare'])
         if 'transfer' in total_events.keys():
             self.transfer_starter(total_events['transfer'])
         if 'game_generation' in total_events.keys():
@@ -110,8 +112,33 @@ class NextTurner:
         # 暂时跟eve作相同处理
         self.eve_starter(pve)
 
+    def transfer_prepare_starter(self,transfer_prepare:list):
+        transfer_club_list = []
+        clubs = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
+        for club in clubs:
+            if club.id != self.save_model.player_club_id:
+                transfer_club = transfer_app.Club(db=self.db, club_id=club.id,
+                                                  date=self.save_model.date, season=self.save_model.season)
+                transfer_club_list.append(transfer_club)
+        for transfer_club in transfer_club_list:
+            transfer_club.adjust_finance()
+        for transfer_club in transfer_club_list:
+            transfer_club.on_sale()
+        for transfer_club in transfer_club_list:
+            transfer_club.judge_buy(self.save_id)  # 按照顺序：调整工资、挂牌、寻找目标 TODO：1`50
+
     def transfer_starter(self, transfer: list):
-        pass
+        transfer_club_list = []
+        clubs = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
+        for club in clubs:
+            if club.id != self.save_model.player_club_id:
+                transfer_club = transfer_app.Club(db=self.db, club_id=club.id,
+                                                  date=self.save_model.date, season=self.save_model.season)
+                transfer_club_list.append(transfer_club)
+        for transfer_club in transfer_club_list:
+            transfer_club.make_offer(self.save_id)
+            # TODO 处理offer未打开，考虑转会窗第一天不接受报价或隔一段时间接受
+            #transfer_club.receive_offer(self.save_id)
 
     def game_generation_starter(self, game_generation):
         """

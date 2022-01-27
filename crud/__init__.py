@@ -7,3 +7,5 @@ from crud.save import *
 from crud.calendar import *
 from crud.user import *
 from crud.save import *
+from crud.offer import *
+from crud.target_player import *

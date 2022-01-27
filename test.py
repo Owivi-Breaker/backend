@@ -1,6 +1,7 @@
-from modules import next_turn_app
+from modules import next_turn_app,transfer_app
 from core.db import get_session
 import time
+
 
 calendar_game = {
     'club_id': '1,2',

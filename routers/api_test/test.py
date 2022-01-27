@@ -11,7 +11,7 @@ import schemas
 import models
 import crud
 import game_configs
-from modules import generate_app, game_app, computed_data_app, next_turn_app
+from modules import generate_app, game_app, computed_data_app, next_turn_app, transfer_app
 from utils import logger, Date
 import utils
 
@@ -54,6 +54,51 @@ async def quick_game(fake_season=1, save_id=1, db: Session = Depends(get_db)):
     temp_events = process.split("\n")
     events = [i for i in temp_events if i != '']
     return events
+
+
+@router.get('/all-try-sell')
+def all_try_sell(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
+    for club in clubs:
+        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+        transfer_club.on_sale()
+        print(str(club.name) + "完成")
+
+
+@router.get('/all-adjust-wage')
+def all_adjust_wage(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
+    for club in clubs:
+        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+        transfer_club.adjust_finance()
+        print(str(club.name) + "完成")
+
+
+@router.get('/all-judge-buy')
+def all_judge_buy(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
+    for club in clubs:
+        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+        transfer_club.judge_buy(save_id=save_model.id)
+        print(str(club.name) + "完成")
+
+
+@router.get('/all-make-offer')
+def all_make_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
+    for club in clubs:
+        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+        transfer_club.make_offer(save_id=save_model.id)
+        print(str(club.name) + "完成")
+
+
+@router.get('/all-receive-offer')
+def all_receive_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
+    for club in clubs:
+        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+        transfer_club.receive_offer(save_id=save_model.id)
+        print(str(club.name) + "完成")
 
 
 @router.get('/incoming-games-info')

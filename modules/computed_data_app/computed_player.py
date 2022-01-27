@@ -70,6 +70,7 @@ class ComputedPlayer:
         data['style_tag'] = ["就地反抢", "前插", "防守内收"]  # TODO 挂个假数据
         data['talent_tag'] = ["大心脏", "偷猎者"]  # TODO 挂个假数据
         data['recent_ratings'] = self.get_ratings_in_recent_games()
+        data['on_sale'] = self.player_model.on_sale
         return schemas.PlayerShow(**data)
 
     def get_location_num(self) -> Dict[str, int]:
@@ -291,7 +292,10 @@ class ComputedPlayer:
         basic_values = top_capa ** 3 / 70.0
         avg_rating = self.get_avg_rating_in_recent_year()
         extra_values = avg_rating * 2000 - 12000
-        return int(basic_values + extra_values)
+        real_values = int(basic_values + extra_values)
+        if real_values < 10:
+            real_values = 10
+        return real_values
 
     def get_superior_location(self) -> List[str]:
         """
@@ -300,3 +304,5 @@ class ComputedPlayer:
         TODO 优化算法
         """
         return [x[0] for x in self.get_sorted_location_capa()[:3]]
+
+
