@@ -61,7 +61,7 @@ def all_try_sell(db: Session = Depends(get_db), save_model=Depends(utils.get_cur
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
         transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
-        transfer_club.on_sale()
+        transfer_club.judge_on_sale()
         print(str(club.name) + "完成")
 
 

@@ -9,7 +9,7 @@ import crud
 import models
 import schemas
 from utils import Date, utils, logger
-from modules import game_app, generate_app, computed_data_app,transfer_app
+from modules import game_app, generate_app, computed_data_app, transfer_app
 
 
 class NextTurner:
@@ -144,38 +144,41 @@ class NextTurner:
             computer_club_id=computer_club_id,
             game=game, date=self.save_model.date, season=self.save_model.season)
 
-    def transfer_prepare_starter(self,transfer_prepare:list):
+    def transfer_prepare_starter(self, transfer_prepare: list):
         transfer_club_list = []
-        clubs = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
+        clubs: List[models.Club] = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
         for club in clubs:
             if club.id != self.save_model.player_club_id:
-                transfer_club = transfer_app.Club(db=self.db, club_id=club.id,
-                                                  date=self.save_model.date, season=self.save_model.season)
+                transfer_club = transfer_app.Club(
+                    db=self.db, club_id=club.id,
+                    date=self.save_model.date, season=self.save_model.season,
+                    club_model=club)
                 transfer_club_list.append(transfer_club)
         for transfer_club in transfer_club_list:
             transfer_club.adjust_finance()
         for transfer_club in transfer_club_list:
-            transfer_club.on_sale()
+            transfer_club.judge_on_sale()
         for transfer_club in transfer_club_list:
             transfer_club.judge_buy(self.save_id)  # 按照顺序：调整工资、挂牌、寻找目标 TODO：1`50
+        self.db.commit()
 
     def transfer_starter(self, transfer: list):
         """
         转会入口
         """
-        pass
-        transfer_club_list = []
+        transfer_club_list: List[transfer_app.Club] = []
         clubs = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
+        # 剔除玩家俱乐部
         for club in clubs:
             if club.id != self.save_model.player_club_id:
                 transfer_club = transfer_app.Club(db=self.db, club_id=club.id,
                                                   date=self.save_model.date, season=self.save_model.season)
                 transfer_club_list.append(transfer_club)
-        for transfer_club in transfer_club_list:
-            transfer_club.make_offer(self.save_id)
-            # TODO 处理offer未打开，考虑转会窗第一天不接受报价或隔一段时间接受
-            #transfer_club.receive_offer(self.save_id)
 
+        for transfer_club in transfer_club_list:
+            transfer_club.receive_offer(self.save_id)
+
+            transfer_club.make_offer(self.save_id)
 
     def game_generation_starter(self, game_generation):
         """

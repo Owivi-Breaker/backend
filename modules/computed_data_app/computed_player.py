@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy.orm import Session
 from typing import Dict, List, Tuple, Optional
 import random
@@ -24,6 +26,10 @@ class ComputedPlayer:
             if player_model \
             else crud.get_player_by_id(db=self.db, player_id=self.player_id)
         self.age = self.player_model.age
+
+        # with open("./game_configs/data/location_capability.json", encoding='utf-8') as f_obj:
+        #     self.location_capability = json.load(f_obj)
+        self.location_capability = game_configs.location_capability
         self.capa = dict()
         self.init_capa()
 
@@ -63,9 +69,9 @@ class ComputedPlayer:
         data['real_stamina'] = self.get_real_stamina()
         data['location_num'] = self.get_location_num()
         data['capa'] = self.get_all_capa(is_retain_decimal=True)
-        data['top_location'] = self.get_top_capa_n_location()[0]
+        data['top_location'] = self.get_top_lo_n_capa()[0]
         data['superior_location'] = self.get_superior_location()
-        data['top_capa'] = self.get_top_capa_n_location()[1]
+        data['top_capa'] = self.get_top_lo_n_capa()[1]
         data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa(True)}
         data['style_tag'] = ["就地反抢", "前插", "防守内收"]  # TODO 挂个假数据
         data['talent_tag'] = ["大心脏", "偷猎者"]  # TODO 挂个假数据
@@ -144,7 +150,7 @@ class ComputedPlayer:
         :param is_retain_decimal: 是否保留小数
         """
         weight_dict = dict()
-        for lo in game_configs.location_capability:
+        for lo in self.location_capability:
             # 拿到指定位置的能力比重
             if lo['name'] == lo_name:
                 weight_dict = lo['weight']
@@ -166,22 +172,22 @@ class ComputedPlayer:
         """
         location_capa = []
         if is_retain_decimal:
-            for location in game_configs.location_capability:
+            for location in self.location_capability:
                 location_capa.append(
                     [location['name'], self.get_location_capa(location['name'], True)]
                 )
         else:
-            for location in game_configs.location_capability:
+            for location in self.location_capability:
                 location_capa.append(
                     [location['name'], self.get_location_capa(location['name'])]
                 )
         location_capa = sorted(location_capa, key=lambda x: -x[1])
         return location_capa
 
-    def get_top_capa_n_location(self, is_retain_decimal: bool = False) -> Tuple[str, float]:
+    def get_top_lo_n_capa(self, is_retain_decimal: bool = False) -> Tuple[str, float]:
         """
-        获取最佳位置的综合能力以及该位置
-        :return: (能力值, 位置名)
+        获取最佳位置以及该位置的综合能力
+        :return: (位置名, 能力值)
         :param is_retain_decimal: 是否保留小数
         """
         lo_name, top_capa = self.get_sorted_location_capa()[0]
@@ -288,7 +294,7 @@ class ComputedPlayer:
         """
         获取身价
         """
-        top_capa = self.get_top_capa_n_location()[1]
+        top_capa = self.get_top_lo_n_capa()[1]
         basic_values = top_capa ** 3 / 70.0
         avg_rating = self.get_avg_rating_in_recent_year()
         extra_values = avg_rating * 2000 - 12000
@@ -304,5 +310,3 @@ class ComputedPlayer:
         TODO 优化算法
         """
         return [x[0] for x in self.get_sorted_location_capa()[:3]]
-
-

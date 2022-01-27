@@ -7,5 +7,4 @@ from models.save import *
 from models.game_pve import *
 from models.calendar import *
 from models.user import *
-from models.target_player import *
-from models.offer import *
+from models.transfer import *

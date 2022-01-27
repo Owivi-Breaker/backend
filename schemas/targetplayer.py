@@ -5,16 +5,16 @@ from pydantic import BaseModel
 import schemas
 
 
-class Target_PlayerCreate(BaseModel):
+class TargetPlayerCreate(BaseModel):
     buyer_id: int
     target_id: int
     season: int
     save_id: int
+    rejected_date: str = ''
 
     class Config:
         orm_mode = True
 
 
-class Target_Player(Target_PlayerCreate):
+class TargetPlayer(TargetPlayerCreate):
     id: int
-

@@ -43,7 +43,7 @@ def update_player(db: Session, player_id: int, attri: dict):
     db_player = db.query(models.Player).filter(models.Player.id == player_id).first()
     for key, value in attri.items():
         setattr(db_player, key, value)
-    db.commit()
+    # db.commit()
     return db_player
 
 
