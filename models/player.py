@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float,Boolean
 from sqlalchemy.orm import relationship
 from models.base import Base
 
@@ -66,4 +66,5 @@ class Player(Base):
     # 生涯数据
     game_data = relationship('GamePlayerData', backref='player', lazy='select')
 
+    on_sale = Column(Boolean, default=False)
 # endregion

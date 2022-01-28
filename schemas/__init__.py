@@ -7,3 +7,5 @@ from schemas.league import *
 from schemas.save import *
 from schemas.game_pve import *
 from schemas.user import *
+from schemas.targetplayer import *
+from schemas.offer import *

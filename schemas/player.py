@@ -128,3 +128,4 @@ class PlayerShow(BaseModel):
     style_tag: List[str]  # 风格标签
     talent_tag: List[str]  # 天赋标签
     recent_ratings: List[float]  # 近五场比赛的评分
+    on_sale: bool # 是否挂牌

@@ -698,6 +698,15 @@ class CalendarGenerator:
             logger.error("无{}赛程".format(game_type))
         logger.info('{}比赛日程表生成'.format(game_type))
 
+    def generate_transfer_prepare_days(self):
+        """
+        转会窗前准备日
+        """
+        year, month, day = self.save_model.date.split('-')
+        date = Date(int(year), 5, 31)
+        transfer_prepare_dict = {"transfer prepare": []}
+        self.add_dict(str(date), transfer_prepare_dict)
+
     def generate_transfer_days(self):
         """
         生成转会日
