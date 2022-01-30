@@ -128,21 +128,20 @@ class NextTurner:
         """
         if self.skip:
             self.eve_starter(pve)
-            return
-
-        game = pve[0]
-        clubs_id = game['club_id'].split(',')
-        if int(clubs_id[0]) != self.save_model.player_club_id:
-            computer_club_id = int(clubs_id[0])
         else:
-            computer_club_id = int(clubs_id[1])
-        game_pve_generator = generate_app.GamePvEGenerator(
-            db=self.db,
-            save_model=self.save_model)
-        game_pve_generator.create_game_pve(
-            player_club_id=self.save_model.player_club_id,
-            computer_club_id=computer_club_id,
-            game=game, date=self.save_model.date, season=self.save_model.season)
+            game = pve[0]
+            clubs_id = game['club_id'].split(',')
+            if int(clubs_id[0]) != self.save_model.player_club_id:
+                computer_club_id = int(clubs_id[0])
+            else:
+                computer_club_id = int(clubs_id[1])
+            game_pve_generator = generate_app.GamePvEGenerator(
+                db=self.db,
+                save_model=self.save_model)
+            game_pve_generator.create_game_pve(
+                player_club_id=self.save_model.player_club_id,
+                computer_club_id=computer_club_id,
+                game=game, date=self.save_model.date, season=self.save_model.season)
 
     def transfer_prepare_starter(self, transfer_prepare: list):
         transfer_club_list = []

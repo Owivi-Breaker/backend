@@ -673,6 +673,6 @@ class GameEvE:
         """
         将goal_record中的数据转换为字符串
         """
-        if self.goal_record:
+        if not self.goal_record:
             return '[]'
         return json.dumps([g.dict() for g in self.goal_record], ensure_ascii=False)
