@@ -245,7 +245,7 @@ class ComputedPlayer:
             return self.age + self.player_model.club.league.save.season - 1
 
     def get_game_player_data(self, start_season: int = None, end_season: int = None) \
-            -> List[schemas.GamePlayerData]:
+            -> List[models.GamePlayerData]:
         """
         获取指定球员某赛季的比赛信息
         :param start_season: 开始赛季，若为空，默认1开始
@@ -271,6 +271,7 @@ class ComputedPlayer:
         if not game_player_data:
             return schemas.TotalGamePlayerDataShow()
         result = dict()
+        result['id'] = self.player_id
         result['appearance'] = len(game_player_data)
         result["final_rating"] = float(
             utils.retain_decimal(sum([p.final_rating for p in game_player_data]) / len(game_player_data)))

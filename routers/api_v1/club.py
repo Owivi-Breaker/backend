@@ -88,7 +88,7 @@ def get_players_by_club(
             for player_model in club_model.players]
 
 
-@router.get('/me/player/total-game-data', response_model=List[schemas.GamePlayerDataShow], tags=['player api'])
+@router.get('/me/player/total-game-data', response_model=List[schemas.TotalGamePlayerDataShow], tags=['player api'])
 def get_total_game_players_data_by_user(
         start_season: int = None, end_season: int = None,
         db: Session = Depends(get_db),
@@ -106,11 +106,12 @@ def get_total_game_players_data_by_user(
             season=save_model.season, date=save_model.date,
             player_model=player_model).get_total_game_player_data(start_season=start_season, end_season=end_season)
         for player_model in club_model.players]
-
+    logger.info(game_players_data[0])
     return game_players_data
 
 
-@router.get('/{club_id}/player/total-game-data', response_model=List[schemas.GamePlayerDataShow], tags=['player api'])
+@router.get('/{club_id}/player/total-game-data', response_model=List[schemas.TotalGamePlayerDataShow],
+            tags=['player api'])
 def get_total_game_players_data_by_club(
         club_id: int,
         start_season: int = None, end_season: int = None,

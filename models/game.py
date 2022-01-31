@@ -63,6 +63,7 @@ class GameTeamData(Base):
 
 
 class GamePlayerData(Base):
+    # 球员的一场比赛数据
     __tablename__ = 'game_player_data'
     id = Column(Integer, primary_key=True, index=True)
 

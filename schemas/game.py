@@ -49,6 +49,7 @@ class GamePlayerData(GamePlayerDataCreate):
 
 
 class GamePlayerDataShow(BaseModel):
+    id: int
     location: Location = 'ST'
 
     final_rating: float = 6.0
@@ -77,6 +78,7 @@ class GamePlayerDataShow(BaseModel):
 
 
 class TotalGamePlayerDataShow(BaseModel):
+    id: int = -1
     appearance: int = 0
 
     final_rating: float = 6.0

@@ -29,6 +29,7 @@ class GamePvE(game_eve_app.GameEvE):
         self.type = self.game_pve_models.type
         self.name = self.game_pve_models.name
         self.save_id = self.game_pve_models.save_id
+        self.goal_record: List[schemas.GoalRecord] = []  # 进球记录
         self.winner_id = 0
 
         self.total_turns = 50 if not self.is_extra_time else 70  # 总比赛回合数
