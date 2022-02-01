@@ -121,3 +121,13 @@ def next_turn(tactic: str = None,
     # 返回数据
     computed_game_pve = computed_data_app.ComputedGamePvE(db=db, save_id=save_model.id)
     return computed_game_pve.get_show_data()
+
+
+@router.get('/show-game-info')
+def show_game_info(db: Session = Depends(get_db),
+              save_model: models.Save = Depends(utils.get_current_save)) -> schemas.GamePvEInfo:
+    """
+    获得当前比赛双方信息
+    """
+    computed_game_pve = computed_data_app.ComputedGamePvE(db=db, save_id=save_model.id)
+    return computed_game_pve.get_show_data()
