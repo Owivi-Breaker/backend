@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field
 import schemas
 import models
 import crud
-from utils import logger, utils
 import utils
 from core.db import engine, get_db
 from modules import game_app, generate_app, computed_data_app
@@ -46,7 +45,7 @@ def commit_lineup_n_tactic_weight(
         lineup_str = player_selector.select_players(is_random=True, is_save_mode=True)
         save_model.lineup = lineup_str
     else:
-        lineup_str = utils.turn_dict2str(lineup)
+        lineup_str = utils.utils.turn_dict2str(lineup)
         save_model.lineup = lineup_str
 
     if not tactic_weight:
@@ -90,8 +89,7 @@ def skip_game_pve(
 @router.post('/start')
 def start_game_pve(
         tactic_weight: TacticWeight = None,
-        lineup: Optional[Dict[int, str]] = Body(
-            None, example=lineup_example),
+        lineup: Optional[Dict[int, str]] = None,
         db: Session = Depends(get_db),
         save_model: models.Save = Depends(utils.get_current_save)):
     """
