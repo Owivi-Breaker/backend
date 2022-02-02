@@ -68,10 +68,10 @@ class GamePvE(game_eve_app.GameEvE):
         else:
             return self.rteam, self.lteam
 
-    def start_one_turn(self) -> bool:
+    def start_one_turn(self) -> Tuple[bool, int]:
         """
         开始新一回合
-        :return: 比赛是否结束
+        :return: 比赛是否结束; game id 若无则为0
         """
         if self.turns == 1:
             self.add_script('比赛开始！')
@@ -113,26 +113,27 @@ class GamePvE(game_eve_app.GameEvE):
                     # 此时加时赛结束 两队仍然平分 需要进入点球阶段
                     self.add_script('\n开始点球！')
                     self.penalty()
-                    self.end_game(exchange_ball, original_score)
-                    return False
+                    game_id = self.end_game(exchange_ball, original_score)
+                    return False, game_id
                 else:
                     # 常规比赛时间结束 需要进入加时阶段
                     self.is_extra_time = True
                     self.add_script('\n开始加时比赛！')
             else:
                 # 结束比赛
-                self.end_game(exchange_ball, original_score)
-                return False
+                game_id = self.end_game(exchange_ball, original_score)
+                return False, game_id
 
         # 记录球员实时评分
         self.rate()
         # 保存到临时表
         self.save_temporary_table(exchange_ball, original_score)
-        return True
+        return True, 0
 
-    def end_game(self, exchange_ball: bool, original_score: Tuple[int, int]):
+    def end_game(self, exchange_ball: bool, original_score: Tuple[int, int]) -> int:
         """
         比赛结束后的处理
+        :return: game id
         """
         # 记录胜者id
         if self.lteam.score > self.rteam.score:
@@ -157,8 +158,9 @@ class GamePvE(game_eve_app.GameEvE):
 
         self.rate()  # 球员评分
         self.save_temporary_table(exchange_ball, original_score)  # 保存到临时表
-        self.save_game_data()  # 保存比赛
+        game_id = self.save_game_data()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
+        return game_id
 
     def is_need_extra_time(self) -> bool:
         """

@@ -188,6 +188,7 @@ class GamePvEInfo(BaseModel):
     """
     发送给前端的整合数据
     """
+    game_id: int = 0  # 比赛结束后 生成的比赛id 只有在 game_pve 最后一回合才会赋值成非0值
     game_info: GamePvEShow
     player_team_info: TeamPvEShow
     computer_team_info: TeamPvEShow

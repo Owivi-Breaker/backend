@@ -412,6 +412,8 @@ class GameEvE:
             game_team_info_model.player_data = game_player_data_model_list
         game_model.teams = game_team_info_model_list
         self.db.commit()
+        self.db.refresh(game_model)
+        return game_model.id
         # 更迅速地保存GamePlayerData
         # game_player_data_schemas_list: List[schemas.GamePlayerData] = list(
         #     map(lambda p: p.export_game_player_data_schemas(created_time), team.players))

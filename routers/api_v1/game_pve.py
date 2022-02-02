@@ -77,13 +77,16 @@ def skip_game_pve(
         db=db, save_model=save_model)
     game_pve_generator.create_team_n_player_pve()
     flag = True
+    game_id = 0
     while flag:
         game_pve = game_app.GamePvE(save_id=save_model.id, db=db, player_tactic='')
-        flag = game_pve.start_one_turn()
+        flag, game_id = game_pve.start_one_turn()
 
     # 返回数据
     computed_game_pve = computed_data_app.ComputedGamePvE(db=db, save_id=save_model.id)
-    return computed_game_pve.get_show_data()
+    game_pve_info = computed_game_pve.get_show_data()
+    game_pve_info.game_id = game_id
+    return game_pve_info
 
 
 @router.post('/start')
@@ -117,15 +120,17 @@ def next_turn(tactic: str = None,
     """
     # 开始回合
     game_pve = game_app.GamePvE(save_id=save_model.id, db=db, player_tactic=tactic)
-    is_finished = game_pve.start_one_turn()
+    is_finished, game_id = game_pve.start_one_turn()
     # 返回数据
     computed_game_pve = computed_data_app.ComputedGamePvE(db=db, save_id=save_model.id)
-    return computed_game_pve.get_show_data()
+    game_pve_info = computed_game_pve.get_show_data()
+    game_pve_info.game_id = game_id
+    return game_pve_info
 
 
 @router.get('/show-game-info')
 def show_game_info(db: Session = Depends(get_db),
-              save_model: models.Save = Depends(utils.get_current_save)) -> schemas.GamePvEInfo:
+                   save_model: models.Save = Depends(utils.get_current_save)) -> schemas.GamePvEInfo:
     """
     获得当前比赛双方信息
     """
