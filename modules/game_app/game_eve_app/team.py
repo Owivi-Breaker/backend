@@ -273,16 +273,21 @@ class Team:
         """
         射门与扑救，一对一
         :param attacker: 进攻球员实例
-        :param defender: 防守球员（门将）实例
+        :param defender: 防守球员（门将）实例 可能为无（空列表）
         :param assister: 助攻球员实例
         :return: 进攻是否成功
         """
         self.add_script('{}起脚打门！'.format(attacker.name))
-        average_stamina = self.get_rival_team().get_average_capability('stamina')
-        attacker.plus_data('shots', average_stamina)
-        defender.plus_data('saves', average_stamina)
-        win_player = utils.select_by_pro(
-            {attacker: attacker.get_capa('shooting'), defender: defender.get_capa('goalkeeping')})
+        if defender:
+            average_stamina = self.get_rival_team().get_average_capability('stamina')
+            attacker.plus_data('shots', average_stamina)
+            defender.plus_data('saves', average_stamina)
+            win_player = utils.select_by_pro(
+                {attacker: attacker.get_capa('shooting'), defender: defender.get_capa('goalkeeping')})
+        else:
+            average_stamina = self.get_rival_team().get_average_capability('stamina')
+            attacker.plus_data('shots', average_stamina)
+            win_player = attacker
         if win_player == attacker:
             # 比分直接在这儿改写，省的在每处调用后都要改写比分
             self.score += 1
@@ -313,6 +318,11 @@ class Team:
         :return: 进攻是否成功
         """
         average_stamina = self.get_rival_team().get_average_capability('stamina')
+        if not defender:
+            return True
+        if not attacker:
+            return False
+
         # 更新数据，并判定实时体力是否下降
         attacker.plus_data('dribbles', average_stamina)
         defender.plus_data('tackles', average_stamina)
@@ -334,7 +344,7 @@ class Team:
         """
         冲刺、过人与抢断，多对多
         :param attackers: 进攻球员组
-        :param defenders: 防守球员组
+        :param defenders: 防守球员组 可能为空列表
         :return: 进攻是否成功、持球球员
         """
         average_stamina = self.get_rival_team().get_average_capability('stamina')

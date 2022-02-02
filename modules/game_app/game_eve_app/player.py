@@ -95,27 +95,25 @@ class Player:
         """
         return self.data[data_name]
 
-    def plus_data(self, data_name: str, average_stamina: Optional[float] = None):
+    def plus_data(self, data_name: str, average_stamina: Optional[float] = 0):
         """
         根据指定动作，更新场上数据，并消耗体力
         :param data_name: 动作名
         :param average_stamina: 对方球队的平均体力能力
         """
+        stamina_diff = 0  # 需要扣除的体力值
         if data_name == 'shots' or data_name == 'dribbles' \
                 or data_name == 'tackles' \
                 or data_name == 'saves' or data_name == 'aerials':
-            self.data['actions'] += 1
-            if utils.select_by_pro(
-                    {False: self.get_capa('stamina'), True: average_stamina}
-            ) and average_stamina:
-                # 若capa stamina判定结果是False，则扣除体力
-                self.stamina -= 2.5
+            stamina_diff = 2.5
         elif data_name == 'passes':
-            self.data['actions'] += 1
-            if utils.select_by_pro(
-                    {False: self.get_capa('stamina'), True: average_stamina}
-            ) and average_stamina:
-                self.stamina -= 1
+            stamina_diff = 1
+
+        self.data['actions'] += 1
+        if average_stamina and utils.select_by_pro(
+                {False: self.get_capa('stamina'), True: average_stamina}):
+            # 若capa stamina判定结果是False，则扣除体力
+            self.stamina -= stamina_diff
 
         if self.stamina < 0:
             self.stamina = 0

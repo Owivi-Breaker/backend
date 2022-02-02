@@ -87,6 +87,7 @@ class GamePvECreate(BaseModel):
     player_club_id: int  # 玩家俱乐部id外键
     computer_club_id: int  # 电脑俱乐部id外键
     home_club_id: int  # 主场俱乐部id
+    goal_record: str = '[]'  # 进球记录
 
     name: str
     type: str

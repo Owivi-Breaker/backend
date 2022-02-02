@@ -375,7 +375,7 @@ class GameEvE:
             'mvp': self.get_highest_rating_player().player_model.id,
             'save_id': self.save_id,
             'winner_id': self.winner_id,
-            'goal_record': self.goal_record_to_str()
+            'goal_record': self.goal_record2str()
         }
         game_data = schemas.GameCreate(**data)
         return game_data
@@ -671,7 +671,7 @@ class GameEvE:
         highest_rating_player = max(player_list, key=lambda x: x[1])[0]
         return highest_rating_player
 
-    def goal_record_to_str(self) -> str:
+    def goal_record2str(self) -> str:
         """
         将goal_record中的数据转换为字符串
         """

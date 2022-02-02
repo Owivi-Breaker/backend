@@ -1,3 +1,5 @@
+import json
+
 import crud
 from utils import utils, logger
 import models
@@ -29,7 +31,8 @@ class GamePvE(game_eve_app.GameEvE):
         self.type = self.game_pve_models.type
         self.name = self.game_pve_models.name
         self.save_id = self.game_pve_models.save_id
-        self.goal_record: List[schemas.GoalRecord] = []  # 进球记录
+        self.goal_record: List[schemas.GoalRecord] = self.str2goal_record(self.game_pve_models.goal_record)  # 进球记录
+        logger.info(self.goal_record)
         self.winner_id = 0
 
         self.total_turns = 50 if not self.is_extra_time else 70  # 总比赛回合数
@@ -56,6 +59,19 @@ class GamePvE(game_eve_app.GameEvE):
             self.is_player_turn = True
         else:
             self.is_player_turn = False
+
+    @staticmethod
+    def str2goal_record(text: str) -> List[schemas.GoalRecord]:
+        """
+        将 goal_record 字符串转换为 schemas.GoalRecord 形式
+        """
+        if not text:
+            return []
+        goal_record_dict = json.loads(text)
+
+        if not goal_record_dict:
+            return []
+        return [schemas.GoalRecord(**x) for x in goal_record_dict]
 
     def init_hold_ball_team(self) -> Tuple[game_pve_app.TeamPvE, game_pve_app.TeamPvE]:
         """
@@ -194,6 +210,7 @@ class GamePvE(game_eve_app.GameEvE):
         self.game_pve_models.script = self.script
         self.game_pve_models.new_script = self.new_script
         self.game_pve_models.is_extra_time = self.is_extra_time
+        self.game_pve_models.goal_record = self.goal_record2str()
         if exchange_ball:
             self.game_pve_models.cur_attacker = self.game_pve_models.computer_club_id \
                 if self.is_player_turn \
