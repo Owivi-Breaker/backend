@@ -42,7 +42,7 @@ async def quick_game(fake_season=1, save_id=1, db: Session = Depends(get_db)):
     展示一场 eve 比赛的过程，
     默认为曼城与曼联的英超比赛
     """
-    game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=Date(2021, 8, 30), game_name='英超',
+    game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=str(Date(2021, 8, 30)), game_name='英超',
                                 game_type='league', season=int(fake_season), save_id=save_id)
     result = game_eve.start()
     query_str = "and_(models.Game.season=='{}', models.Game.type=='{}', models.Game.date=='{}')".format(fake_season,
