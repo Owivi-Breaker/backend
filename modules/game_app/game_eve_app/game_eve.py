@@ -33,13 +33,14 @@ class GameEvE:
                                        season=self.season, date=self.date)
         self.rteam = game_eve_app.Team(db=self.db, game=self, club_id=club2_id, club_model=club2_model,
                                        season=self.season, date=self.date)
+        self.ingame_time = 0
 
     def start(self) -> Tuple:
         """
         开始比赛
         :return: 比分元组
         """
-        self.add_script('比赛开始！')
+        self.add_script('比赛开始！', 's')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
 
@@ -67,9 +68,13 @@ class GameEvE:
             # 比分相同
             pass
 
-        self.judge_extra_time()  # 加时判断与点球判断 最后修改self.winner_id
-        self.add_script('比赛结束！ {} {}:{} {}'.format(
-            self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name))
+        judge = self.judge_extra_time()  # 加时判断与点球判断 最后修改self.winner_id
+        if judge == 1:
+            self.add_script('比赛结束！ {} {}:{} {}'.format(
+                self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name), 'ae')
+        else:
+            self.add_script('比赛结束！ {} {}:{} {}'.format(
+                self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name), 'e')
 
         if self.winner_id == self.lteam.club_id:
             winner_name = self.lteam.name
@@ -79,9 +84,9 @@ class GameEvE:
             winner_name = None
 
         if winner_name:
-            self.add_script('胜者为{}！'.format(winner_name))
+            self.add_script('胜者为{}！'.format(winner_name), 'e')
         else:
-            self.add_script('平局')
+            self.add_script('平局', 'e')
 
         self.rate()  # 球员评分
         self.save_game_data()  # 保存比赛
@@ -97,9 +102,11 @@ class GameEvE:
         """
         if 'cup' in self.type and self.rteam.score == self.lteam.score:
             self.extra_time()
+            return 1
         if 'champion' in self.type and 'group' not in self.type:
             if self.type == 'champions2to1' and self.rteam.score == self.lteam.score:
                 self.extra_time()
+                return 1
             else:
                 query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.type=='{}')".format(
                     self.save_id, int(self.season), self.type)
@@ -110,13 +117,14 @@ class GameEvE:
                     if self.lteam.club_id == team2.club_id or self.lteam.club_id == team1.club_id:  # 查找这两队上一次比赛
                         if team1.score == team2.score:  # 上一轮打平，这一轮加时
                             self.extra_time()
+                            return 1
 
     def extra_time(self):
         """
         进行加时比赛
         """
         print('加时')
-        self.add_script('\n开始加时比赛！')
+        self.add_script('\n开始加时比赛！', 'as')
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = False
         for _ in range(20):  # 加时赛20个回合
@@ -151,22 +159,22 @@ class GameEvE:
         turn = 0
         win_club_id = 0  # 胜者
         while win_club_id == 0:
-            self.add_script('\n第{}轮点球！'.format(turn + 1))
+            self.add_script('\n第{}轮点球！'.format(turn + 1), 'n')
             l_out = self.lteam.making_final_penalty(self.rteam, turn)  # 点球结果
             if l_out:
-                self.add_script('稳稳将球罚进！')
+                self.add_script('稳稳将球罚进！', 'n')
                 lteam_p += 1
             elif not l_out:
-                self.add_script('被门将拒之门外！')
+                self.add_script('被门将拒之门外！', 'n')
 
             r_out = self.rteam.making_final_penalty(self.lteam, turn)
 
             if r_out:
-                self.add_script('稳稳将球罚进！')
+                self.add_script('稳稳将球罚进！', 'n')
                 rteam_p += 1
             elif not r_out:
-                self.add_script('被门将拒之门外！')
-            self.add_script('{} : {}'.format(lteam_p, rteam_p))
+                self.add_script('被门将拒之门外！', 'n')
+            self.add_script('{} : {}'.format(lteam_p, rteam_p), 'n')
             if turn < 3 and lteam_p - rteam_p > 2:  # 前三轮，2：0还能继续
                 win_club_id = self.lteam.club_id
 
@@ -190,7 +198,7 @@ class GameEvE:
 
         self.winner_id = win_club_id
         self.add_script('点球结束！ {} {}:{} {}'.format(
-            self.lteam.name, lteam_p, rteam_p, self.rteam.name))
+            self.lteam.name, lteam_p, rteam_p, self.rteam.name), 'n')
 
     def tactical_start(self, num: int = 20):
         """
@@ -420,12 +428,75 @@ class GameEvE:
         # crud.create_game_player_data_bulk(game_player_data=game_player_data_schemas_list,
         #                                   game_team_info_id=game_team_info_model.id)
 
-    def add_script(self, text: str):
+    def add_script(self, text: str, status: str):
         """
         添加解说
         :param text: 解说词
+        :param status:状态参数
         """
-        self.script += text + '\n'
+        grade = '@' + str(random.randint(1, 5))
+        if status == 's':  # 开始
+            str_time = '@00:00'
+            self.ingame_time = 0
+            self.script += text + str_time + grade + '\n'
+        elif status == 'as':  # 加时开始
+            str_time = '@090:00'
+            self.ingame_time = 9000
+            self.script += text + str_time + grade + '\n'
+        elif status == 'e':  # 结束
+            str_time = '@90:00'
+            self.script += text + str_time + grade + '\n'
+        elif status == 'ae':
+            str_time = '@120:00'  # 加时结束
+            self.script += text + str_time + grade + '\n'
+        elif status == 'd':  # 两段动作
+            happening_time = random.randint(self.ingame_time + 25, self.ingame_time + 100)
+            str_time = str(happening_time)
+            if int(str_time[-2:]) > 60:  # 60进制
+                happening_time += 40
+            str_time = str(happening_time)
+            cstr_time = str_time
+            if len(str_time) == 1:
+                cstr_time = "000" + str_time
+            if len(str_time) == 2:
+                cstr_time = "00" + str_time
+            if len(str_time) == 3:
+                cstr_time = "0" + str_time
+            self.ingame_time = happening_time
+            if len(str_time) < 5:  # 100分钟以内
+                str_sec = cstr_time[-2:]
+                str_min = cstr_time[:2]
+                str_time = str_min + ":" + str_sec
+            else:
+                str_sec = cstr_time[-2:]
+                str_min = cstr_time[:3]
+                str_time = str_min + ":" + str_sec
+            self.script += text + '@' + str_time + grade + '\n'
+        elif status == 'c':  # 连续动作,时间间隔短
+            happening_time = random.randint(self.ingame_time + 1, self.ingame_time + 4)
+            str_time = str(happening_time)
+            if int(str_time[-2:]) > 60:  # 60进制
+                happening_time += 40
+            str_time = str(happening_time)
+            cstr_time = str_time
+            if len(str_time) == 1:
+                cstr_time = "000" + str_time
+            if len(str_time) == 2:
+                cstr_time = "00" + str_time
+            if len(str_time) == 3:
+                cstr_time = "0" + str_time
+            self.ingame_time = happening_time
+            if len(str_time) < 5:  # 100分钟以内
+                str_sec = cstr_time[-2:]
+                str_min = cstr_time[:2]
+                str_time = str_min + ":" + str_sec
+            else:
+                str_sec = cstr_time[-2:]
+                str_min = cstr_time[:3]
+                str_time = str_min + ":" + str_sec
+            self.script += text + '@' + str_time + grade + '\n'
+        elif status == 'n':  # 纯解说
+            self.script += text + grade + '\n'
 
     def init_hold_ball_team(self) -> Tuple[game_eve_app.Team, game_eve_app.Team]:
         """
