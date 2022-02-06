@@ -339,3 +339,33 @@ class Club:
                     db=self.db, player_id=offer.target_id, season=self.season, date=self.date)
                 p.adjust_wage(round(np.random.normal(p.wanna_wage(), 2), 3))
                 # offer.status = 'c'
+
+    def improve_crew(self):
+        """
+        职员更新
+        """
+        willingness = random.randint(0, 1)  # 随机一个是否愿意升级
+        if self.team_model.finance > 3000 and willingness == 1:  # TODO 具体升级要求再议
+            crew = {'a': self.team_model.assistant,
+                    'd': self.team_model.doctor,
+                    's': self.team_model.scout,
+                    'n': self.team_model.negotiator}
+            sorted_crew = sorted(crew.items(), key=lambda kv: (kv[1], kv[0]))
+            num = 1
+            for i in range(len(sorted_crew)):
+                if sorted_crew[i][1] == sorted_crew[0][1]:
+                    num = i + 1  # 并列最低的个数
+            if num == 1:  # 升级最低的
+                target = sorted_crew[0][0]
+            else:  # 随机挑选最低的
+                target_num = random.randint(0, num - 1)
+                target = sorted_crew[target_num][0]
+            if target == 'a':
+                self.team_model.assistant += 1
+            elif target == 'd':
+                self.team_model.doctor += 1
+            elif target == 's':
+                self.team_model.scout += 1
+            elif target == 'n':
+                self.team_model.negotiator += 1
+            #  TODO 扣钱

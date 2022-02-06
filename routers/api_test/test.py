@@ -101,6 +101,15 @@ def all_receive_offer(db: Session = Depends(get_db), save_model=Depends(utils.ge
         print(str(club.name) + "完成")
 
 
+@router.get('/all-improve-crew')
+def all_improve_crew(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
+    for club in clubs:
+        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+        transfer_club.improve_crew()
+        print(str(club.name) + "完成")
+
+
 @router.get('/incoming-games-info')
 async def get_incoming_games_info(db: Session = Depends(get_db),
                                   save_model=Depends(utils.get_current_save)):
