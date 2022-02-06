@@ -68,6 +68,8 @@ class NextTurner:
             self.eve_starter(total_events['eve'])
         if 'transfer prepare' in total_events.keys():
             self.transfer_prepare_starter(total_events['transfer prepare'])
+        if 'crew improve' in total_events.keys():
+            self.crew_improve_starter(total_events['crew improve'])
         if 'transfer' in total_events.keys():
             self.transfer_starter(total_events['transfer'])
         if 'game_generation' in total_events.keys():
@@ -160,6 +162,19 @@ class NextTurner:
         for transfer_club in transfer_club_list:
             transfer_club.judge_buy(self.save_id)  # 按照顺序：调整工资、挂牌、寻找目标 TODO：1`50
         self.db.commit()
+
+    def crew_improve_starter(self, crew_improve: list):
+        transfer_club_list = []
+        clubs: List[models.Club] = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
+        for club in clubs:
+            if club.id != self.save_model.player_club_id:
+                transfer_club = transfer_app.Club(
+                    db=self.db, club_id=club.id,
+                    date=self.save_model.date, season=self.save_model.season,
+                    club_model=club)
+                transfer_club_list.append(transfer_club)
+        for transfer_club in transfer_club_list:
+            transfer_club.improve_crew()
 
     def transfer_starter(self, transfer: list):
         """

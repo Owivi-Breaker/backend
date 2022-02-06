@@ -707,6 +707,15 @@ class CalendarGenerator:
         transfer_prepare_dict = {"transfer prepare": []}
         self.add_dict(str(date), transfer_prepare_dict)
 
+    def generate_crew_improve_days(self):
+        """
+        职员升级日
+        """
+        year, month, day = self.save_model.date.split('-')
+        date = Date(int(year), 9, 1)
+        crew_improve_dict = {"crew improve": []}
+        self.add_dict(str(date), crew_improve_dict)
+
     def generate_transfer_days(self):
         """
         生成转会日
