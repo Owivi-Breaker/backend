@@ -35,6 +35,7 @@ class GamePvE(game_eve_app.GameEvE):
         self.goal_record: List[schemas.GoalRecord] = self.str2goal_record(self.game_pve_models.goal_record)  # 进球记录
         logger.info(self.goal_record)
         self.winner_id = 0
+        self.ingame_time = 0
 
         self.total_turns = 50 if not self.is_extra_time else 70  # 总比赛回合数
         # 默认lteam为玩家球队 rteam为电脑球队

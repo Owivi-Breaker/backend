@@ -28,7 +28,6 @@ class Team:
         self.players: List[game_eve_app.Player] = []  # 球员列表
         self.init_players()
         self.score: int = 0  # 本方比分
-        self.ingame_time = 0
 
         # self.data记录俱乐部场上数据
         self.data = dict()
