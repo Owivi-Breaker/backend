@@ -1,24 +1,20 @@
 from sqlalchemy import create_engine, Index
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.exc import OperationalError
-
+from sqlalchemy_utils import database_exists, create_database
 from core.config import settings
 from models.base import Base
 import models
 from utils import logger
 
-engine = create_engine(
-    settings.DB_URL["sqlite"], connect_args={"check_same_thread": False}
-)
-
-# engine = create_engine(settings.DB_URL["MySQLLocal"], encoding="utf-8")
-
+engine = create_engine(settings.DB_URL["MySQL"], encoding='utf-8')
+# 建数据库
+if not database_exists(engine.url):
+    create_database(engine.url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 ScopedSession = scoped_session(SessionLocal)  # 使用安全的线程
-
 Base.metadata.create_all(bind=engine)
-
 # 构建索引 老存档只需运行一次即可
 try:
     player_id_index = Index('player_id_idx', models.GamePlayerData.player_id)
@@ -45,14 +41,6 @@ def get_db():
         raise
     finally:
         db.close()
-
-
-# def get_db():
-#     db = SessionFactory()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
 
 
 def get_session():

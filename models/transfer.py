@@ -1,5 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, Integer, String
 from models.base import Base
 
 
@@ -24,4 +23,4 @@ class Offer(Base):
     target_club_id = Column(Integer, ForeignKey('club.id'))
     offer_price = Column(Integer)
     season = Column(Integer)
-    status = Column(String)
+    status = Column(String(2))
