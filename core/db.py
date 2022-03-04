@@ -8,7 +8,7 @@ from models.base import Base
 import models
 from utils import logger
 
-engine = create_engine(settings.DB_URL["MySQL"], encoding='utf-8')
+engine = create_engine(settings.DB_URL["MySQLLocal"], encoding='utf-8')
 # 建数据库
 if not database_exists(engine.url):
     create_database(engine.url)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Index
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Index, TEXT
 from sqlalchemy.orm import relationship
 from models.base import Base
 from game_configs.game_config import Location
@@ -14,7 +14,7 @@ class Game(Base):
     type = Column(String(1000))
     date = Column(String(1000))
     season = Column(String(1000))
-    script = Column(String(5000))
+    script = Column(TEXT)
     goal_record = Column(String(2000))
 
     teams = relationship("GameTeamInfo", backref="game")

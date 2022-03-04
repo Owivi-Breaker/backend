@@ -35,7 +35,6 @@ class GamePvE(game_eve_app.GameEvE):
         self.goal_record: List[schemas.GoalRecord] = self.str2goal_record(self.game_pve_models.goal_record)  # 进球记录
         logger.info(self.goal_record)
         self.winner_id = 0
-        self.ingame_time = 0
 
         self.total_turns = 50 if not self.is_extra_time else 70  # 总比赛回合数
         # 默认lteam为玩家球队 rteam为电脑球队
@@ -45,81 +44,13 @@ class GamePvE(game_eve_app.GameEvE):
             else:
                 self.rteam = game_pve_app.TeamPvE(db=self.db, game=self, team_pve_model=t)
 
-    def add_script(self, text: str, status: str):
+    def add_script(self, text: str, status: str) -> None:
         """
         重写方法 添加解说
         :param text: 解说词
+        :param status: 解说状态
         """
-        grade = '@' + str(random.randint(1, 5))
-        if status == 's':  # 开始
-            str_time = '@00:00'
-            self.ingame_time = 0
-            self.script += text + str_time + grade + '\n'
-            self.new_script += text + str_time + grade + '\n'
-        elif status == 'as':  # 加时开始
-            str_time = '@090:00'
-            self.ingame_time = 9000
-            self.script += text + str_time + grade + '\n'
-            self.new_script += text + str_time + grade + '\n'
-        elif status == 'e':  # 结束
-            str_time = '@90:00'
-            self.script += text + str_time + grade + '\n'
-            self.new_script += text + str_time + grade + '\n'
-        elif status == 'ae':
-            str_time = '@120:00'  # 加时结束
-            self.script += text + str_time + grade + '\n'
-            self.new_script += text + str_time + grade + '\n'
-        elif status == 'd':  # 两段动作
-            happening_time = random.randint(self.ingame_time + 25, self.ingame_time + 100)
-            str_time = str(happening_time)
-            if int(str_time[-2:]) > 60:  # 60进制
-                happening_time += 40
-            str_time = str(happening_time)
-            cstr_time = str_time
-            if len(str_time) == 1:
-                cstr_time = "000" + str_time
-            if len(str_time) == 2:
-                cstr_time = "00" + str_time
-            if len(str_time) == 3:
-                cstr_time = "0" + str_time
-            self.ingame_time = happening_time
-            if len(str_time) < 5:  # 100分钟以内
-                str_sec = cstr_time[-2:]
-                str_min = cstr_time[:2]
-                str_time = str_min + ":" + str_sec
-            else:
-                str_sec = cstr_time[-2:]
-                str_min = cstr_time[:3]
-                str_time = str_min + ":" + str_sec
-            self.script += text + '@' + str_time + grade + '\n'
-            self.new_script += text + '@' + str_time + grade + '\n'
-        elif status == 'c':  # 连续动作,时间间隔短
-            happening_time = random.randint(self.ingame_time + 1, self.ingame_time + 4)
-            str_time = str(happening_time)
-            if int(str_time[-2:]) > 60:  # 60进制
-                happening_time += 40
-            str_time = str(happening_time)
-            cstr_time = str_time
-            if len(str_time) == 1:
-                cstr_time = "000" + str_time
-            if len(str_time) == 2:
-                cstr_time = "00" + str_time
-            if len(str_time) == 3:
-                cstr_time = "0" + str_time
-            self.ingame_time = happening_time
-            if len(str_time) < 5:  # 100分钟以内
-                str_sec = cstr_time[-2:]
-                str_min = cstr_time[:2]
-                str_time = str_min + ":" + str_sec
-            else:
-                str_sec = cstr_time[-2:]
-                str_min = cstr_time[:3]
-                str_time = str_min + ":" + str_sec
-            self.script += text + '@' + str_time + grade + '\n'
-            self.new_script += text + '@' + str_time + grade + '\n'
-        elif status == 'n':  # 纯解说
-            self.script += text + grade + '\n'
-            self.new_script += text + grade + '\n'
+        self.new_script += text + '@' + status + '\n'
 
     def judge_attacker(self):
         """
@@ -153,6 +84,64 @@ class GamePvE(game_eve_app.GameEvE):
             return self.lteam, self.rteam
         else:
             return self.rteam, self.lteam
+
+    def deal_new_script(self) -> None:
+        """
+        处理新解说
+        """
+        print(self.new_script)
+        turns: int = self.game_pve_models.turns - 1
+        ingame_time = turns * 108 // 60 * 100 + turns * 108 % 60
+        temp = self.new_script.split('\n')
+        for i in range(len(temp)):
+            if temp[i] == '':
+                continue
+            text, status = tuple(temp[i].split("@"))
+            grade = '@' + str(random.randint(1, 5))
+            if status == 's':  # 开始
+                str_time = '@00:00'
+                ingame_time = 0
+                temp[i] = text + str_time + grade + '\n'
+            elif status == 'as':  # 加时开始
+                str_time = '@090:00'
+                ingame_time = 9000
+                temp[i] = text + str_time + grade + '\n'
+            elif status == 'e':  # 结束
+                str_time = '@90:00'
+                temp[i] = text + str_time + grade + '\n'
+            elif status == 'ae':
+                str_time = '@120:00'  # 加时结束
+                temp[i] = text + str_time + grade + '\n'
+            elif status == "d" or status == "c":
+                if status == "d":
+                    happening_time = random.randint(ingame_time + 30, ingame_time + 90)
+                else:
+                    happening_time = random.randint(ingame_time + 1, ingame_time + 4)
+                str_time = str(happening_time)
+                if int(str_time[-2:]) > 60:  # 60进制
+                    happening_time += 40
+                str_time = str(happening_time)
+                cstr_time = str_time
+                if len(str_time) == 1:
+                    cstr_time = "000" + str_time
+                if len(str_time) == 2:
+                    cstr_time = "00" + str_time
+                if len(str_time) == 3:
+                    cstr_time = "0" + str_time
+                ingame_time = happening_time
+                if len(str_time) < 5:  # 100分钟以内
+                    str_sec = cstr_time[-2:]
+                    str_min = cstr_time[:2]
+                    str_time = str_min + ":" + str_sec
+                else:
+                    str_sec = cstr_time[-2:]
+                    str_min = cstr_time[:3]
+                    str_time = str_min + ":" + str_sec
+                temp[i] = text + '@' + str_time + grade + '\n'
+            elif status == 'n':  # 纯解说
+                temp[i] = text + grade + '\n'
+        self.new_script = ''.join(temp)
+        self.script += self.new_script + '\n'
 
     def start_one_turn(self) -> Tuple[bool, int]:
         """
@@ -213,6 +202,7 @@ class GamePvE(game_eve_app.GameEvE):
         # 记录球员实时评分
         self.rate()
         # 保存到临时表
+        self.deal_new_script()
         self.save_temporary_table(exchange_ball, original_score)
         return True, 0
 
@@ -243,6 +233,7 @@ class GamePvE(game_eve_app.GameEvE):
             self.add_script('平局', 'n')
 
         self.rate()  # 球员评分
+        self.deal_new_script()
         self.save_temporary_table(exchange_ball, original_score)  # 保存到临时表
         game_id = self.save_game_data()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变

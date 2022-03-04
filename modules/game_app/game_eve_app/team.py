@@ -332,11 +332,11 @@ class Team:
              defender: defender.get_capa('interception')})
         if win_player == attacker:
             attacker.plus_data('dribble_success')
-            self.add_script('{}过掉了{}'.format(attacker.name, defender.name), 'd')
+            self.add_script('{}过掉了{}'.format(attacker.name, defender.name), 'c')
             return True
         else:
             defender.plus_data('tackle_success')
-            self.add_script('{}阻截了{}的进攻'.format(defender.name, attacker.name), 'd')
+            self.add_script('{}阻截了{}的进攻'.format(defender.name, attacker.name), 'c')
             return False
 
     def sprint_dribble_and_block(self, attackers: List[game_eve_app.Player],
@@ -368,10 +368,10 @@ class Team:
                 defender.plus_data('tackle_success')
                 attackers.remove(attacker)
             if not attackers:
-                self.add_script('{}抢到皮球'.format(win_player.name), 'd')
+                self.add_script('{}抢到皮球'.format(win_player.name), 'c')
                 return False, win_player
             elif not defenders:
-                self.add_script('{}过掉了{}'.format(win_player.name, defender.name), 'd')
+                self.add_script('{}过掉了{}'.format(win_player.name, defender.name), 'c')
                 return True, win_player
             else:
                 pass
@@ -389,7 +389,7 @@ class Team:
         if not attackers:
             return False, random.choice(defenders)  # 随机选一个防守球员持球
 
-        self.add_script('球员们尝试争顶', 'd')
+        self.add_script('球员们尝试争顶', 'c')
         average_stamina = self.get_rival_team().get_average_capability('stamina')
         while True:
             attacker = random.choice(attackers)
@@ -455,6 +455,7 @@ class Team:
         """
         self.plus_data('wing_cross')
         self.add_script('\n{}尝试下底传中'.format(self.name), 'd')
+
         # 边锋或边卫过边卫
         while True:
             flag = utils.is_happened_by_pro(0.5)
@@ -473,7 +474,7 @@ class Team:
         state, win_player = self.sprint_dribble_and_block(wings, wing_backs)  # 一对一或一对多
         if state:
             # 边锋/卫传中
-            self.add_script('{}一脚起球传中'.format(win_player.name), 'd')
+            self.add_script('{}一脚起球传中'.format(win_player.name), 'c')
             state = self.pass_ball(win_player, rival_team.get_average_capability('passing'), is_long_pass=True)
             if state:
                 # 争顶
