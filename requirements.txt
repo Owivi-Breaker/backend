@@ -12,3 +12,4 @@ python-multipart
 bcrypt
 pymysql
 numpy
+SQLAlchemy-Utils
