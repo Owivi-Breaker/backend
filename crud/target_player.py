@@ -56,7 +56,6 @@ def delete_target_by_player_id_n_buyer_id(db: Session, target_id: int, buyer_id:
     """
     根据指定球员id和买房俱乐部id删除目标球员实例
     """
-    db_target = db.query(models.TargetPlayer).filter(
-        and_(models.TargetPlayer.target_id == target_id,
-             models.TargetPlayer.buyer_id == buyer_id)).first()
+    db_target = db.query(models.TargetPlayer).filter(and_(models.TargetPlayer.target_id == target_id,
+                                                          models.TargetPlayer. buyer_id == buyer_id)).first()
     db.delete(db_target)

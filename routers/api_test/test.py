@@ -1,19 +1,11 @@
-from typing import List
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
-from core.db import engine, get_db, drop_all
-from pydantic import BaseModel
-import datetime
-import random
-import string
-import schemas
-import models
+
 import crud
-import game_configs
-from modules import generate_app, game_app, computed_data_app, next_turn_app, transfer_app
-from utils import logger, Date
 import utils
+from core.db import get_db, drop_all
+from modules import game_app, computed_data_app, transfer_app
+from utils import Date
 
 router = APIRouter()
 
@@ -56,7 +48,7 @@ async def quick_game(fake_season=1, save_id=1, db: Session = Depends(get_db)):
     return events
 
 
-@router.get('/all-try-sell')
+@router.get('/all-judge-on-sale2')
 def all_try_sell(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -65,7 +57,7 @@ def all_try_sell(db: Session = Depends(get_db), save_model=Depends(utils.get_cur
         print(str(club.name) + "完成")
 
 
-@router.get('/all-adjust-wage')
+@router.get('/all-adjust-finance1')
 def all_adjust_wage(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -74,7 +66,7 @@ def all_adjust_wage(db: Session = Depends(get_db), save_model=Depends(utils.get_
         print(str(club.name) + "完成")
 
 
-@router.get('/all-judge-buy')
+@router.get('/all-judge-buy3')
 def all_judge_buy(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -83,7 +75,7 @@ def all_judge_buy(db: Session = Depends(get_db), save_model=Depends(utils.get_cu
         print(str(club.name) + "完成")
 
 
-@router.get('/all-make-offer')
+@router.get('/all-make-offer6')
 def all_make_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -91,17 +83,17 @@ def all_make_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_c
         transfer_club.make_offer(save_id=save_model.id)
         print(str(club.name) + "完成")
 
-
-@router.get('/all-receive-offer')
+@router.get('/all-receive-offer5')
 def all_receive_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
-        transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
-        transfer_club.receive_offer(save_id=save_model.id)
-        print(str(club.name) + "完成")
+        if club.id != save_model.player_club_id:
+            transfer_club = transfer_app.Club(db=db, club_id=club.id, date=save_model.date, season=save_model.season)
+            transfer_club.receive_offer(save_id=save_model.id)
+            print(str(club.name) + "完成")
 
 
-@router.get('/all-improve-crew')
+@router.get('/all-improve-crew4')
 def all_improve_crew(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:

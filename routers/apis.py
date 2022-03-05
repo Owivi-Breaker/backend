@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from routers.api_v1 import game, player, club, league, game_pve, login, next_turn, user
+from routers.api_v1 import game, player, club, league, game_pve, login, next_turn, user, transfer
 from routers.api_test import test
 
 import utils
@@ -37,4 +37,8 @@ api_router.include_router(
 
 api_router.include_router(
     next_turn.router, prefix='/v1/next-turn', tags=['next turn api'],
+    dependencies=[Depends(utils.verify_token)])
+
+api_router.include_router(
+    transfer.router, prefix='/v1/transfer', tags=['transfer api'],
     dependencies=[Depends(utils.verify_token)])
