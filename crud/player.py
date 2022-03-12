@@ -1,7 +1,8 @@
+import string
 import time
 from typing import List
 
-from sqlalchemy import and_, desc
+from sqlalchemy import and_, desc, asc
 from sqlalchemy.orm import Session
 
 import crud
@@ -66,24 +67,23 @@ def get_players_by_save(db: Session, save_id: int, skip: int, limit: int) -> Lis
     return player_list[skip:skip + limit]
 
 
-def get_on_sale_players_by_save(db: Session, save_id: int, offset: int, limit: int) -> List[models.Player]:
+def get_on_sale_players_by_save(db: Session, save_id: int, offset: int, limit: int, order: int, attri: string) -> List[
+    models.Player]:
     """
     获取指定存档全部被挂牌球员db实例
     """
-    player_list = db.query(models.Player).join(models.Club,models.League).\
-        filter(models.Player.on_sale == 1 and models.League.save_id == save_id).\
-        order_by(desc('age')).limit(limit).offset(offset).all()
+    if order == "0":
+        print("0")
+        player_list = db.query(models.Player).join(models.Club, models.League). \
+            filter(models.Player.on_sale == 1 and models.League.save_id == save_id). \
+            order_by(asc(attri)).limit(limit).offset(offset).all()
+    else:
+        print("1")
+        player_list = db.query(models.Player).join(models.Club, models.League). \
+            filter(models.Player.on_sale == 1 and models.League.save_id == save_id). \
+            order_by(desc(attri)).limit(limit).offset(offset).all()
+
     return player_list
-    # db_clubs = crud.get_clubs_by_save(db=db, save_id=save_id)
-    # player_list: List[models.Player] = []
-    # on_sale_player_list:List[models.Player] = []
-    # for club in db_clubs:
-    #     player_list.extend(club.players)
-    # for player in player_list:
-    #     if player.on_sale:
-    #         on_sale_player_list.append(player)
-    # print("查询完成")
-    # return on_sale_player_list[skip:skip+limit]
 
 
 # TODO 需要重写
