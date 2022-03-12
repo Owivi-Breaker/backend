@@ -1,3 +1,4 @@
+import string
 from typing import List
 
 from fastapi import APIRouter, Depends
@@ -23,8 +24,6 @@ def make_offer_by_user(target_player_id: int, offer_price: int, db: Session = De
                                           offer_price=offer_price)
 
 
-# TODO 两个接口，一个从offer表中查结果，一个拿到接近俱乐部所有被挂牌的球员
-
 @router.get('/negotiate-wage')
 # 玩家与球员协商工资
 def negotiate_wage(target_player_id: int, offer_wage: int, db: Session = Depends(get_db),
@@ -45,12 +44,17 @@ def negotiate_wage(target_player_id: int, offer_wage: int, db: Session = Depends
 
 
 @router.get('/get-on-sale-players')
-# 获取近似俱乐部所有被挂牌的球员
-def get_on_sale_players(offset: int, limit: int,
+def get_on_sale_players(offset: int, limit: int, attri: str = "id", order=0,
                         db: Session = Depends(get_db),
                         save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
+    """
+    获取所有被挂牌的球员
+    attri：排序标签
+    order：0升序，1降序
+    """
     db_players: List[models.Player] = crud.get_on_sale_players_by_save(db=db, save_id=save_model.id,
-                                                                       offset=offset, limit=limit)
+                                                                       offset=offset, limit=limit, order=order,
+                                                                       attri=attri)
     player_show: List[schemas.PlayerShow] = []
     for player_model in db_players:
         player_info = computed_data_app.ComputedPlayer(player_id=player_model.id,
@@ -63,7 +67,8 @@ def get_on_sale_players(offset: int, limit: int,
 
 @router.get('/get-negotiate-list')
 # 获取待谈判列表
-def get_negotiate_list(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)) ->List[schemas.PlayerShow]:
+def get_negotiate_list(db: Session = Depends(get_db),
+                       save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
     player_show: List[schemas.PlayerShow] = []
     negotiate_list = crud.get_unnegotiated_offers_by_player(db=db, save_id=save_model.id,
                                                             buyer_id=save_model.player_club_id,
@@ -75,4 +80,3 @@ def get_negotiate_list(db: Session = Depends(get_db), save_model=Depends(utils.g
                                                        date=save_model.date).get_show_data()
         player_show.append(player_info)
     return player_show
-
