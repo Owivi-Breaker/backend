@@ -7,7 +7,7 @@ from core.config import settings
 from models.base import Base
 import models
 from utils import logger
-import dburl
+from core import dburl
 
 engine = create_engine(settings.DB_URL[dburl.db_url], encoding='utf-8')
 # 建数据库
