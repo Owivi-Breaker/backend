@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 import crud
 import schemas
+import game_configs
 from modules.game_app import game_eve_app
 from modules.game_app import game_pve_app
 from utils import logger
@@ -159,15 +160,30 @@ class GamePvE(game_eve_app.GameEvE):
                 tactic_name = self.player_tactic
             # 玩家进攻
             if tactic_name == 'wing_cross':
-                exchange_ball = hold_ball_team.wing_cross(no_ball_team)
+                if hold_ball_team.get_location_players((game_configs.Location.LW, game_configs.Location.LB)) or hold_ball_team.get_location_players((game_configs.Location.RW, game_configs.Location.RB)):
+                    exchange_ball = hold_ball_team.wing_cross(no_ball_team)
+                else:
+                    return True, 0
             elif tactic_name == 'under_cutting':
-                exchange_ball = hold_ball_team.under_cutting(no_ball_team)
+                if hold_ball_team.get_location_players((game_configs.Location.LW, game_configs.Location.RW)):
+                    exchange_ball = hold_ball_team.under_cutting(no_ball_team)
+                else:
+                    return True, 0
             elif tactic_name == 'pull_back':
-                exchange_ball = hold_ball_team.pull_back(no_ball_team)
+                if hold_ball_team.get_location_players((game_configs.Location.LW, game_configs.Location.RW)):
+                    exchange_ball = hold_ball_team.pull_back(no_ball_team)
+                else:
+                    return True, 0
             elif tactic_name == 'middle_attack':
-                exchange_ball = hold_ball_team.middle_attack(no_ball_team)
+                if hold_ball_team.get_location_players((game_configs.Location.CM,)):
+                    exchange_ball = hold_ball_team.middle_attack(no_ball_team)
+                else:
+                    return True, 0
             elif tactic_name == 'counter_attack' and counter_attack_permitted:
-                exchange_ball = hold_ball_team.counter_attack(no_ball_team)
+                if hold_ball_team.get_location_players((game_configs.Location.GK,game_configs.Location.CB)):
+                    exchange_ball = hold_ball_team.counter_attack(no_ball_team)
+                else:
+                    return True, 0
             else:
                 logger.error('战术名称{}错误或不可用！'.format(self.player_tactic))
                 exchange_ball = hold_ball_team
