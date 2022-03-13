@@ -70,7 +70,7 @@ def get_players_by_save(db: Session, save_id: int, skip: int, limit: int) -> Lis
 def get_on_sale_players_by_save(db: Session, save_id: int, offset: int, limit: int, order: int, attri: string) -> List[
     models.Player]:
     """
-    获取指定存档全部被挂牌球员db实例
+    根据属性，获取一定数量指定存档被挂牌球员db实例
     """
     if order == "0":
         print("0")
@@ -82,6 +82,18 @@ def get_on_sale_players_by_save(db: Session, save_id: int, offset: int, limit: i
         player_list = db.query(models.Player).join(models.Club, models.League). \
             filter(models.Player.on_sale == 1 and models.League.save_id == save_id). \
             order_by(desc(attri)).limit(limit).offset(offset).all()
+
+    return player_list
+
+
+def get_all_on_sale_players_by_save(db: Session, save_id: int) -> \
+        List[
+            models.Player]:
+    """
+   获取所有指定存档被挂牌球员db实例
+    """
+    player_list = db.query(models.Player).join(models.Club, models.League). \
+        filter(models.Player.on_sale == 1 and models.League.save_id == save_id).all()
 
     return player_list
 

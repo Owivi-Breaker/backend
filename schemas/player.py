@@ -56,6 +56,7 @@ class PlayerCreate(BaseModel):
     free_kick_limit: int
     stamina_limit: int
     goalkeeping_limit: int
+    values:float
 
     class Config:
         orm_mode = True

@@ -126,6 +126,7 @@ class PlayerGenerator:
         """
         return random.randint(2, 30)
 
+
     def get_capa_potential(self, local_nationality: str = '', ) -> int:
         """
         生成潜力值
@@ -185,7 +186,8 @@ class PlayerGenerator:
 
             # 正态分布获取一个预期的综合能力值
             target_lo_capa = min(self.get_capa(self.data['translated_nationality']), 88)
-
+            #  根据综合能力值计算初始身价
+            self.data['values'] = target_lo_capa**3/70
             while True:
                 # 模拟球员按照位置权重成长的过程
                 capa_name = utils.select_by_pro(original_location['weight'])
@@ -215,6 +217,8 @@ class PlayerGenerator:
         else:
             # 生成年轻球员
             self.generate_data()
+            #  默认身价
+            self.data['values'] = 10
             # 为球员选择先天位置，并增强相应能力
             original_location = random.choice(game_configs.capa_potential)
             self.data[original_location['name'] + '_num'] = 1

@@ -324,7 +324,10 @@ class GameEvE:
         # region  剩余体力保存
         self.update_player(player.player_model,
                            attri={'real_stamina': player.stamina, 'last_game_date': self.date})
-
+        # endregion
+        # region 比赛结束计算身价
+        self.update_player(player.player_model,
+                           attri={'values': player.computed_player.get_values()})
         # endregion
 
     @staticmethod

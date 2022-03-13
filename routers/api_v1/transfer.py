@@ -65,6 +65,21 @@ def get_on_sale_players(offset: int, limit: int, attri: str = "id", order=0,
     return player_show
 
 
+@router.get('/get-all-on-sale-players')
+def get_all_on_sale_players(
+                            db: Session = Depends(get_db),
+                            save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
+    db_players: List[models.Player] = crud.get_all_on_sale_players_by_save(db=db, save_id=save_model.id)
+    player_show: List[schemas.PlayerShow] = []
+    for player_model in db_players:
+        player_info = computed_data_app.ComputedPlayer(player_id=player_model.id,
+                                                       db=db,
+                                                       season=save_model.season,
+                                                       date=save_model.date).get_show_data()
+        player_show.append(player_info)
+    return player_show
+
+
 @router.get('/get-negotiate-list')
 # 获取待谈判列表
 def get_negotiate_list(db: Session = Depends(get_db),

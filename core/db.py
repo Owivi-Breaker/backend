@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, Index
+from sqlalchemy import create_engine, Index, table
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Boolean
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.exc import OperationalError
@@ -22,6 +23,11 @@ try:
     player_id_index.create(bind=engine)
 except OperationalError:
     logger.warning("player_id_idx already exists")
+# try:
+#     values = Column('values', Float)
+#     models.Player.__table__.append_column(values)
+# except OperationalError:
+#     logger.warning("add column failed")
 
 
 def drop_all():

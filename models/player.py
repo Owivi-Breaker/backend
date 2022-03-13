@@ -67,4 +67,6 @@ class Player(Base):
     game_data = relationship('GamePlayerData', backref='player', lazy='select')
 
     on_sale = Column(Boolean, default=False)
+    values = Column(Float,default=10.0)
 # endregion
+

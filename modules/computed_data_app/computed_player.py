@@ -255,7 +255,7 @@ class ComputedPlayer:
         e_season = end_season if end_season else self.season
         game_player_data: List[models.GamePlayerData] = [
             game_data for game_data in self.player_model.game_data if \
-            s_season <= game_data.season <= e_season]
+            s_season <= int(game_data.season) <= e_season]
 
         return game_player_data
 
