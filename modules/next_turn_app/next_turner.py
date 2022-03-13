@@ -146,6 +146,7 @@ class NextTurner:
                 game=game, date=self.save_model.date, season=self.save_model.season)
 
     def transfer_prepare_starter(self, transfer_prepare: list):
+        logger.info("转会窗准备日")
         transfer_club_list = []
         clubs: List[models.Club] = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
         for club in clubs:
@@ -164,6 +165,7 @@ class NextTurner:
         self.db.commit()
 
     def crew_improve_starter(self, crew_improve: list):
+        logger.info("职员升级日")
         transfer_club_list = []
         clubs: List[models.Club] = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
         for club in clubs:
@@ -180,6 +182,7 @@ class NextTurner:
         """
         转会入口
         """
+        logger.info("转会窗开放")
         transfer_club_list: List[transfer_app.Club] = []
         clubs = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
         # 剔除玩家俱乐部

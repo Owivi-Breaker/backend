@@ -27,6 +27,8 @@ class CalendarGenerator:
         self.generate_league_games()
         self.generate_cup_games(game_type="cup32to16")
         self.generate_champions_league_games(game_type='champions_group')
+        self.generate_transfer_prepare_days()
+        self.generate_crew_improve_days()
         self.generate_transfer_days()
         self.generate_next_calendar()
         self.generate_uncertain_games()
@@ -703,9 +705,13 @@ class CalendarGenerator:
         转会窗前准备日
         """
         year, month, day = self.save_model.date.split('-')
-        date = Date(int(year), 5, 31)
+        date1 = Date(int(year)+1, 5, 31)
+        date2 = Date(int(year), 12, 31)
         transfer_prepare_dict = {"transfer prepare": []}
-        self.add_dict(str(date), transfer_prepare_dict)
+        self.add_dict(str(date1), transfer_prepare_dict)
+        logger.info("生成夏窗准备日")
+        self.add_dict(str(date2), transfer_prepare_dict)
+        logger.info("生成冬窗准备日")
 
     def generate_crew_improve_days(self):
         """
@@ -726,12 +732,14 @@ class CalendarGenerator:
         for date_str in date_range:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)
+        logger.info("生成夏窗")
         # 冬窗
         date_range = utils.date_range(
             int(year) + 1, 1, 1, int(year) + 1, 1, 31)
         for date_str in date_range:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)
+        logger.info("生成冬窗")
 
     def generate_next_calendar(self):
         """

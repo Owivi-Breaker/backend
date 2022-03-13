@@ -252,6 +252,7 @@ class GameEvE:
         """
         for player in self.lteam.players:
             self.update_player_data(player)
+        self.db.commit()
         for player in self.rteam.players:
             self.update_player_data(player)
         # self.db.commit() # 感觉不用加
@@ -328,6 +329,7 @@ class GameEvE:
         # region 比赛结束计算身价
         self.update_player(player.player_model,
                            attri={'values': player.computed_player.get_values()})
+        # self.db.commit()
         # endregion
 
     @staticmethod
@@ -381,7 +383,7 @@ class GameEvE:
             'type': self.type,
             'created_time': created_time,
             'date': self.date,
-            'season': self.season,
+            'season': str(self.season),
             'script': self.script,
             'mvp': self.get_highest_rating_player().player_model.id,
             'save_id': self.save_id,
