@@ -24,9 +24,9 @@
 
 ## 一些截图
 
-![image-20220314195410500](C:\Users\Tyeah\AppData\Roaming\Typora\typora-user-images\image-20220314195410500.png)
+![image-20220314195410500](https://markdown-1303167219.cos.ap-shanghai.myqcloud.com/image-20220314195410500.png)
 
-![image-20220314200203112](C:\Users\Tyeah\AppData\Roaming\Typora\typora-user-images\image-20220314200203112.png)
+![image-20220314200203112](https://markdown-1303167219.cos.ap-shanghai.myqcloud.com/image-20220314200203112.png)
 
 ![image-20220314204749189](https://markdown-1303167219.cos.ap-shanghai.myqcloud.com/image-20220314204749189.png)
 
