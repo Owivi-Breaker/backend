@@ -1,3 +1,5 @@
+from random import randint
+
 import numpy as np
 
 from utils import utils, logger
@@ -117,7 +119,9 @@ class Player:
         for offer in offer_list:
             if offer.target_id == self.player_id:  # 找到玩家对这个球员的报价
                 offer_found = 1
-                if offer_wage > want_wage:
+                rate = 100 - (want_wage - offer_wage)  # 谈判成功概率
+                i = randint(1, 100)
+                if i < rate:
                     crud.update_player(
                         db=self.db, player_id=self.player_id,
                         attri={"club_id": offer.buyer_id,

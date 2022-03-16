@@ -30,6 +30,8 @@ class CalendarGenerator:
         self.generate_transfer_prepare_days()
         self.generate_crew_improve_days()
         self.generate_transfer_days()
+        self.generate_transfer_end_days()
+        self.generate_offer_expire_days()
         self.generate_next_calendar()
         self.generate_uncertain_games()
         self.generate_promote_n_relegate_day()
@@ -705,7 +707,7 @@ class CalendarGenerator:
         转会窗前准备日
         """
         year, month, day = self.save_model.date.split('-')
-        date1 = Date(int(year)+1, 5, 31)
+        date1 = Date(int(year) + 1, 5, 31)
         date2 = Date(int(year), 12, 31)
         transfer_prepare_dict = {"transfer prepare": []}
         self.add_dict(str(date1), transfer_prepare_dict)
@@ -722,20 +724,42 @@ class CalendarGenerator:
         crew_improve_dict = {"crew improve": []}
         self.add_dict(str(date), crew_improve_dict)
 
+    def generate_offer_expire_days(self):
+        """
+        未谈判报价过期日
+        """
+        year, month, day = self.save_model.date.split('-')
+        date1 = Date(int(year), 9, 1)
+        date2 = Date(int(year) + 1, 2, 1)
+        crew_improve_dict = {"offer expire": []}
+        self.add_dict(str(date1), crew_improve_dict)
+        self.add_dict(str(date2), crew_improve_dict)
+
+    def generate_transfer_end_days(self):
+        """
+        转会最后一天，只收不发
+        """
+        year, month, day = self.save_model.date.split('-')
+        date1 = Date(int(year), 8, 31)
+        date2 = Date(int(year) + 1, 1, 31)
+        crew_improve_dict = {"transfer end": []}
+        self.add_dict(str(date1), crew_improve_dict)
+        self.add_dict(str(date2), crew_improve_dict)
+
     def generate_transfer_days(self):
         """
         生成转会日
         """
         year, month, day = self.save_model.date.split('-')
         # 夏窗
-        date_range = utils.date_range(int(year), 6, 1, int(year), 8, 31)
+        date_range = utils.date_range(int(year), 6, 1, int(year), 8, 30)
         for date_str in date_range:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)
         logger.info("生成夏窗")
         # 冬窗
         date_range = utils.date_range(
-            int(year) + 1, 1, 1, int(year) + 1, 1, 31)
+            int(year) + 1, 1, 1, int(year) + 1, 1, 30)
         for date_str in date_range:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)

@@ -93,8 +93,8 @@ def get_players_by_attri(offset: int, limit: int, attri: str = "club_name", valu
 @router.get('/get-negotiate-list')
 # 获取待谈判列表
 def get_negotiate_list(db: Session = Depends(get_db),
-                       save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
-    player_show: List[schemas.PlayerShow] = []
+                       save_model=Depends(utils.get_current_save)):
+    result_show = []
     negotiate_list = crud.get_unnegotiated_offers_by_player(db=db, save_id=save_model.id,
                                                             buyer_id=save_model.player_club_id,
                                                             season=save_model.season)
@@ -103,5 +103,22 @@ def get_negotiate_list(db: Session = Depends(get_db),
                                                        db=db,
                                                        season=save_model.season,
                                                        date=save_model.date).get_show_data()
-        player_show.append(player_info)
-    return player_show
+        result_show.append({'player_info': player_info, 'offer': offer})
+    return result_show
+
+
+@router.get('/get-rejected-offers')
+# 获取待谈判列表
+def get_rejected_offers(db: Session = Depends(get_db),
+                        save_model=Depends(utils.get_current_save)) :
+    result_show = []
+    negotiate_list = crud.get_rejected_offers_by_player(db=db, save_id=save_model.id,
+                                                        buyer_id=save_model.player_club_id,
+                                                        season=save_model.season)
+    for offer in negotiate_list:
+        player_info = computed_data_app.ComputedPlayer(player_id=offer.target_id,
+                                                       db=db,
+                                                       season=save_model.season,
+                                                       date=save_model.date).get_show_data()
+        result_show.append({'player_info': player_info, 'offer': offer})
+    return result_show

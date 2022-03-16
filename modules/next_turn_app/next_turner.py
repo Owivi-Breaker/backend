@@ -70,8 +70,12 @@ class NextTurner:
             self.transfer_prepare_starter(total_events['transfer prepare'])
         if 'crew improve' in total_events.keys():
             self.crew_improve_starter(total_events['crew improve'])
+        if 'offer expire' in total_events.keys():
+            self.offer_expire_starter(total_events['offer expire'])
         if 'transfer' in total_events.keys():
             self.transfer_starter(total_events['transfer'])
+        if 'transfer end' in total_events.keys():
+            self.transfer_end_starter(total_events['transfer end'])
         if 'game_generation' in total_events.keys():
             self.game_generation_starter(total_events['game_generation'])
         if 'next_calendar' in total_events.keys():
@@ -178,6 +182,14 @@ class NextTurner:
         for transfer_club in transfer_club_list:
             transfer_club.improve_crew()
 
+    def offer_expire_starter(self, offer_expire: list):
+        logger.info("未谈判offer过期")
+        target_offers = crud.get_unnegotiated_offers_by_player(db=self.db, save_id=self.save_id,
+                                                               buyer_id=self.save_model.player_club_id,
+                                                               season=self.save_model.season)
+        for offer in target_offers:
+            offer.status = 'r'  # 状态改为r
+
     def transfer_starter(self, transfer: list):
         """
         转会入口
@@ -191,11 +203,26 @@ class NextTurner:
                 transfer_club = transfer_app.Club(db=self.db, club_id=club.id,
                                                   date=self.save_model.date, season=self.save_model.season)
                 transfer_club_list.append(transfer_club)
-
         for transfer_club in transfer_club_list:
             transfer_club.receive_offer(self.save_id)
-
             transfer_club.make_offer(self.save_id)
+
+    def transfer_end_starter(self, transfer: list):
+        """
+        转会入口
+        """
+        logger.info("转会窗最后一日")
+        transfer_club_list: List[transfer_app.Club] = []
+        clubs = crud.get_clubs_by_save(db=self.db, save_id=self.save_id)
+        # 剔除玩家俱乐部
+        for club in clubs:
+            if club.id != self.save_model.player_club_id:
+                transfer_club = transfer_app.Club(db=self.db, club_id=club.id,
+                                                  date=self.save_model.date, season=self.save_model.season)
+                transfer_club_list.append(transfer_club)
+        for transfer_club in transfer_club_list:
+            transfer_club.receive_offer(self.save_id)  # 转会窗最后一天，只接受offer，不发新的。
+
 
     def game_generation_starter(self, game_generation):
         """

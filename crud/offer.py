@@ -94,6 +94,21 @@ def get_unnegotiated_offers_by_player(db: Session, save_id: int, buyer_id: int, 
     return db_offers
 
 
+def get_rejected_offers_by_player(db: Session, save_id: int, buyer_id: int, season: int) -> List[models.Offer]:
+    """
+    获取玩家被拒绝的报价
+    :param save_id: 存档id
+    :param buyer_id: 买家家俱乐部id
+    :param season: 赛季
+    """
+    db_offers = db.query(models.Offer).filter(
+        and_(models.Offer.save_id == save_id,
+             models.Offer.buyer_id == buyer_id,
+             models.Offer.season == season,
+             models.Offer.status == 'r')).all()
+    return db_offers
+
+
 def delete_offer_by_id(db: Session, offer_id: int):
     db_offer = db.query(models.Offer).filter(models.Offer.id == offer_id).first()
     db.delete(db_offer)
