@@ -35,7 +35,7 @@ class GamePvEGenerator:
 
         data = dict()
         data['created_time'] = datetime.datetime.now()  # TODO created_time 字段都应由sqlalchemy自动生成
-        data['home_club_id'] = game['club_id'][0]
+        data['home_club_id'] = game['club_id'].split(',')[0]
         data['name'] = game['game_name']
         data['type'] = game['game_type']
         data['date'] = date
