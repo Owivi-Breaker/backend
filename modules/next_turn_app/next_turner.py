@@ -184,9 +184,9 @@ class NextTurner:
 
     def offer_expire_starter(self, offer_expire: list):
         logger.info("未谈判offer过期")
-        target_offers = crud.get_unnegotiated_offers_by_player(db=self.db, save_id=self.save_id,
-                                                               buyer_id=self.save_model.player_club_id,
-                                                               season=self.save_model.season)
+        target_offers = crud.get_offers_from_player_by_status(db=self.db, save_id=self.save_id,
+                                                              buyer_id=self.save_model.player_club_id,
+                                                              season=self.save_model.season, status='n')
         for offer in target_offers:
             offer.status = 'r'  # 状态改为r
 
@@ -222,7 +222,6 @@ class NextTurner:
                 transfer_club_list.append(transfer_club)
         for transfer_club in transfer_club_list:
             transfer_club.receive_offer(self.save_id)  # 转会窗最后一天，只接受offer，不发新的。
-
 
     def game_generation_starter(self, game_generation):
         """

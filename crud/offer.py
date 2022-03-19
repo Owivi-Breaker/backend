@@ -79,18 +79,20 @@ def get_active_offers_by_club(db: Session, save_id: int, buyer_id: int, season: 
     return db_offers
 
 
-def get_unnegotiated_offers_by_player(db: Session, save_id: int, buyer_id: int, season: int) -> List[models.Offer]:
+def get_offers_from_player_by_status(db: Session, save_id: int, buyer_id: int, season: int, status: str) -> List[
+    models.Offer]:
     """
-    获取玩家还未进行工资谈判的报价
+    根据状态获取玩家报价
     :param save_id: 存档id
     :param buyer_id: 买家家俱乐部id
     :param season: 赛季
+    :param status: 状态 r,s,w,u
     """
     db_offers = db.query(models.Offer).filter(
         and_(models.Offer.save_id == save_id,
              models.Offer.buyer_id == buyer_id,
              models.Offer.season == season,
-             models.Offer.status == 'n')).all()
+             models.Offer.status == status)).all()
     return db_offers
 
 

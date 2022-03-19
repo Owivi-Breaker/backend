@@ -105,21 +105,27 @@ class Player:
         offer_price = np.random.normal(offer_price, offer_price // 6)
         return offer_price
 
-    def negotiate_wage(self, offer_wage: int, save_id, buyer_club_id) -> int:
+    def negotiate_wage(self, offer_wage: float, save_id, buyer_club_id) -> int:
         """
         玩家与球员谈判工资
         成功则完成球员交易且返回1
         工资不满足返回0
         offer不存在返回2
         """
-        want_wage = np.random.normal(self.wanna_wage(), 2)
+        want_wage = np.random.normal(self.wanna_wage(), self.wanna_wage()/5)
+        if want_wage < 0:
+            want_wage = self.wanna_wage()
         offer_found = 0
         offer_list: List[models.Offer] = crud.get_offers_by_buyer(
             db=self.db, save_id=save_id, buyer_id=buyer_club_id, season=self.season)  # 查找玩家发出的所有报价
         for offer in offer_list:
             if offer.target_id == self.player_id:  # 找到玩家对这个球员的报价
                 offer_found = 1
-                rate = 90-((want_wage-offer_wage)/want_wage*100)  # 谈判成功概率
+                logger.info(want_wage)
+                rate = 90 - ((want_wage - offer_wage) / want_wage * 100)  # 谈判成功概率
+                if offer_wage <= 0 or rate < 0:
+                    rate = 0
+                logger.info(rate)
                 i = randint(1, 100)
                 if i < rate:
                     crud.update_player(
@@ -128,6 +134,7 @@ class Player:
                                "on_sale": False})  # 修改球员所属俱乐部
                     self.adjust_wage(real_wage=offer_wage)  # 修改球员工资
                     offer.status = 's'  # 交易完成
+                    # TODO 钱
                     return 1
                 else:
                     return 0  # 工资不满足要求

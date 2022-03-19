@@ -17,7 +17,25 @@ router = APIRouter()
 
 @router.get('/make-offer-by-user')  # 玩家向球员报价
 def make_offer_by_user(target_player_id: int, offer_price: int, db: Session = Depends(get_db),
-                       save_model=Depends(utils.get_current_save), ):
+                       save_model=Depends(utils.get_current_save)):
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='s')
+    for offer in negotiate_list:
+        if offer.target_id == target_player_id:
+            return {'status': 'can not offer'}
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='n')
+    for offer in negotiate_list:
+        if offer.target_id == target_player_id:
+            return {'status': 'can not offer'}
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='u')
+    for offer in negotiate_list:
+        if offer.target_id == target_player_id:
+            return {'status': 'can not offer'}
     user_transfer_club = transfer_app.Club(db=db, club_id=save_model.player_club_id, date=save_model.date,
                                            season=save_model.season)
     user_transfer_club.make_offer_by_user(save_id=save_model.id, target_player_id=target_player_id,
@@ -26,7 +44,7 @@ def make_offer_by_user(target_player_id: int, offer_price: int, db: Session = De
 
 @router.get('/negotiate-wage')
 # 玩家与球员协商工资
-def negotiate_wage(target_player_id: int, offer_wage: int, db: Session = Depends(get_db),
+def negotiate_wage(target_player_id: int, offer_wage: float, db: Session = Depends(get_db),
                    save_model=Depends(utils.get_current_save)):
     target_player = transfer_app.Player(
         db=db,
@@ -90,14 +108,25 @@ def get_players_by_attri(offset: int, limit: int, attri: str = "club_name", valu
     return player_show
 
 
+@router.get('/negotiate-failed')
+def negotiate_failed(target_id: int, db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='n')
+    for offer in negotiate_list:
+        if offer.target_id == target_id:
+            offer.status = 'r'
+            return {'status': 'set complete'}
+
+
 @router.get('/get-negotiate-list')
 # 获取待谈判列表
 def get_negotiate_list(db: Session = Depends(get_db),
                        save_model=Depends(utils.get_current_save)):
     result_show = []
-    negotiate_list = crud.get_unnegotiated_offers_by_player(db=db, save_id=save_model.id,
-                                                            buyer_id=save_model.player_club_id,
-                                                            season=save_model.season)
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='n')
     for offer in negotiate_list:
         player_info = computed_data_app.ComputedPlayer(player_id=offer.target_id,
                                                        db=db,
@@ -108,13 +137,13 @@ def get_negotiate_list(db: Session = Depends(get_db),
 
 
 @router.get('/get-rejected-offers')
-# 获取待谈判列表
+# 获取被拒绝列表
 def get_rejected_offers(db: Session = Depends(get_db),
-                        save_model=Depends(utils.get_current_save)) :
+                        save_model=Depends(utils.get_current_save)):
     result_show = []
-    negotiate_list = crud.get_rejected_offers_by_player(db=db, save_id=save_model.id,
-                                                        buyer_id=save_model.player_club_id,
-                                                        season=save_model.season)
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='r')
     for offer in negotiate_list:
         player_info = computed_data_app.ComputedPlayer(player_id=offer.target_id,
                                                        db=db,
