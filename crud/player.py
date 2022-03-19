@@ -97,7 +97,7 @@ def get_all_players_by_save_n_attri(db: Session, save_id: int, offset: int,
             join(models.Club, models.Player.club_id == models.Club.id). \
             join(models.League, models.Club.league_id == models.League.id). \
             filter(models.League.save_id == save_id). \
-            filter(models.Player.translated_name == value).first()
+            filter(models.Player.translated_name == value).all()  # 用all得到一个list，不能用first
     elif attri == "club_name":
         club = db.query(models.Club). \
             join(models.League, models.Club.league_id == models.League.id). \
