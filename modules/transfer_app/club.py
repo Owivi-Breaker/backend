@@ -366,7 +366,10 @@ class Club:
                     # TODO 给钱
                     p = transfer_app.Player(
                         db=self.db, player_id=offer.target_id, season=self.season, date=self.date)
-                    p.adjust_wage(round(np.random.normal(p.wanna_wage(), 2), 3))  # 调整球员工资
+                    wage = round(np.random.normal(p.wanna_wage(), 2), 3)
+                    if wage < 0:
+                        wage = p.wanna_wage()
+                    p.adjust_wage(wage)  # 调整球员工资
                     offer.status = 's'  # 交易完成
                 elif offer.status == 'u':  # 买方俱乐部是玩家
                     # TODO  加钱

@@ -119,7 +119,7 @@ class Player:
         for offer in offer_list:
             if offer.target_id == self.player_id:  # 找到玩家对这个球员的报价
                 offer_found = 1
-                rate = 100 - (want_wage - offer_wage)  # 谈判成功概率
+                rate = 90-((want_wage-offer_wage)/want_wage*100)  # 谈判成功概率
                 i = randint(1, 100)
                 if i < rate:
                     crud.update_player(

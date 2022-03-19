@@ -33,7 +33,6 @@ def get_club_by_user(save_model=Depends(utils.get_current_save), db: Session = D
     """
     获取玩家俱乐部信的信息
     """
-    logger.debug("cnm")
     club_model: models.Club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
 
     return computed_data_app.ComputedClub(
