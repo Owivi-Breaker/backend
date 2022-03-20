@@ -123,7 +123,9 @@ class PlayerGenerator:
         """
         生成初始周薪
         TODO 暂时随机化
+        在generate函数中已进行覆盖，此处随机应当未无效
         """
+
         return random.randint(2, 30)
 
 
@@ -188,6 +190,7 @@ class PlayerGenerator:
             target_lo_capa = min(self.get_capa(self.data['translated_nationality']), 88)
             #  根据综合能力值计算初始身价
             self.data['values'] = target_lo_capa**3/70
+            self.data['wages'] = target_lo_capa**3/70/500
             while True:
                 # 模拟球员按照位置权重成长的过程
                 capa_name = utils.select_by_pro(original_location['weight'])
@@ -219,6 +222,7 @@ class PlayerGenerator:
             self.generate_data()
             #  默认身价
             self.data['values'] = 10
+            self.data['wages'] = 0.02
             # 为球员选择先天位置，并增强相应能力
             original_location = random.choice(game_configs.capa_potential)
             self.data[original_location['name'] + '_num'] = 1

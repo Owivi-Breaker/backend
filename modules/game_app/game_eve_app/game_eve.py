@@ -87,11 +87,36 @@ class GameEvE:
             self.add_script('胜者为{}！'.format(winner_name), 'e')
         else:
             self.add_script('平局', 'e')
+        #  杯赛奖金
+        if self.type == 'champions2to1':
+            if self.lteam.club_id == self.winner_id:
+                self.lteam.team_model.finance += 4000
+                self.rteam.team_model.finance += 2500
+            else:
+                self.rteam.team_model.finance += 4000
+                self.lteam.team_model.finance += 2500
+            logger.info("欧冠冠军奖金")
+        if self.type == 'cup2to1':
+            if self.lteam.club_id == self.winner_id:
+                self.lteam.team_model.finance += 1500
+            else:
+                self.rteam.team_model.finance += 1500
+            logger.info("杯赛冠军奖金")
+        if self.lteam.team_model.reputation > self.rteam.team_model.reputation:
+            seat_rate = self.lteam.team_model.reputation/100
+        else:
+            seat_rate = self.rteam.team_model.reputation/100
+        viewer = seat_rate * 8
+        if self.type == 'league':
+            self.lteam.team_model.finance += viewer * 100
+        elif self.name == 'champions_league':
+            self.lteam.team_model.finance += viewer * 150
+        else:
+            self.lteam.team_model.finance += viewer * 50
 
         self.rate()  # 球员评分
         self.save_game_data()  # 保存比赛
         self.update_players_data()  # 保存球员数据的改变
-
         return self.lteam.team_model.name, self.rteam.team_model.name, self.lteam.score, self.rteam.score
 
     def judge_extra_time(self):

@@ -8,8 +8,19 @@ import threading
 import crud
 import models
 import schemas
+from modules.computed_data_app import computed_game
 from utils import Date, utils, logger
 from modules import game_app, generate_app, computed_data_app, transfer_app
+
+
+def crew_salary_check(db: Session, club_id: int):
+    sum_salary = 0
+    club = crud.get_club_by_id(db=db, club_id=club_id)
+    sum_salary += 2 ** (club.assistant - 1) * 5
+    sum_salary += 2 ** (club.doctor - 1) * 5
+    sum_salary += 2 ** (club.negotiator - 1) * 5
+    sum_salary += 2 ** (club.scout - 1) * 5
+    return sum_salary
 
 
 class NextTurner:
@@ -76,6 +87,12 @@ class NextTurner:
             self.transfer_starter(total_events['transfer'])
         if 'transfer end' in total_events.keys():
             self.transfer_end_starter(total_events['transfer end'])
+        if 'rank and tv' in total_events.keys():
+            self.rank_n_tv_income()
+        if 'ad income' in total_events.keys():
+            self.ad_income()
+        if 'salary day' in total_events.keys():
+            self.salary_day()
         if 'game_generation' in total_events.keys():
             self.game_generation_starter(total_events['game_generation'])
         if 'next_calendar' in total_events.keys():
@@ -222,6 +239,78 @@ class NextTurner:
                 transfer_club_list.append(transfer_club)
         for transfer_club in transfer_club_list:
             transfer_club.receive_offer(self.save_id)  # 转会窗最后一天，只接受offer，不发新的。
+
+    def rank_n_tv_income_base(self, league: models.League,
+                              game: computed_data_app.computed_game, first_bonus,
+                              second_bonus, rest_bonus):
+        df = game.get_season_points_table(game_season=self.save_model.season, game_name=league.name)
+        point_table = [tuple(x) for x in df.values]
+        first_club = crud.get_club_by_id(db=self.db, club_id=point_table[0][0])
+        first_club.finance += first_bonus  # 转播奖金
+        first_club.finance += 2500  # 联赛排名
+        second = crud.get_club_by_id(db=self.db, club_id=point_table[1][0])
+        second.finance += second_bonus
+        second.finance += 1500
+        third = crud.get_club_by_id(db=self.db, club_id=point_table[2][0])
+        third.finance += second_bonus
+        for i in range(3, 19):
+            club = crud.get_club_by_id(db=self.db, club_id=point_table[i][0])
+            club.finance += rest_bonus
+
+    def rank_n_tv_income(self):
+        leagues = self.save_model.leagues
+        game = computed_data_app.ComputedGame(db=self.db, save_id=self.save_id)
+        for league in leagues:
+            if league.name == "英超":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=15000,
+                                           second_bonus=9000, rest_bonus=4800)
+                logger.info("英超发钱")
+            elif league.name == "西甲":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=12500,
+                                           second_bonus=7500, rest_bonus=4000)
+                logger.info("西甲发钱")
+            elif league.name == "德甲":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=10200,
+                                           second_bonus=6200, rest_bonus=3550)
+                logger.info("德甲发钱")
+            elif league.name == "意甲":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=10000,
+                                           second_bonus=6000, rest_bonus=3200)
+                logger.info("意甲发钱")
+            elif league.name == "法甲":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=8750,
+                                           second_bonus=5250, rest_bonus=2800)
+                logger.info("法甲发钱")
+            elif league.name == "英冠":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=6250,
+                                           second_bonus=3750, rest_bonus=2000)
+                logger.info("英冠发钱")
+            elif league.name == "西乙":
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=5625,
+                                           second_bonus=3375, rest_bonus=1800)
+                logger.info("西医发钱")
+            else:
+                self.rank_n_tv_income_base(league=league, game=game, first_bonus=5000,
+                                           second_bonus=3000, rest_bonus=1600)
+                logger.info(league.name + "发钱")
+
+    def ad_income(self):
+        leagues = self.save_model.leagues
+        for league in leagues:
+            for club in league.clubs:
+                club.finance += club.reputation ** 3 * 0.02 + 500  # 广告
+            logger.info(league.name + "广告")
+
+    def salary_day(self):
+        leagues = self.save_model.leagues
+        for league in leagues:
+            for club in league.clubs:
+                sum_salary = 0
+                for player in club.players:
+                    sum_salary += player.wages
+                sum_salary += crew_salary_check(db=self.db, club_id=club.id)
+                club.finance -= sum_salary
+            logger.info(league.name+"扣除工资")
 
     def game_generation_starter(self, game_generation):
         """

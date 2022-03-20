@@ -35,7 +35,9 @@ class CalendarGenerator:
         self.generate_next_calendar()
         self.generate_uncertain_games()
         self.generate_promote_n_relegate_day()
-
+        self.generate_salary_days()
+        self.rank_n_tv()
+        self.ad_income()
         self.save_in_db()
 
     def add_dict(self, date: str, target_dict: dict):
@@ -764,6 +766,35 @@ class CalendarGenerator:
             transfer_dict = {"transfer": []}
             self.add_dict(date_str, transfer_dict)
         logger.info("生成冬窗")
+
+    def generate_salary_days(self):
+        """
+        工资发放日，从8.6开始的每周六，共52周
+        """
+        year, month, day = self.save_model.date.split('-')
+        date = Date(int(year), 8, 6)
+        for weeks in range(1, 52):
+            salary_dict = {"salary day": []}
+            self.add_dict(str(date), salary_dict)
+            date.plus_days(7)
+
+    def rank_n_tv(self):
+        """
+        转播与联赛排名收益
+        """
+        year, month, day = self.save_model.date.split('-')
+        date = Date(int(year), 5, 1)
+        ad_dict = {"rank and tv": []}
+        self.add_dict(str(date), ad_dict)
+
+    def ad_income(self):
+        """
+        广告收益
+        """
+        year, month, day = self.save_model.date.split('-')
+        date = Date(int(year), 8, 13)
+        league_dict = {"ad income": []}
+        self.add_dict(str(date), league_dict)
 
     def generate_next_calendar(self):
         """

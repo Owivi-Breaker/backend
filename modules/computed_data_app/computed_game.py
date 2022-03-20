@@ -292,3 +292,5 @@ class ComputedGame:
             teams.append(schemas.GameTeamShow(**t_data))
         g_data['teams_info'] = teams
         return schemas.GameShow(**g_data)
+
+

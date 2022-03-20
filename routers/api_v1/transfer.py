@@ -23,23 +23,26 @@ def make_offer_by_user(target_player_id: int, offer_price: int, db: Session = De
                                                            season=save_model.season, status='s')
     for offer in negotiate_list:
         if offer.target_id == target_player_id:
-            return {'status': 'can not offer'}
+            return {'status': 'repeat offer'}
     negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
                                                            buyer_id=save_model.player_club_id,
                                                            season=save_model.season, status='n')
     for offer in negotiate_list:
         if offer.target_id == target_player_id:
-            return {'status': 'can not offer'}
+            return {'status': 'repeat offer'}
     negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
                                                            buyer_id=save_model.player_club_id,
                                                            season=save_model.season, status='u')
     for offer in negotiate_list:
         if offer.target_id == target_player_id:
-            return {'status': 'can not offer'}
+            return {'status': 'repeat offer'}
     user_transfer_club = transfer_app.Club(db=db, club_id=save_model.player_club_id, date=save_model.date,
                                            season=save_model.season)
+    if user_transfer_club.team_model.finance < offer_price:
+        return {'status': 'can not afford'}
     user_transfer_club.make_offer_by_user(save_id=save_model.id, target_player_id=target_player_id,
                                           offer_price=offer_price)
+    return {'status': 'succeed'}
 
 
 @router.get('/negotiate-wage')

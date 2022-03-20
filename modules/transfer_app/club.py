@@ -362,8 +362,10 @@ class Club:
                                 " 从 " + str(self.name) + " 转会至 " +
                                 str(crud.get_club_by_id(db=self.db, club_id=offer.buyer_id).name) +
                                 " " + str(offer.offer_price) + "w!")
-                    # TODO  加钱
-                    # TODO 给钱
+                    #  加钱扣钱
+                    self.team_model.finance += offer.offer_price
+                    buyer = crud.get_club_by_id(db=self.db, club_id=offer.buyer_id)
+                    buyer.finance -= offer.offer_price
                     p = transfer_app.Player(
                         db=self.db, player_id=offer.target_id, season=self.season, date=self.date)
                     wage = round(np.random.normal(p.wanna_wage(), 2), 3)
@@ -372,8 +374,7 @@ class Club:
                     p.adjust_wage(wage)  # 调整球员工资
                     offer.status = 's'  # 交易完成
                 elif offer.status == 'u':  # 买方俱乐部是玩家
-                    # TODO  加钱
-                    # TODO 给钱
+                    # 加钱 给钱
                     offer.status = 'n'  # 转到球员处工资谈判
 
     def improve_crew(self):

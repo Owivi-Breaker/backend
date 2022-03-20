@@ -78,7 +78,6 @@ class Player:
     def wanna_wage(self):
         """
         预期工资,身价/ 500
-        TODO: 创建球员的时候工资不正确
         """
         proper_wage = self.computed_player.get_values() / 500
         return proper_wage
@@ -112,7 +111,7 @@ class Player:
         工资不满足返回0
         offer不存在返回2
         """
-        want_wage = np.random.normal(self.wanna_wage(), self.wanna_wage()/5)
+        want_wage = np.random.normal(self.wanna_wage(), self.wanna_wage() / 5)
         if want_wage < 0:
             want_wage = self.wanna_wage()
         offer_found = 0
@@ -134,7 +133,10 @@ class Player:
                                "on_sale": False})  # 修改球员所属俱乐部
                     self.adjust_wage(real_wage=offer_wage)  # 修改球员工资
                     offer.status = 's'  # 交易完成
-                    # TODO 钱
+                    buyer = crud.get_club_by_id(club_id=buyer_club_id, db=self.db)
+                    buyer.finance -= offer.offer_price
+                    seller = crud.get_club_by_id(db=self.db, club_id=offer.target_club_id)
+                    seller.finance += offer.offer_price
                     return 1
                 else:
                     return 0  # 工资不满足要求

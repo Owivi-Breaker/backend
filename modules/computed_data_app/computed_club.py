@@ -45,9 +45,6 @@ class ComputedClub:
         logger.debug(data)
         return schemas.ClubShow(**data)
 
-    def change_finance(self, income: int):
-        """
-        俱乐部余额变动
-        :param income 变动金额，可正可负
-        """
-        self.club_model.finance += income
+
+
+
