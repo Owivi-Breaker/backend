@@ -1,6 +1,7 @@
 import string
 from typing import List
 
+import numpy as np
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -13,6 +14,75 @@ from modules import game_app, computed_data_app, transfer_app
 from utils import Date
 
 router = APIRouter()
+
+
+@router.post('/put-on-sale')  # 玩家主动挂牌球员
+def put_on_sale(target_player_id: int, db: Session = Depends(get_db)):
+    target_player = crud.get_player_by_id(player_id=target_player_id, db=db)
+    target_player.on_sale = 1
+    db.commit()
+
+
+@router.post('/upgrade-crew')  # 玩家升级球队职员
+def upgrade_crew(crew: str, db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    """
+    crew: scout,assistant,doctor,negotiator
+    """
+    club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+    if crew == "scout":
+        club.scout += 1
+    elif crew == "doctor":
+        club.doctor += 1
+    elif crew == "assistant":
+        club.assistant += 1
+    elif crew == "negotiator":
+        club.negotiator += 1
+    else:
+        return {"status": "param error"}
+    db.commit()
+
+
+@router.post('incoming-offers')  # 接收对于玩家球员的报价
+def incoming_offers(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    result_show = []
+    offer_list = crud.get_offers_by_target_club(db=db, save_id=save_model.id, target_club_id=save_model.player_club_id,
+                                                season=save_model.season)
+    for offer in offer_list:
+        player_info = computed_data_app.ComputedPlayer(player_id=offer.target_id,
+                                                       db=db,
+                                                       season=save_model.season,
+                                                       date=save_model.date).get_show_data()
+        result_show.append({'player_info': player_info, 'offer': offer})
+    return result_show
+
+
+@router.post('dealing-offers')  # 玩家处理报价
+def dealing_offers(offer_id: int, answer: str, db: Session = Depends(get_db),
+                   save_model=Depends(utils.get_current_save)):
+    offer = crud.get_offer_by_id(offer_id=offer_id, db=db)
+    if answer == 'yes':
+        crud.delete_target_by_player_id_n_buyer_id(
+            db=db, target_id=offer.target_id, buyer_id=offer.buyer_id)  # 从target表中删除
+        #  加钱扣钱
+        player_team = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+        player_team.finance += offer.offer_price
+        buyer = crud.get_club_by_id(db=db, club_id=offer.buyer_id)
+        buyer.finance -= offer.offer_price
+        p = transfer_app.Player(
+            db=db, player_id=offer.target_id, season=save_model.season, date=save_model.date)
+        wage = round(np.random.normal(p.wanna_wage(), 2), 3)
+        if wage < 0:
+            wage = p.wanna_wage()
+        p.adjust_wage(wage)  # 调整球员工资
+        p.player_model.club_id = offer.buyer_id  # 改球员俱乐部
+        p.player_model.on_sale = 0
+        offer.status = 's'  # 交易完成
+        db.commit()
+        return {"status": "succeed"}
+    else:
+        offer.status = 'r'
+        db.commit()
+        return {"status": "rejected"}
 
 
 @router.get('/make-offer-by-user')  # 玩家向球员报价
@@ -78,11 +148,12 @@ def get_on_sale_players(offset: int, limit: int, attri: str = "id", order=0,
                                                                        attri=attri)
     player_show: List[schemas.PlayerShow] = []
     for player_model in db_players:
-        player_info = computed_data_app.ComputedPlayer(player_id=player_model.id,
-                                                       db=db,
-                                                       season=save_model.season,
-                                                       date=save_model.date).get_show_data()
-        player_show.append(player_info)
+        if player_model.club_id != save_model.player_club_id:
+            player_info = computed_data_app.ComputedPlayer(player_id=player_model.id,
+                                                           db=db,
+                                                           season=save_model.season,
+                                                           date=save_model.date).get_show_data()
+            player_show.append(player_info)
     return player_show
 
 
@@ -118,7 +189,7 @@ def negotiate_failed(target_id: int, db: Session = Depends(get_db), save_model=D
                                                            season=save_model.season, status='n')
     for offer in negotiate_list:
         if offer.target_id == target_id:
-            offer.status = 'r'
+            offer.status = 'nf'
             return {'status': 'set complete'}
 
 

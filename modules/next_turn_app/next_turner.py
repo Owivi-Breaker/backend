@@ -206,6 +206,16 @@ class NextTurner:
                                                               season=self.save_model.season, status='n')
         for offer in target_offers:
             offer.status = 'r'  # 状态改为r
+        target_offers = crud.get_offers_from_player_by_status(db=self.db, save_id=self.save_id,
+                                                              buyer_id=self.save_model.player_club_id,
+                                                              season=self.save_model.season, status='w')
+        for offer in target_offers:
+            offer.status = 'r'  # 状态改为r
+        target_offers = crud.get_offers_from_player_by_status(db=self.db, save_id=self.save_id,
+                                                              buyer_id=self.save_model.player_club_id,
+                                                              season=self.save_model.season, status='u')
+        for offer in target_offers:
+            offer.status = 'r'  # 状态改为r
 
     def transfer_starter(self, transfer: list):
         """
@@ -253,7 +263,7 @@ class NextTurner:
         second.finance += 1500
         third = crud.get_club_by_id(db=self.db, club_id=point_table[2][0])
         third.finance += second_bonus
-        for i in range(3, 19):
+        for i in range(3, len(point_table)):
             club = crud.get_club_by_id(db=self.db, club_id=point_table[i][0])
             club.finance += rest_bonus
 
@@ -310,7 +320,7 @@ class NextTurner:
                     sum_salary += player.wages
                 sum_salary += crew_salary_check(db=self.db, club_id=club.id)
                 club.finance -= sum_salary
-            logger.info(league.name+"扣除工资")
+            logger.info(league.name + "扣除工资")
 
     def game_generation_starter(self, game_generation):
         """

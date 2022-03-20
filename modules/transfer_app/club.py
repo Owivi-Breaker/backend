@@ -40,6 +40,10 @@ class Club:
         """
         全队球员工资更新; 若财政不足,最贵挂牌,其余球员降薪20%
         """
+        if self.team_model.finance <= 0:
+            finance_help = random.randint(2000, 4000)
+            self.team_model.finance = finance_help
+            logger.info(self.name + "得到资金补助" + finance_help)
         wage_chart = {}
         for player in self.players:
             player_wage = {player: player.wanna_wage()}
@@ -382,7 +386,7 @@ class Club:
         职员更新
         """
         willingness = random.randint(0, 1)  # 随机一个是否愿意升级
-        if self.team_model.finance > 3000 and willingness == 1:  # TODO 具体升级要求再议
+        if self.team_model.finance > 5000 and willingness == 1:  # TODO 具体升级要求再议
             crew = {'a': self.team_model.assistant,
                     'd': self.team_model.doctor,
                     's': self.team_model.scout,
@@ -405,4 +409,4 @@ class Club:
                 self.team_model.scout += 1
             elif target == 'n':
                 self.team_model.negotiator += 1
-            #  TODO 扣钱
+

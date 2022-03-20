@@ -15,6 +15,11 @@ def create_offer(db: Session, offer: schemas.OfferCreate):
     return db_offer
 
 
+def get_offer_by_id(offer_id: int, db: Session) -> models.Offer:
+    db_offer = db.query(models.Offer).filter(models.Offer.id == offer_id).first()
+    return db_offer
+
+
 def update_offer(db: Session, offer_id: int, attri: dict):
     db_offer = db.query(models.Offer).filter(models.Offer.id == offer_id).first()
     for key, value in attri.items():
@@ -60,7 +65,8 @@ def get_offers_by_target_club(db: Session, save_id: int, target_club_id: int, se
     db_offers = db.query(models.Offer).filter(
         and_(models.Offer.save_id == save_id,
              models.Offer.target_club_id == target_club_id,
-             models.Offer.season == season)).all()
+             models.Offer.season == season,
+             models.Offer.status == 'w')).all()
     return db_offers
 
 
