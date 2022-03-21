@@ -98,14 +98,14 @@ def get_club_rank(save_id: int, game_season: int,
     df = computed_game.get_season_points_table(game_season, game_name)
     point_table = [tuple(x) for x in df.values]
     if point_table:
-        for rank in range(0, 19):
+        for rank in range(0, len(point_table)):
             if point_table[rank][1] == club_name:
                 return rank+1
     else:
         league = crud.get_league_by_id(db=db,league_id=league_id)
         for club in league.clubs:
             point_table.append(club.name)
-        for rank in range(0, 19):
+        for rank in range(0, len(point_table)):
             if point_table[rank] == club_name:
                 return rank + 1
     return {'status': "club don't match league"}

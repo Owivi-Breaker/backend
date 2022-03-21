@@ -66,7 +66,7 @@ def get_offers_by_target_club(db: Session, save_id: int, target_club_id: int, se
         and_(models.Offer.save_id == save_id,
              models.Offer.target_club_id == target_club_id,
              models.Offer.season == season,
-             models.Offer.status == 'w')).all()
+             models.Offer.status != 's')).all()
     return db_offers
 
 

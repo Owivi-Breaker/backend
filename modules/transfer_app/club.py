@@ -307,7 +307,6 @@ class Club:
         # 查找本赛季收到的offer
         offer_list: List[models.Offer] = crud.get_offers_by_target_club(
             db=self.db, save_id=save_id, target_club_id=self.club_id, season=self.season)
-
         for offer in offer_list:
             if offer.status == 's':
                 pass
