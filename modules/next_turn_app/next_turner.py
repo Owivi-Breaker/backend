@@ -253,19 +253,45 @@ class NextTurner:
     def rank_n_tv_income_base(self, league: models.League,
                               game: computed_data_app.computed_game, first_bonus,
                               second_bonus, rest_bonus):
+        year, month, day = self.date.split('-')
+        date = datetime.datetime(int(year), int(month), int(day))
         df = game.get_season_points_table(game_season=self.save_model.season, game_name=league.name)
         point_table = [tuple(x) for x in df.values]
         first_club = crud.get_club_by_id(db=self.db, club_id=point_table[0][0])
         first_club.finance += first_bonus  # 转播奖金
+        if first_club.id == self.save_model.player_club_id:
+            user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=first_bonus, event="转播收益",
+                                                     date=date)
+            crud.add_user_finance(db=self.db, user_finance=user_finance)
         first_club.finance += 2500  # 联赛排名
+        if first_club.id == self.save_model.player_club_id:
+            user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=2500, event="联赛排名收益",
+                                                     date=date)
+            crud.add_user_finance(db=self.db, user_finance=user_finance)
         second = crud.get_club_by_id(db=self.db, club_id=point_table[1][0])
         second.finance += second_bonus
+        if second.id == self.save_model.player_club_id:
+            user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=second_bonus, event="转播收益",
+                                                     date=date)
+            crud.add_user_finance(db=self.db, user_finance=user_finance)
         second.finance += 1500
+        if second.id == self.save_model.player_club_id:
+            user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=1500, event="联赛排名收益",
+                                                     date=date)
+            crud.add_user_finance(db=self.db, user_finance=user_finance)
         third = crud.get_club_by_id(db=self.db, club_id=point_table[2][0])
         third.finance += second_bonus
+        if third.id == self.save_model.player_club_id:
+            user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=second_bonus, event="转播收益",
+                                                     date=date)
+            crud.add_user_finance(db=self.db, user_finance=user_finance)
         for i in range(3, len(point_table)):
             club = crud.get_club_by_id(db=self.db, club_id=point_table[i][0])
             club.finance += rest_bonus
+            if club.id == self.save_model.player_club_id:
+                user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=rest_bonus, event="转播收益",
+                                                         date=date)
+                crud.add_user_finance(db=self.db, user_finance=user_finance)
 
     def rank_n_tv_income(self):
         leagues = self.save_model.leagues
@@ -274,42 +300,41 @@ class NextTurner:
             if league.name == "英超":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=15000,
                                            second_bonus=9000, rest_bonus=4800)
-                logger.info("英超发钱")
             elif league.name == "西甲":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=12500,
                                            second_bonus=7500, rest_bonus=4000)
-                logger.info("西甲发钱")
             elif league.name == "德甲":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=10200,
                                            second_bonus=6200, rest_bonus=3550)
-                logger.info("德甲发钱")
             elif league.name == "意甲":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=10000,
                                            second_bonus=6000, rest_bonus=3200)
-                logger.info("意甲发钱")
             elif league.name == "法甲":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=8750,
                                            second_bonus=5250, rest_bonus=2800)
-                logger.info("法甲发钱")
             elif league.name == "英冠":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=6250,
                                            second_bonus=3750, rest_bonus=2000)
-                logger.info("英冠发钱")
             elif league.name == "西乙":
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=5625,
                                            second_bonus=3375, rest_bonus=1800)
-                logger.info("西医发钱")
             else:
                 self.rank_n_tv_income_base(league=league, game=game, first_bonus=5000,
                                            second_bonus=3000, rest_bonus=1600)
-                logger.info(league.name + "发钱")
 
     def ad_income(self):
         leagues = self.save_model.leagues
         for league in leagues:
             for club in league.clubs:
                 club.finance += club.reputation ** 3 * 0.02 + 500  # 广告
-            logger.info(league.name + "广告")
+                if club.id == self.save_model.player_club_id:
+                    year, month, day = self.date.split('-')
+                    date = datetime.datetime(int(year), int(month), int(day))
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id,
+                                                             amount=club.reputation ** 3 * 0.02 + 500,
+                                                             event="广告收益",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
 
     def salary_day(self):
         leagues = self.save_model.leagues
@@ -320,7 +345,12 @@ class NextTurner:
                     sum_salary += player.wages
                 sum_salary += crew_salary_check(db=self.db, club_id=club.id)
                 club.finance -= sum_salary
-            logger.info(league.name + "扣除工资")
+                if club.id == self.save_model.player_club_id:
+                    year, month, day = self.date.split('-')
+                    date = datetime.datetime(int(year), int(month), int(day))
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=-sum_salary, event="球员与职员工资",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
 
     def game_generation_starter(self, game_generation):
         """

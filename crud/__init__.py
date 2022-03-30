@@ -10,4 +10,5 @@ from crud.save import *
 from crud.game_pve import *
 from crud.offer import *
 from crud.target_player import *
+from crud.user_finance import *
 

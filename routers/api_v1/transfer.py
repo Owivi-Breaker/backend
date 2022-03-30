@@ -1,6 +1,6 @@
 import string
 from typing import List
-
+import datetime
 import numpy as np
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -63,11 +63,16 @@ def dealing_offers(offer_id: int, answer: str, db: Session = Depends(get_db),
     if answer == 'yes':
         crud.delete_target_by_player_id_n_buyer_id(
             db=db, target_id=offer.target_id, buyer_id=offer.buyer_id)  # 从target表中删除
-        #  加钱扣钱
         player_team = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
         player_team.finance += offer.offer_price
         buyer = crud.get_club_by_id(db=db, club_id=offer.buyer_id)
         buyer.finance -= offer.offer_price
+        year, month, day = save_model.date.split('-')
+        date = datetime.datetime(int(year), int(month), int(day))
+        user_finance = schemas.UserFinanceCreate(save_id=save_model.id, amount=offer.offer_price,
+                                                 event="球员卖出",
+                                                 date=date)
+        crud.add_user_finance(db=db, user_finance=user_finance)
         p = transfer_app.Player(
             db=db, player_id=offer.target_id, season=save_model.season, date=save_model.date)
         wage = round(np.random.normal(p.wanna_wage(), 2), 3)

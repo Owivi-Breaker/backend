@@ -8,3 +8,4 @@ from models.game_pve import *
 from models.calendar import *
 from models.user import *
 from models.transfer import *
+from models.user_finance import *
