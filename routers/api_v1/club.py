@@ -300,29 +300,29 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
             best_player = player_info.id
             highest_rate = player_info.final_rating
     if best_shooter == -1:
-            best_shooter = club_model.players[i].translated_name
+        best_shooter = club_model.players[i].translated_name
     else:
-            best_shooter = crud.get_player_by_id(player_id=best_shooter, db=db).translated_name
+        best_shooter = crud.get_player_by_id(player_id=best_shooter, db=db).translated_name
     if best_assistant == -1:
-            best_assistant = club_model.players[i].translated_name
+        best_assistant = club_model.players[i].translated_name
     else:
-            best_assistant = crud.get_player_by_id(player_id=best_assistant, db=db).translated_name
+        best_assistant = crud.get_player_by_id(player_id=best_assistant, db=db).translated_name
     if best_passer == -1:
-            best_passer = club_model.players[i].translated_name
+        best_passer = club_model.players[i].translated_name
     else:
-            best_passer = crud.get_player_by_id(player_id=best_passer, db=db).translated_name
+        best_passer = crud.get_player_by_id(player_id=best_passer, db=db).translated_name
     if best_tackler == -1:
-            best_tackler = club_model.players[i].translated_name
+        best_tackler = club_model.players[i].translated_name
     else:
-            best_tackler = crud.get_player_by_id(player_id=best_tackler, db=db).translated_name
+        best_tackler = crud.get_player_by_id(player_id=best_tackler, db=db).translated_name
     if best_dribbler == -1:
-            best_dribbler = club_model.players[i].translated_name
+        best_dribbler = club_model.players[i].translated_name
     else:
-            best_dribbler = crud.get_player_by_id(player_id=best_dribbler, db=db).translated_name
+        best_dribbler = crud.get_player_by_id(player_id=best_dribbler, db=db).translated_name
     if best_player == -1:
-            best_player = club_model.players[i].translated_name
+        best_player = club_model.players[i].translated_name
     else:
-            best_player = crud.get_player_by_id(player_id=best_player, db=db).translated_name
+        best_player = crud.get_player_by_id(player_id=best_player, db=db).translated_name
 
     return {"最佳射手": best_shooter,
             "进球": most_score,
@@ -336,3 +336,12 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
             "拦截成功率": highest_tackle,
             "过人成功率最高": best_dribbler,
             "过人成功率": highest_dribble}
+
+
+@router.get('/me/finance-history')
+def get_finance_history(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    """
+    玩家财政历史
+    """
+    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id)
+    return finance_history

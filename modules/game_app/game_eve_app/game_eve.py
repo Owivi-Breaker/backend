@@ -87,25 +87,60 @@ class GameEvE:
             self.add_script('胜者为{}！'.format(winner_name), 'e')
         else:
             self.add_script('平局', 'e')
+        year, month, day = self.date.split('-')
+        date = datetime.datetime(int(year), int(month), int(day))
+        save = crud.get_save_by_id(db=self.db, save_id=self.save_id)
+        user_club_id = save.player_club_id
         #  杯赛奖金
         if self.type == 'champions2to1':
             if self.lteam.club_id == self.winner_id:
                 self.lteam.team_model.finance += 4000
                 self.rteam.team_model.finance += 2500
+                if self.lteam.club_id == user_club_id:
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=4000,
+                                                             event="欧冠冠军奖金",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
+                elif self.rteam.club_id == user_club_id:
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=2500,
+                                                             event="欧冠亚军奖金",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
             else:
                 self.rteam.team_model.finance += 4000
                 self.lteam.team_model.finance += 2500
+                if self.rteam.club_id == user_club_id:
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=4000,
+                                                             event="欧冠冠军奖金",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
+                elif self.lteam.club_id == user_club_id:
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=2500,
+                                                             event="欧冠亚军奖金",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
             logger.info("欧冠冠军奖金")
+
         if self.type == 'cup2to1':
             if self.lteam.club_id == self.winner_id:
                 self.lteam.team_model.finance += 1500
+                if self.lteam.club_id == user_club_id:
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=1500,
+                                                             event="杯赛冠军奖金",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
             else:
                 self.rteam.team_model.finance += 1500
+                if self.rteam.club_id == user_club_id:
+                    user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=1500,
+                                                             event="杯赛冠军奖金",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
             logger.info("杯赛冠军奖金")
         if self.lteam.team_model.reputation > self.rteam.team_model.reputation:
-            seat_rate = self.lteam.team_model.reputation/100
+            seat_rate = self.lteam.team_model.reputation / 100
         else:
-            seat_rate = self.rteam.team_model.reputation/100
+            seat_rate = self.rteam.team_model.reputation / 100
         viewer = seat_rate * 8
         if self.type == 'league':
             self.lteam.team_model.finance += viewer * 100
@@ -113,6 +148,11 @@ class GameEvE:
             self.lteam.team_model.finance += viewer * 150
         else:
             self.lteam.team_model.finance += viewer * 50
+            if self.lteam.club_id == user_club_id:
+                user_finance = schemas.UserFinanceCreate(save_id=self.save_id, amount=viewer * 50,
+                                                         event="门票收益",
+                                                         date=date)
+                crud.add_user_finance(db=self.db, user_finance=user_finance)
 
         self.rate()  # 球员评分
         self.save_game_data()  # 保存比赛

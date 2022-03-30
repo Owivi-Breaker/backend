@@ -135,6 +135,12 @@ class Player:
                     offer.status = 's'  # 交易完成
                     buyer = crud.get_club_by_id(club_id=buyer_club_id, db=self.db)
                     buyer.finance -= offer.offer_price
+                    year, month, day = self.date.split('-')
+                    date = datetime.datetime(int(year), int(month), int(day))
+                    user_finance = schemas.UserFinanceCreate(save_id=save_id, amount=-offer.offer_price,
+                                                             event="球员买入",
+                                                             date=date)
+                    crud.add_user_finance(db=self.db, user_finance=user_finance)
                     seller = crud.get_club_by_id(db=self.db, club_id=offer.target_club_id)
                     seller.finance += offer.offer_price
                     return 1
