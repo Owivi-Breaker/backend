@@ -242,4 +242,17 @@ def get_rejected_offers(db: Session = Depends(get_db),
                                                        season=save_model.season,
                                                        date=save_model.date).get_show_data()
         result_show.append({'player_info': player_info, 'offer': offer})
+    db.commit()
     return result_show
+
+
+@router.get('/deal-rejected-offers')
+def get_rejected_offers(db: Session = Depends(get_db),
+                        save_model=Depends(utils.get_current_save)):
+    negotiate_list = crud.get_offers_from_player_by_status(db=db, save_id=save_model.id,
+                                                           buyer_id=save_model.player_club_id,
+                                                           season=save_model.season, status='r')
+    for offer in negotiate_list:
+        offer.status = 'rr'  # 防止他第二天又被找到
+    db.commit()
+    return {"status": "succeed"}
