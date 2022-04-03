@@ -205,7 +205,10 @@ def negotiate_failed(target_id: int, db: Session = Depends(get_db), save_model=D
     for offer in negotiate_list:
         if offer.target_id == target_id:
             offer.status = 'nf'
+            db.commit()
             return {'status': 'set complete'}
+    else:
+        return {'status': 'no offer'}
 
 
 @router.get('/get-negotiate-list')
