@@ -305,70 +305,76 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
     #  处理球员 id
     if best_shooter == -1:
         best_shooter = club_model.players[0]
-        best_shooter_name = best_shooter.translated_name
-        best_shooter_image = best_shooter.avatar
+        best_shooter_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_shooter.id, db=db,
+            player_model=best_shooter, season=save_model.season, date=save_model.date).get_show_data()
     else:
         best_shooter = crud.get_player_by_id(player_id=best_shooter, db=db)
-        best_shooter_image = best_shooter.avatar
-        best_shooter_name = best_shooter.translated_name
+        best_shooter_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_shooter.id, db=db,
+            player_model=best_shooter, season=save_model.season, date=save_model.date).get_show_data()
     if best_assistant == -1:
         best_assistant = club_model.players[0]
-        best_assistant_name = best_assistant.translated_name
-        best_assistant_image = best_assistant.avatar
+        best_assistant_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_assistant.id, db=db,
+            player_model=best_assistant, season=save_model.season, date=save_model.date).get_show_data()
     else:
         best_assistant = crud.get_player_by_id(player_id=best_assistant, db=db)
-        best_assistant_image = best_assistant.avatar
-        best_assistant_name = best_assistant.translated_name
+        best_assistant_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_assistant.id, db=db,
+            player_model=best_assistant, season=save_model.season, date=save_model.date).get_show_data()
     if best_passer == -1:
         best_passer = club_model.players[0]
-        best_passer_name = best_passer.translated_name
-        best_passer_image = best_passer.avatar
+        best_passer_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_passer.id, db=db,
+            player_model=best_passer, season=save_model.season, date=save_model.date).get_show_data()
     else:
         best_passer = crud.get_player_by_id(player_id=best_passer, db=db)
-        best_passer_image = best_passer.avatar
-        best_passer_name = best_passer.translated_name
+        best_passer_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_passer.id, db=db,
+            player_model=best_passer, season=save_model.season, date=save_model.date).get_show_data()
     if best_tackler == -1:
         best_tackler = club_model.players[0]
-        best_tackler_name = best_tackler.translated_name
-        best_tackler_image = best_tackler.avatar
+        best_tackler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_tackler.id, db=db,
+            player_model=best_tackler, season=save_model.season, date=save_model.date).get_show_data()
     else:
         best_tackler = crud.get_player_by_id(player_id=best_tackler, db=db)
-        best_tackler_image = best_tackler.avatar
-        best_tackler_name = best_tackler.translated_name
+        best_tackler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_tackler.id, db=db,
+            player_model=best_tackler, season=save_model.season, date=save_model.date).get_show_data()
     if best_dribbler == -1:
         best_dribbler = club_model.players[0]
-        best_dribbler_name = best_dribbler.translated_name
-        best_dribbler_image = best_dribbler.avatar
+        best_dribbler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_dribbler.id, db=db,
+            player_model=best_dribbler, season=save_model.season, date=save_model.date).get_show_data()
     else:
         best_dribbler = crud.get_player_by_id(player_id=best_dribbler, db=db)
-        best_dribbler_image = best_dribbler.avatar
-        best_dribbler_name = best_dribbler.translated_name
+        best_dribbler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_dribbler.id, db=db,
+            player_model=best_dribbler, season=save_model.season, date=save_model.date).get_show_data()
     if best_player == -1:
         best_player = club_model.players[0]
-        best_player_name = best_player.translated_name
-        best_player_image = best_player.avatar
+        best_player_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_player.id, db=db,
+            player_model=best_player, season=save_model.season, date=save_model.date).get_show_data()
     else:
         best_player = crud.get_player_by_id(player_id=best_player, db=db)
-        best_player_image = best_player.avatar
-        best_player_name = best_player.translated_name
+        best_player_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
+            player_id=best_player.id, db=db,
+            player_model=best_player, season=save_model.season, date=save_model.date).get_show_data()
 
-    return {"最佳射手": best_shooter_name,
-            "最佳射手头像": best_shooter_image,
+    return {"最佳射手": best_shooter_show,
             "进球": most_score,
-            "平均评分最高": best_player_name,
-            "平均评分最高头像": best_player_image,
+            "平均评分最高": best_player_show,
             "评分": highest_rate,
-            "助攻最多": best_assistant_name,
-            "助攻最多头像": best_assistant_image,
+            "助攻最多": best_assistant_show,
             "助攻": most_assistant,
-            "传球成功率最高": best_passer_name,
-            "传球成功率最高头像": best_passer_image,
+            "传球成功率最高": best_passer_show,
             "传球成功率": highest_passing,
-            "拦截成功率最高": best_tackler_name,
-            "拦截成功率最高头像": best_tackler_image,
+            "拦截成功率最高": best_tackler_show,
             "拦截成功率": highest_tackle,
-            "过人成功率最高": best_dribbler_name,
-            "过人成功率最高头像": best_dribbler_image,
+            "过人成功率最高": best_dribbler_show,
             "过人成功率": highest_dribble}
 
 
