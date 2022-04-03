@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session
 from typing import List
@@ -13,7 +15,7 @@ def add_user_finance(db: Session, user_finance: schemas.UserFinanceCreate):
     return db_user_finance
 
 
-def get_user_finance_by_save(db: Session, save_id: int) -> List[models.UserFinance]:
+def get_user_finance_by_save(db: Session, save_id: int,date:datetime) -> List[models.UserFinance]:
     db_user_finances = db.query(models.UserFinance).filter(
-        and_(models.UserFinance.save_id == save_id)).all()
+        and_(models.UserFinance.save_id == save_id,models.UserFinance.date>date)).all()
     return db_user_finances

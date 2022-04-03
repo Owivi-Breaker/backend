@@ -18,6 +18,9 @@ router = APIRouter()
 
 @router.post('/put-on-sale')  # 玩家主动挂牌球员
 def put_on_sale(target_player_id: int, db: Session = Depends(get_db)):
+    """
+    玩家主动挂牌球员
+    """
     target_player = crud.get_player_by_id(player_id=target_player_id, db=db)
     target_player.on_sale = 1
     db.commit()
@@ -27,6 +30,7 @@ def put_on_sale(target_player_id: int, db: Session = Depends(get_db)):
 def upgrade_crew(crew: str, db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     crew: scout,assistant,doctor,negotiator
+    玩家升级球队职员
     """
     club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
     if crew == "scout":
@@ -42,8 +46,11 @@ def upgrade_crew(crew: str, db: Session = Depends(get_db), save_model=Depends(ut
     db.commit()
 
 
-@router.post('incoming-offers')  # 接收对于玩家球员的报价
+@router.post('/incoming-offers')  # 接收对于玩家球员的报价
 def incoming_offers(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    """
+    接收对于玩家球员的报价
+    """
     result_show = []
     offer_list = crud.get_offers_by_target_club(db=db, save_id=save_model.id, target_club_id=save_model.player_club_id,
                                                 season=save_model.season)
@@ -56,9 +63,12 @@ def incoming_offers(db: Session = Depends(get_db), save_model=Depends(utils.get_
     return result_show
 
 
-@router.post('dealing-offers')  # 玩家处理报价
+@router.post('/dealing-offers')  # 玩家处理报价
 def dealing_offers(offer_id: int, answer: str, db: Session = Depends(get_db),
                    save_model=Depends(utils.get_current_save)):
+    """
+    玩家处理报价
+    """
     offer = crud.get_offer_by_id(offer_id=offer_id, db=db)
     if answer == 'yes':
         crud.delete_target_by_player_id_n_buyer_id(

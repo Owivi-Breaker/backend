@@ -377,7 +377,6 @@ class Club:
                     p.adjust_wage(wage)  # 调整球员工资
                     offer.status = 's'  # 交易完成
                 elif offer.status == 'u':  # 买方俱乐部是玩家
-                    # 加钱 给钱
                     offer.status = 'n'  # 转到球员处工资谈判
 
     def improve_crew(self):

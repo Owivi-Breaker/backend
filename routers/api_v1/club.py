@@ -1,3 +1,5 @@
+import datetime
+from datetime import timedelta
 from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
@@ -279,7 +281,8 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
     highest_passing = 0
     highest_tackle = 0
     highest_dribble = 0
-    for i in range(0, len(game_players_data)):
+    best_shooter = best_assistant = best_passer = best_tackler = best_dribbler = best_player = -1
+    for i in range(0, len(game_players_data)):  # 遍历得到六个最佳球员的id
         player_info = game_players_data[i]
         if player_info.goals >= most_score:
             best_shooter = player_info.id
@@ -287,61 +290,154 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
         if player_info.assists >= most_assistant:
             best_assistant = player_info.id
             most_assistant = player_info.assists
-        if player_info.pass_success >= highest_passing:
+        if player_info.passes > 0 and player_info.pass_success / player_info.passes >= highest_passing:
             best_passer = player_info.id
-            highest_passing = player_info.pass_success
-        if player_info.tackle_success >= highest_tackle:
+            highest_passing = player_info.pass_success / player_info.passes
+        if player_info.tackles > 0 and player_info.tackle_success / player_info.tackles >= highest_tackle:
             best_tackler = player_info.id
-            highest_tackle = player_info.tackle_success
-        if player_info.dribble_success >= highest_dribble:
+            highest_tackle = player_info.tackle_success / player_info.tackles
+        if player_info.dribbles > 0 and player_info.dribble_success / player_info.dribbles >= highest_dribble:
             best_dribbler = player_info.id
-            highest_dribble = player_info.dribble_success
+            highest_dribble = player_info.dribble_success / player_info.dribbles
         if player_info.final_rating >= highest_rate:
             best_player = player_info.id
             highest_rate = player_info.final_rating
+    #  处理球员 id
     if best_shooter == -1:
-        best_shooter = club_model.players[i].translated_name
+        best_shooter = club_model.players[0]
+        best_shooter_name = best_shooter.translated_name
+        best_shooter_image = best_shooter.avatar
     else:
-        best_shooter = crud.get_player_by_id(player_id=best_shooter, db=db).translated_name
+        best_shooter = crud.get_player_by_id(player_id=best_shooter, db=db)
+        best_shooter_image = best_shooter.avatar
+        best_shooter_name = best_shooter.translated_name
     if best_assistant == -1:
-        best_assistant = club_model.players[i].translated_name
+        best_assistant = club_model.players[0]
+        best_assistant_name = best_assistant.translated_name
+        best_assistant_image = best_assistant.avatar
     else:
-        best_assistant = crud.get_player_by_id(player_id=best_assistant, db=db).translated_name
+        best_assistant = crud.get_player_by_id(player_id=best_assistant, db=db)
+        best_assistant_image = best_assistant.avatar
+        best_assistant_name = best_assistant.translated_name
     if best_passer == -1:
-        best_passer = club_model.players[i].translated_name
+        best_passer = club_model.players[0]
+        best_passer_name = best_passer.translated_name
+        best_passer_image = best_passer.avatar
     else:
-        best_passer = crud.get_player_by_id(player_id=best_passer, db=db).translated_name
+        best_passer = crud.get_player_by_id(player_id=best_passer, db=db)
+        best_passer_image = best_passer.avatar
+        best_passer_name = best_passer.translated_name
     if best_tackler == -1:
-        best_tackler = club_model.players[i].translated_name
+        best_tackler = club_model.players[0]
+        best_tackler_name = best_tackler.translated_name
+        best_tackler_image = best_tackler.avatar
     else:
-        best_tackler = crud.get_player_by_id(player_id=best_tackler, db=db).translated_name
+        best_tackler = crud.get_player_by_id(player_id=best_tackler, db=db)
+        best_tackler_image = best_tackler.avatar
+        best_tackler_name = best_tackler.translated_name
     if best_dribbler == -1:
-        best_dribbler = club_model.players[i].translated_name
+        best_dribbler = club_model.players[0]
+        best_dribbler_name = best_dribbler.translated_name
+        best_dribbler_image = best_dribbler.avatar
     else:
-        best_dribbler = crud.get_player_by_id(player_id=best_dribbler, db=db).translated_name
+        best_dribbler = crud.get_player_by_id(player_id=best_dribbler, db=db)
+        best_dribbler_image = best_dribbler.avatar
+        best_dribbler_name = best_dribbler.translated_name
     if best_player == -1:
-        best_player = club_model.players[i].translated_name
+        best_player = club_model.players[0]
+        best_player_name = best_player.translated_name
+        best_player_image = best_player.avatar
     else:
-        best_player = crud.get_player_by_id(player_id=best_player, db=db).translated_name
+        best_player = crud.get_player_by_id(player_id=best_player, db=db)
+        best_player_image = best_player.avatar
+        best_player_name = best_player.translated_name
 
-    return {"最佳射手": best_shooter,
+    return {"最佳射手": best_shooter_name,
+            "最佳射手头像": best_shooter_image,
             "进球": most_score,
-            "平均评分最高": best_player,
+            "平均评分最高": best_player_name,
+            "平均评分最高头像": best_player_image,
             "评分": highest_rate,
-            "助攻最多": best_assistant,
+            "助攻最多": best_assistant_name,
+            "助攻最多头像": best_assistant_image,
             "助攻": most_assistant,
-            "传球成功率最高": best_passer,
+            "传球成功率最高": best_passer_name,
+            "传球成功率最高头像": best_passer_image,
             "传球成功率": highest_passing,
-            "拦截成功率最高": best_tackler,
+            "拦截成功率最高": best_tackler_name,
+            "拦截成功率最高头像": best_tackler_image,
             "拦截成功率": highest_tackle,
-            "过人成功率最高": best_dribbler,
+            "过人成功率最高": best_dribbler_name,
+            "过人成功率最高头像": best_dribbler_image,
             "过人成功率": highest_dribble}
 
 
 @router.get('/me/finance-history')
-def get_finance_history(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+def get_finance_history(days: int, db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
-    玩家财政历史
+    获取指定天数内玩家收支情况
     """
-    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id)
+    year, month, day = save_model.date.split('-')
+    date = datetime.date(int(year), int(month), int(day)) + timedelta(-days)
+    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, date=date)
     return finance_history
+
+
+@router.get('/me/season-finance')
+def get_season_finance(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    """
+    获取当前赛季收益情况
+    """
+    year, month, day = save_model.date.split('-')
+    date = datetime.date(int(year), 7, 31)
+    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, date=date)
+    total_amount = 0
+    for event in finance_history:
+        total_amount += event.amount
+    return total_amount
+
+
+@router.get('/me/player-statistics')
+def get_players_statistics(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    sum_age = 0
+    sum_players = 0
+    highest_wage: float = 0
+    lowest_wage: float = 30
+    user_club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+    highest_wage_player = lowest_wage_player = user_club.players[0].translated_name
+    for player in user_club.players:
+        sum_age += player.age
+        sum_players += 1
+        if player.wages > highest_wage:
+            highest_wage = player.wages
+            highest_wage_player = player.translated_name
+        if player.wages < lowest_wage:
+            lowest_wage = player.wages
+            lowest_wage_player = player.translated_name
+    average_age: float = sum_age / sum_players
+
+    return {"平均年龄": average_age,
+            "最高工资": highest_wage,
+            "最高工资球员": highest_wage_player,
+            "最低工资": lowest_wage,
+            "最低工资球员": lowest_wage_player}
+
+
+@router.get('/me/season-goal-statistics')
+def get_season_goal_statistics(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    computed_game = computed_data_app.ComputedGame(db=db, save_id=save_model.id)
+    user_club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
+    league = crud.get_league_by_id(db=db, league_id=user_club.league_id)
+    goal = lost = 0
+    df = computed_game.get_season_points_table(save_model.season, league.name)
+    point_table = [tuple(x) for x in df.values]
+    if point_table:
+        for rank in range(0, len(point_table)):
+            if point_table[rank][1] == user_club.name:
+                goal = point_table[rank][5]
+                lost = point_table[rank][6]
+                return {"进球": goal,
+                        "失球": lost}
+    else:
+        return {"进球": goal,
+                "失球": lost}
