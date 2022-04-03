@@ -394,7 +394,8 @@ def get_season_finance(db: Session = Depends(get_db), save_model=Depends(utils.g
     """
     获取当前赛季收益情况
     """
-    year, month, day = save_model.date.split('-')
+    season = save_model.season
+    year = 2019+season
     date = datetime.date(int(year), 7, 31)
     finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, date=date)
     total_amount = 0
