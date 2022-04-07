@@ -193,6 +193,8 @@ class Club:
         """
         导出报价 schemas
         """
+        year, month, day = self.date.split('-')
+        offer_date = datetime.date(int(year), int(month), int(day))
         data = {
             'buyer_id': self.club_id,
             'target_id': player.player_model.id,
@@ -200,7 +202,8 @@ class Club:
             'offer_price': offer_price,
             'season': self.season,
             'save_id': save_id,
-            'status': 'w'
+            'status': 'w',
+            'date': offer_date
         }
         offer_data = schemas.OfferCreate(**data)
         return offer_data
@@ -210,6 +213,8 @@ class Club:
         """
         导出专用于玩家的报价 schemas
         """
+        year, month, day = self.date.split('-')
+        offer_date = datetime.date(int(year), int(month), int(day))
         data = {
             'buyer_id': self.club_id,
             'target_id': player.player_model.id,
@@ -217,7 +222,8 @@ class Club:
             'offer_price': offer_price,
             'season': self.season,
             'save_id': save_id,
-            'status': 'u'
+            'status': 'u',
+            'date': offer_date
         }
         offer_data = schemas.OfferCreate(**data)
         return offer_data
@@ -365,7 +371,6 @@ class Club:
                                 " 从 " + str(self.name) + " 转会至 " +
                                 str(crud.get_club_by_id(db=self.db, club_id=offer.buyer_id).name) +
                                 " " + str(offer.offer_price) + "w!")
-                    #  加钱扣钱
                     self.team_model.finance += offer.offer_price
                     buyer = crud.get_club_by_id(db=self.db, club_id=offer.buyer_id)
                     buyer.finance -= offer.offer_price
@@ -375,6 +380,9 @@ class Club:
                     if wage < 0:
                         wage = p.wanna_wage()
                     p.adjust_wage(wage)  # 调整球员工资
+                    year, month, day = self.date.split('-')
+                    success_date = datetime.date(int(year), int(month), int(day))
+                    offer.date = success_date  # 记录交易成功日期
                     offer.status = 's'  # 交易完成
                 elif offer.status == 'u':  # 买方俱乐部是玩家
                     offer.status = 'n'  # 转到球员处工资谈判
@@ -407,4 +415,3 @@ class Club:
                 self.team_model.scout += 1
             elif target == 'n':
                 self.team_model.negotiator += 1
-

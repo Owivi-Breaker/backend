@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Date
 from models.base import Base
 
 
@@ -24,3 +24,4 @@ class Offer(Base):
     offer_price = Column(Integer)
     season = Column(Integer)
     status = Column(String(2))
+    date = Column(Date)

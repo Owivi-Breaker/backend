@@ -1,5 +1,5 @@
 import datetime
-from datetime import timedelta
+from datetime import timedelta, date
 from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
@@ -384,8 +384,8 @@ def get_finance_history(days: int, db: Session = Depends(get_db), save_model=Dep
     获取指定天数内玩家收支情况
     """
     year, month, day = save_model.date.split('-')
-    date = datetime.date(int(year), int(month), int(day)) + timedelta(-days)
-    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, date=date)
+    limit_date = datetime.date(int(year), int(month), int(day)) + timedelta(-days)
+    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, limit_date=limit_date)
     return finance_history
 
 
@@ -395,9 +395,9 @@ def get_season_finance(db: Session = Depends(get_db), save_model=Depends(utils.g
     获取当前赛季收益情况
     """
     season = save_model.season
-    year = 2019+season
-    date = datetime.date(int(year), 7, 31)
-    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, date=date)
+    year = 2019 + season
+    limit_date = datetime.date(int(year), 7, 31)
+    finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, limit_date=limit_date)
     total_amount = 0
     for event in finance_history:
         total_amount += event.amount
@@ -448,3 +448,46 @@ def get_season_goal_statistics(db: Session = Depends(get_db), save_model=Depends
     else:
         return {"进球": goal,
                 "失球": lost}
+
+
+@router.get('/me/season-tactics-statistics')
+def get_season_tactics_statistics(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
+    """
+    获取当前赛季俱乐部各战术成功率
+    """
+    game_infos = crud.get_game_team_info_by_club(db=db, club_id=save_model.player_club_id, season=save_model.season)
+    game_datas = [game_info.team_data
+                  for game_info in game_infos]
+    wing_cross = wing_success = 0
+    pull_back = pull_back_success = 0
+    middle = middle_success = 0
+    under_cut = under_cut_success = 0
+    counter = counter_success = 0
+    for game_data in game_datas:
+        wing_cross += game_data.wing_cross
+        wing_success += game_data.wing_cross_success
+        pull_back += game_data.pull_back
+        pull_back_success += game_data.pull_back_success
+        middle += game_data.middle_attack
+        middle_success += game_data.middle_attack_success
+        under_cut += game_data.under_cutting
+        under_cut_success += game_data.under_cutting_success
+        counter += game_data.counter_attack
+        counter_success += game_data.counter_attack_success
+    return {
+        "下底传中": wing_cross,
+        "下底传中成功": wing_success,
+        "下底传中成功率": wing_success / wing_cross*100,
+        "倒三角": pull_back,
+        "倒三角成功": pull_back_success,
+        "倒三角成功率": pull_back_success / pull_back*100,
+        "中路渗透": middle,
+        "中路渗透成功": middle_success,
+        "中路渗透成功率": middle_success / middle*100,
+        "边路内切": under_cut,
+        "边路内切成功": under_cut_success,
+        "边路内切成功率": under_cut_success / under_cut*100,
+        "防守反击": counter,
+        "防守反击成功": counter_success,
+        "防守反击成功率": counter_success / counter*100
+    }

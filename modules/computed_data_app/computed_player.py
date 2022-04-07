@@ -73,11 +73,71 @@ class ComputedPlayer:
         data['superior_location'] = self.get_superior_location()
         data['top_capa'] = self.get_top_lo_n_capa()[1]
         data['location_capa'] = {a[0]: a[1] for a in self.get_sorted_location_capa(True)}
-        data['style_tag'] = ["就地反抢", "前插", "防守内收"]  # TODO 挂个假数据
-        data['talent_tag'] = ["大心脏", "偷猎者"]  # TODO 挂个假数据
+        data['style_tag'] = self.get_style_tag()
+        data['talent_tag'] = self.get_talent_tag()
         data['recent_ratings'] = self.get_ratings_in_recent_games()
         data['on_sale'] = self.player_model.on_sale
         return schemas.PlayerShow(**data)
+
+    def get_talent_tag(self) -> List[str]:
+        """
+        根据球员能力值上线计算天赋
+        """
+        talent_tag = []
+        if self.player_model.goalkeeping_limit > 85:
+            talent_tag.append("壁垒")
+        if self.player_model.height > 185:
+            talent_tag.append("高塔")
+        if self.player_model.strength_limit > 85 and self.player_model.aggression_limit > 85:
+            talent_tag.append("推土机")
+        if self.player_model.pace_limit > 85:
+            talent_tag.append("猎豹")
+        if self.player_model.dribbling_limit > 85:
+            talent_tag.append("魔术师")
+        if self.player_model.passing_limit > 85:
+            talent_tag.append("发动机")
+        if self.player_model.shooting_limit > 85:
+            talent_tag.append("重炮手")
+        if self.player_model.shooting_limit > 83 and self.player_model.aggression_limit > 83:
+            talent_tag.append("偷猎者")
+        if self.player_model.stamina_limit > 85:
+            talent_tag.append("大心脏")
+        if self.player_model.free_kick_limit > 85:
+            talent_tag.append("任意球大师")
+        if self.player_model.interception_limit > 87:
+            talent_tag.append("扫荡者")
+        if len(talent_tag) == 0:
+            talent_tag.append("普通一员")
+        return talent_tag
+
+    def get_style_tag(self) -> List[str]:
+        """
+        根据球员当前能力值计算偏好
+        """
+        style_tag = []
+        if self.player_model.passing > 50 and self.player_model.interception > 50:
+            style_tag.append("就地反抢")
+        if self.player_model.pace > 50 and self.player_model.shooting > 50:
+            style_tag.append("前插攻击")
+        if self.player_model.aggression < 50 and self.player_model.interception > 50:
+            style_tag.append("防守内收")
+        if self.player_model.aggression > 50:
+            style_tag.append("高位压迫")
+        if self.player_model.pace > 50 and self.player_model.passing > 50:
+            style_tag.append("套边传中")
+        if self.player_model.strength > 50 and self.player_model.pace < 40:
+            style_tag.append("站桩护球")
+        if self.player_model.passing > 60 and self.player_model.anticipation > 60:
+            style_tag.append("传球组织")
+        if self.player_model.aggression > 50 and self.player_model.anticipation < 50:
+            style_tag.append("利用身体")
+        if self.player_model.dribbling > 60:
+            style_tag.append("盘带过人")
+        if self.player_model.shooting > 60:
+            style_tag.append("远射得分")
+        if len(style_tag) == 0:
+            style_tag.append("听从指挥")
+        return style_tag
 
     def get_location_num(self) -> Dict[str, int]:
         """

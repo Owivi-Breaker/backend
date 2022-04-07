@@ -73,6 +73,8 @@ class NextTurner:
 
         total_events = self.get_total_events()
         # logger.debug(total_events)
+        if 'transfer' in total_events.keys():
+            self.transfer_starter(total_events['transfer'])
         if 'pve' in total_events.keys():
             self.pve_starter(total_events['pve'])
         if 'eve' in total_events.keys():
@@ -83,8 +85,6 @@ class NextTurner:
             self.crew_improve_starter(total_events['crew improve'])
         if 'offer expire' in total_events.keys():
             self.offer_expire_starter(total_events['offer expire'])
-        if 'transfer' in total_events.keys():
-            self.transfer_starter(total_events['transfer'])
         if 'transfer end' in total_events.keys():
             self.transfer_end_starter(total_events['transfer end'])
         if 'rank and tv' in total_events.keys():

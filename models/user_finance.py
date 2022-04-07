@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, Date
 from models.base import Base
 
 
@@ -9,5 +9,5 @@ class UserFinance(Base):
     save_id = Column(Integer, ForeignKey('save.id'))
     amount = Column(Integer)
     event = Column(String(100))
-    date = Column(DateTime)
+    date = Column(Date)
 

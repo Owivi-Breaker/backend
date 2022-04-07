@@ -88,6 +88,12 @@ def update_game_team_info(db: Session, game_team_info_id: int, attri: dict) -> m
     return db_game_team_info
 
 
+def get_game_team_info_by_club(db: Session, club_id: int, season: int) -> list[models.GameTeamInfo]:
+    db_game_team_info = db.query(models.GameTeamInfo).filter(models.GameTeamInfo.club_id == club_id
+                                                             and models.GameTeamInfo.season == season).all()
+    return db_game_team_info
+
+
 def update_game_team_data(db: Session, game_team_data_id: int, attri: dict) -> models.GameTeamData:
     db_game_team_data = db.query(models.GameTeamData).filter(models.GameTeamData.id == game_team_data_id).first()
     for key, value in attri.items():

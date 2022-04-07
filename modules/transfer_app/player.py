@@ -143,6 +143,9 @@ class Player:
                     crud.add_user_finance(db=self.db, user_finance=user_finance)
                     seller = crud.get_club_by_id(db=self.db, club_id=offer.target_club_id)
                     seller.finance += offer.offer_price
+                    year, month, day = self.date.split('-')
+                    success_date = datetime.date(int(year), int(month), int(day))
+                    offer.date = success_date  # 记录交易成功日期
                     return 1
                 else:
                     return 0  # 工资不满足要求
