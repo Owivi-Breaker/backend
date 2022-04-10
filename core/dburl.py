@@ -1,1 +1,1 @@
-db_url = "MySQLKETCH"
+db_url = "sqlite"

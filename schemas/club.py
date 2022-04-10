@@ -6,9 +6,9 @@ import schemas
 
 class ClubCreate(BaseModel):
     created_time: datetime
-    name: str
-    finance: float  # 单位：万
-    reputation: float
+    name: str = 'default'
+    finance: float = 0  # 单位：万
+    reputation: float = 0
     assistant: int = 0  # 助理教练
     doctor: int = 0  # 队医
     scout: int = 0  # 球探

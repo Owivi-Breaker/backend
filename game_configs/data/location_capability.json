@@ -2,16 +2,16 @@
   {
     "name": "ST",
     "weight": {
-      "shooting": 0.45,
-      "passing": 0,
-      "dribbling": 0.05,
+      "shooting": 0.36,
+      "passing": 0.05,
+      "dribbling": 0.09,
       "interception": 0,
-      "pace": 0.05,
+      "pace": 0.09,
       "strength": 0.15,
       "aggression": 0,
-      "anticipation": 0.15,
+      "anticipation": 0.17,
       "free_kick": 0,
-      "stamina": 0.15,
+      "stamina": 0.09,
       "goalkeeping": 0
     }
   },
@@ -19,15 +19,15 @@
     "name": "LW",
     "weight": {
       "shooting": 0.2,
-      "passing": 0.2,
+      "passing": 0.25,
       "dribbling": 0.4,
       "interception": 0,
-      "pace": 0.2,
+      "pace": 0.1,
       "strength": 0,
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.05,
       "goalkeeping": 0
     }
   },
@@ -35,15 +35,15 @@
     "name": "RW",
     "weight": {
       "shooting": 0.2,
-      "passing": 0.2,
+      "passing": 0.25,
       "dribbling": 0.4,
       "interception": 0,
-      "pace": 0.2,
+      "pace": 0.1,
       "strength": 0,
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.05,
       "goalkeeping": 0
     }
   },
@@ -51,15 +51,15 @@
     "name": "CM",
     "weight": {
       "shooting": 0.2,
-      "passing": 0.7,
-      "dribbling": 0,
-      "interception": 0,
+      "passing": 0.55,
+      "dribbling": 0.04,
+      "interception": 0.03,
       "pace": 0,
-      "strength": 0,
+      "strength": 0.06,
       "aggression": 0,
-      "anticipation": 0,
+      "anticipation": 0.1,
       "free_kick": 0,
-      "stamina": 0.1,
+      "stamina": 0.02,
       "goalkeeping": 0
     }
   },
@@ -67,47 +67,47 @@
     "name": "CB",
     "weight": {
       "shooting": 0,
-      "passing": 0,
+      "passing": 0.19,
       "dribbling": 0,
-      "interception": 0.5,
-      "pace": 0,
-      "strength": 0.25,
+      "interception": 0.26,
+      "pace": 0.1,
+      "strength": 0.18,
       "aggression": 0,
-      "anticipation": 0.25,
+      "anticipation": 0.19,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.08,
       "goalkeeping": 0
     }
   },
   {
     "name": "LB",
     "weight": {
-      "shooting": 0,
-      "passing": 0.2,
-      "dribbling": 0.1,
-      "interception": 0.3,
-      "pace": 0.4,
+      "shooting": 0.1,
+      "passing": 0.28,
+      "dribbling": 0.22,
+      "interception": 0.15,
+      "pace": 0.21,
       "strength": 0,
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.04,
       "goalkeeping": 0
     }
   },
   {
     "name": "RB",
     "weight": {
-      "shooting": 0,
-      "passing": 0.2,
-      "dribbling": 0.1,
-      "interception": 0.3,
-      "pace": 0.4,
+      "shooting": 0.1,
+      "passing": 0.28,
+      "dribbling": 0.22,
+      "interception": 0.15,
+      "pace": 0.21,
       "strength": 0,
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.04,
       "goalkeeping": 0
     }
   },
@@ -115,7 +115,7 @@
     "name": "GK",
     "weight": {
       "shooting": 0,
-      "passing": 0.05,
+      "passing": 0.11,
       "dribbling": 0,
       "interception": 0,
       "pace": 0,
@@ -123,71 +123,71 @@
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
-      "goalkeeping": 0.95
+      "stamina": 0.04,
+      "goalkeeping": 0.85
     }
   },
   {
     "name": "CAM",
     "weight": {
-      "shooting": 0.4,
-      "passing": 0.5,
-      "dribbling": 0,
+      "shooting": 0.32,
+      "passing": 0.36,
+      "dribbling": 0.08,
       "interception": 0,
-      "pace": 0,
-      "strength": 0.05,
-      "aggression": 0,
-      "anticipation": 0.05,
+      "pace": 0.06,
+      "strength": 0.06,
+      "aggression": 0.01,
+      "anticipation": 0.06,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.05,
       "goalkeeping": 0
     }
   },
   {
     "name": "LM",
     "weight": {
-      "shooting": 0.1,
-      "passing": 0.5,
-      "dribbling": 0.2,
-      "interception": 0,
-      "pace": 0.2,
+      "shooting": 0.14,
+      "passing": 0.45,
+      "dribbling": 0.22,
+      "interception": 0.03,
+      "pace": 0.07,
       "strength": 0,
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.09,
       "goalkeeping": 0
     }
   },
   {
     "name": "RM",
     "weight": {
-      "shooting": 0.1,
-      "passing": 0.5,
-      "dribbling": 0.2,
-      "interception": 0,
-      "pace": 0.2,
+      "shooting": 0.14,
+      "passing": 0.45,
+      "dribbling": 0.22,
+      "interception": 0.03,
+      "pace": 0.07,
       "strength": 0,
       "aggression": 0,
       "anticipation": 0,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.09,
       "goalkeeping": 0
     }
   },
   {
     "name": "CDM",
     "weight": {
-      "shooting": 0,
-      "passing": 0.5,
-      "dribbling": 0,
-      "interception": 0.3,
-      "pace": 0,
-      "strength": 0.1,
+      "shooting": 0.05,
+      "passing": 0.45,
+      "dribbling": 0.03,
+      "interception": 0.23,
+      "pace": 0.03,
+      "strength": 0.03,
       "aggression": 0,
-      "anticipation": 0.1,
+      "anticipation": 0.08,
       "free_kick": 0,
-      "stamina": 0,
+      "stamina": 0.1,
       "goalkeeping": 0
     }
   }
