@@ -456,38 +456,45 @@ def get_season_tactics_statistics(db: Session = Depends(get_db), save_model=Depe
     获取当前赛季俱乐部各战术成功率
     """
     game_infos = crud.get_game_team_info_by_club(db=db, club_id=save_model.player_club_id, season=save_model.season)
+
+    wing_cross = wing_success = wing_rate = 0
+    pull_back = pull_back_success = pull_rate = 0
+    middle = middle_success = middle_rate = 0
+    under_cut = under_cut_success = under_rate = 0
+    counter = counter_success = counter_rate = 0
     game_datas = [game_info.team_data
                   for game_info in game_infos]
-    wing_cross = wing_success = 0
-    pull_back = pull_back_success = 0
-    middle = middle_success = 0
-    under_cut = under_cut_success = 0
-    counter = counter_success = 0
-    for game_data in game_datas:
-        wing_cross += game_data.wing_cross
-        wing_success += game_data.wing_cross_success
-        pull_back += game_data.pull_back
-        pull_back_success += game_data.pull_back_success
-        middle += game_data.middle_attack
-        middle_success += game_data.middle_attack_success
-        under_cut += game_data.under_cutting
-        under_cut_success += game_data.under_cutting_success
-        counter += game_data.counter_attack
-        counter_success += game_data.counter_attack_success
+    if game_datas:
+        for game_data in game_datas:
+            wing_cross += game_data.wing_cross
+            wing_success += game_data.wing_cross_success
+            pull_back += game_data.pull_back
+            pull_back_success += game_data.pull_back_success
+            middle += game_data.middle_attack
+            middle_success += game_data.middle_attack_success
+            under_cut += game_data.under_cutting
+            under_cut_success += game_data.under_cutting_success
+            counter += game_data.counter_attack
+            counter_success += game_data.counter_attack_success
+        wing_rate = wing_success / wing_cross * 100
+        pull_rate = pull_back_success / pull_back * 100
+        middle_rate = middle_success / middle * 100
+        under_rate = under_cut_success / under_cut * 100
+        counter_rate = counter_success / counter * 100
     return {
         "下底传中": wing_cross,
         "下底传中成功": wing_success,
-        "下底传中成功率": wing_success / wing_cross*100,
+        "下底传中成功率": wing_rate,
         "倒三角": pull_back,
         "倒三角成功": pull_back_success,
-        "倒三角成功率": pull_back_success / pull_back*100,
+        "倒三角成功率": pull_rate,
         "中路渗透": middle,
         "中路渗透成功": middle_success,
-        "中路渗透成功率": middle_success / middle*100,
+        "中路渗透成功率": middle_rate,
         "边路内切": under_cut,
         "边路内切成功": under_cut_success,
-        "边路内切成功率": under_cut_success / under_cut*100,
+        "边路内切成功率": under_rate,
         "防守反击": counter,
         "防守反击成功": counter_success,
-        "防守反击成功率": counter_success / counter*100
+        "防守反击成功率": counter_rate
     }

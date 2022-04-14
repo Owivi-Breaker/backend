@@ -10,7 +10,7 @@ import models
 from utils import logger
 from core import dburl
 
-engine = create_engine(settings.DB_URL[dburl.db_url], encoding='utf-8')
+engine = create_engine(settings.DB_URL[dburl.mysql_db_url], encoding='utf-8')
 # 建数据库
 if not database_exists(engine.url):
     create_database(engine.url)
