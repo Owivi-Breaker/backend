@@ -1,6 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.orm import relationship
 from models.base import Base
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class Save(Base):

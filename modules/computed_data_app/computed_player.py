@@ -1,15 +1,15 @@
 
-from sqlalchemy.orm import Session
-from typing import Dict, List, Tuple, Optional
 import random
+from typing import Dict, List, Optional, Tuple
 
+import crud
 import game_configs
+import models
 import schemas
 import utils
 import utils.utils
+from sqlalchemy.orm import Session
 from utils import logger, utils
-import models
-import crud
 
 
 class ComputedPlayer:

@@ -1,8 +1,7 @@
-from sqlalchemy.orm import Session
-
 import crud
 import models
 import schemas
+from sqlalchemy.orm import Session
 
 
 class ComputedGamePvE:

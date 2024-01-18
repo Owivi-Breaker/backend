@@ -2,7 +2,6 @@
 import datetime
 
 
-
 class Date:
     def __init__(self, *args):
         if len(args) >= 3:

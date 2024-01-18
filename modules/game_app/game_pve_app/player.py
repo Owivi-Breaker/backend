@@ -1,8 +1,7 @@
 import crud
-from modules import computed_data_app
 import models
+from modules import computed_data_app
 from modules.game_app import game_eve_app
-
 from sqlalchemy.orm import Session
 
 

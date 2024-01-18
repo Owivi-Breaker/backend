@@ -1,7 +1,6 @@
+import crud
 import models
 import schemas
-import crud
-
 from sqlalchemy.orm import Session
 
 

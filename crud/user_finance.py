@@ -1,11 +1,10 @@
 from datetime import date
-
-from sqlalchemy import and_
-from sqlalchemy.orm import Session
 from typing import List
 
 import models
 import schemas
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
 
 
 def add_user_finance(db: Session, user_finance: schemas.UserFinanceCreate):

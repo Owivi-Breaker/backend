@@ -1,11 +1,11 @@
+import functools
 import operator
 from typing import List
-import functools
-from sqlalchemy.orm import Session
 
 import crud
 import models
 import schemas
+from sqlalchemy.orm import Session
 
 
 def create_club(db: Session, club: schemas.ClubCreate):

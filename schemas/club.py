@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
+
 import schemas
+from pydantic import BaseModel
 
 
 class ClubCreate(BaseModel):

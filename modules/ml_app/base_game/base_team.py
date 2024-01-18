@@ -1,12 +1,12 @@
-from utils import utils, logger
+import datetime
+import random
+from typing import Dict, List, Optional, Tuple
+
 import game_configs
 import schemas
 from modules.ml_app.base_game.base_player import BasePlayer
-
-import random
-from typing import List, Tuple, Optional, Dict
-import datetime
 from sqlalchemy.orm import Session
+from utils import logger, utils
 
 
 class BaseTeam:

@@ -1,9 +1,9 @@
-from sqlalchemy import and_
-from sqlalchemy.orm import Session
 from typing import List
 
 import models
 import schemas
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
 
 
 def create_offer(db: Session, offer: schemas.OfferCreate):

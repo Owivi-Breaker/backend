@@ -1,9 +1,9 @@
-import schemas
-import models
-import crud
-
-from sqlalchemy.orm import Session
 from typing import Optional
+
+import crud
+import models
+import schemas
+from sqlalchemy.orm import Session
 
 
 class ComputedLeague:

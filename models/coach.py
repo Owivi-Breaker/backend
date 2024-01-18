@@ -1,5 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from models.base import Base
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 
 # region 教练数据

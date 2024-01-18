@@ -1,10 +1,10 @@
 from typing import List
-from sqlalchemy.orm import Session
 
 import models
 import schemas
-from utils import logger
 from core.db import engine
+from sqlalchemy.orm import Session
+from utils import logger
 
 
 def create_game(db: Session, game: schemas.GameCreate):

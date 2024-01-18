@@ -2,16 +2,15 @@
 选人算法
 """
 import json
+import random
+from typing import Dict, List, Optional, Tuple, Union
 
-import models
 import crud
 import game_configs
-from utils import logger, utils
+import models
 from modules.computed_data_app import ComputedPlayer
-
-from typing import List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
-import random
+from utils import logger, utils
 
 
 class PlayerSelector:

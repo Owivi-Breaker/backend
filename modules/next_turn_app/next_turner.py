@@ -2,13 +2,13 @@ import datetime
 import json
 import time
 from typing import List
-from sqlalchemy.orm import Session
 
 import crud
 import models
 import schemas
-from utils import Date, utils, logger
-from modules import game_app, generate_app, computed_data_app, transfer_app
+from modules import computed_data_app, game_app, generate_app, transfer_app
+from sqlalchemy.orm import Session
+from utils import Date, logger, utils
 
 
 def crew_salary_check(db: Session, club_id: int):

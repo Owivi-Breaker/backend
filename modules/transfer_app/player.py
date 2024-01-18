@@ -1,15 +1,14 @@
+import datetime
 from random import randint
+from typing import List
 
-import numpy as np
-
-from utils import logger
+import crud
 import models
+import numpy as np
 import schemas
 from modules import computed_data_app
-import crud
-from typing import List
-import datetime
 from sqlalchemy.orm import Session
+from utils import logger
 
 
 class Player:

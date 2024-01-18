@@ -1,11 +1,9 @@
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
-from core.db import get_db
-from utils import get_current_user, oauth2_scheme
 import crud
 import models
-
+from core.db import get_db
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from utils import get_current_user, oauth2_scheme
 
 #
 # async def verify_token(token: str = Depends(oauth2_scheme),

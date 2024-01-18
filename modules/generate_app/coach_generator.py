@@ -1,15 +1,15 @@
-import models
-from utils import utils
-import game_configs
-import schemas
-import crud
-
-from sqlalchemy.orm import Session
 import datetime
-from faker import Faker
+import json
 import random
 from typing import Tuple
-import json
+
+import crud
+import game_configs
+import models
+import schemas
+from faker import Faker
+from sqlalchemy.orm import Session
+from utils import utils
 
 
 class CoachGenerator:

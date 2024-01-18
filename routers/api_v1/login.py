@@ -1,13 +1,12 @@
-from fastapi import APIRouter
 import datetime
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
 
 import game_configs
-from core.db import get_db
 import utils
+from core.db import get_db
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 

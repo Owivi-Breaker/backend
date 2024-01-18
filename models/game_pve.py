@@ -1,7 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Boolean, TEXT
-from sqlalchemy.orm import relationship
-from models.base import Base
 import game_configs
+from models.base import Base
+from sqlalchemy import TEXT, Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class GamePvE(Base):

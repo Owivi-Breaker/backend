@@ -1,6 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
-from sqlalchemy.orm import relationship
 from models.base import Base
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 
 # region 联赛数据

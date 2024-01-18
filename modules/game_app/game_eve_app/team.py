@@ -1,15 +1,15 @@
-from utils import utils, logger
-import game_configs
+import datetime
+import random
+from typing import List, Optional, Tuple
+
 import crud
+import game_configs
+import models
 import schemas
 from modules.game_app import game_eve_app
 from modules.game_app.player_selector import PlayerSelector
-import models
-
-import random
-from typing import List, Tuple, Optional
-import datetime
 from sqlalchemy.orm import Session
+from utils import logger, utils
 
 
 class Team:

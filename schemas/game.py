@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
 
 from game_configs.game_config import Location
+from pydantic import BaseModel
 
 
 # region 比赛表

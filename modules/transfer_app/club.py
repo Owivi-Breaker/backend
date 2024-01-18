@@ -2,14 +2,13 @@ import datetime
 import random
 from typing import List
 
-import numpy as np
-from sqlalchemy.orm import Session
-
 import crud
 import models
+import numpy as np
 import schemas
-from modules import transfer_app, computed_data_app
-from utils import utils, logger
+from modules import computed_data_app, transfer_app
+from sqlalchemy.orm import Session
+from utils import logger, utils
 
 
 class Club:

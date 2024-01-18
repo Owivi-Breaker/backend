@@ -1,15 +1,15 @@
+import datetime
 from typing import List
-from fastapi import APIRouter, status, Depends, HTTPException
+
+import crud
+import models
+import schemas
+import utils
+from core.db import get_db
+from fastapi import APIRouter, Depends, HTTPException, status
+from modules import generate_app
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-import datetime
-
-from modules import generate_app
-from core.db import get_db
-import schemas
-import models
-import crud
-import utils
 from utils import logger
 
 router = APIRouter()

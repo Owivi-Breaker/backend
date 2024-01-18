@@ -1,7 +1,6 @@
-from sqlalchemy.orm import Session
-
 import models
 import schemas
+from sqlalchemy.orm import Session
 from utils import logger
 
 

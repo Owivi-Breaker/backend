@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends
-from routers.api_v1 import game, player, club, league, game_pve, login, next_turn, user, transfer
-from routers.api_test import test
-
 import utils
+from fastapi import APIRouter, Depends
+from routers.api_test import test
+from routers.api_v1 import club, game, game_pve, league, login, next_turn, player, transfer, user
 
 api_router = APIRouter()
 # router注册

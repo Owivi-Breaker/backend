@@ -1,14 +1,14 @@
+import datetime
+import json
+import random
+from typing import List
+
 import crud
 import models
 import schemas
 from modules import computed_data_app
-from utils import Date, logger, utils
-
 from sqlalchemy.orm import Session
-import random
-from typing import List
-import json
-import datetime
+from utils import Date, logger, utils
 
 
 class CalendarGenerator:

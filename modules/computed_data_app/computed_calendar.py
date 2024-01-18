@@ -1,11 +1,11 @@
-from sqlalchemy.orm import Session
-from typing import List
 import json
+from typing import List
 
-import utils
-from utils import utils
-import models
 import crud
+import models
+import utils
+from sqlalchemy.orm import Session
+from utils import utils
 
 
 class ComputedCalendar:

@@ -1,6 +1,7 @@
+import time
+
 from pygtrans import Translate
 from utils.logger import logger
-import time
 
 
 class Translator:

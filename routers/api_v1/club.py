@@ -1,16 +1,15 @@
 import datetime
 from datetime import timedelta
 from typing import List
-from fastapi import APIRouter
-from fastapi import Depends
-from sqlalchemy.orm import Session
 
-import schemas
-import models
-from core.db import get_db
 import crud
+import models
+import schemas
 import utils
+from core.db import get_db
+from fastapi import APIRouter, Depends
 from modules import computed_data_app
+from sqlalchemy.orm import Session
 from utils import logger
 
 router = APIRouter()

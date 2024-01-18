@@ -1,16 +1,15 @@
+import datetime
 import json
+import random
+from typing import Dict, List, Tuple
 
-from utils import utils, logger
-import game_configs
 import crud
+import game_configs
 import models
 import schemas
 from modules.game_app import game_eve_app
-
-import random
-from typing import Dict, List, Tuple
-import datetime
 from sqlalchemy.orm import Session
+from utils import logger, utils
 
 
 class GameEvE:

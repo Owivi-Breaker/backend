@@ -1,8 +1,8 @@
+from typing import List
+
+import crud
 import models
 from modules.game_app import game_eve_app, game_pve_app
-import crud
-
-from typing import List
 from sqlalchemy.orm import Session
 
 

@@ -1,6 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
-from sqlalchemy.dialects.mysql import TEXT
 from models.base import Base
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.dialects.mysql import TEXT
 
 
 class Calendar(Base):

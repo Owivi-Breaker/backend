@@ -1,15 +1,14 @@
 from typing import Dict, Optional
-from fastapi import APIRouter, Body
-from fastapi import Depends
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
 
-import schemas
-import models
 import crud
+import models
+import schemas
 import utils
 from core.db import get_db
-from modules import game_app, generate_app, computed_data_app
+from fastapi import APIRouter, Body, Depends
+from modules import computed_data_app, game_app, generate_app
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 
 class TacticWeight(BaseModel):

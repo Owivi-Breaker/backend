@@ -1,8 +1,7 @@
-from sqlalchemy.orm import Session
-
+import crud
 import models
 from modules import game_app
-import crud
+from sqlalchemy.orm import Session
 
 
 class TacticAdjustor:

@@ -1,8 +1,8 @@
-from sqlalchemy.orm import Session
 from typing import List
 
 import models
 import schemas
+from sqlalchemy.orm import Session
 
 
 def create_calendar(db: Session, calendar: schemas.CalendarCreate):

@@ -1,10 +1,10 @@
-from utils import utils
-import schemas
-import game_configs
-
-from typing import Optional
 import datetime
+from typing import Optional
+
+import game_configs
+import schemas
 from sqlalchemy.orm import Session
+from utils import utils
 
 
 class BasePlayer:

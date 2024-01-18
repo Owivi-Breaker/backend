@@ -1,13 +1,12 @@
-from sqlalchemy import create_engine, Index
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.exc import OperationalError
-from sqlalchemy_utils import database_exists, create_database
+import models
+from core import dburl
 from core.config import settings
 from models.base import Base
-import models
+from sqlalchemy import Index, create_engine
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy_utils import create_database, database_exists
 from utils import logger
-from core import dburl
 
 engine = create_engine(settings.DB_URL[dburl.mysql_db_url], encoding='utf-8')
 # 建数据库

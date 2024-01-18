@@ -1,7 +1,7 @@
-from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 import models
 import schemas
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 
 def get_user_by_id(db: Session, user_id: int):

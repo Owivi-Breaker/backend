@@ -1,6 +1,6 @@
-from sqlalchemy.orm import Session
 import models
 import schemas
+from sqlalchemy.orm import Session
 
 
 def create_league(league: schemas.LeagueCreate, db: Session):

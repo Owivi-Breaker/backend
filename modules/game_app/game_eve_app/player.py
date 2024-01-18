@@ -1,12 +1,12 @@
-from utils import utils
+import datetime
+from typing import Optional
+
+import game_configs
 import models
 import schemas
-import game_configs
 from modules import computed_data_app
-
-from typing import Optional
-import datetime
 from sqlalchemy.orm import Session
+from utils import utils
 
 
 class Player:

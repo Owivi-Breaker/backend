@@ -1,7 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, TEXT
-from sqlalchemy.orm import relationship
-from models.base import Base
 from game_configs.game_config import Location
+from models.base import Base
+from sqlalchemy import TEXT, Column, DateTime, Enum, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 
 # region 比赛输出数据

@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
 
 import game_configs
+from pydantic import BaseModel
 
 
 class PlayerPvECreate(BaseModel):

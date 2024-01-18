@@ -1,13 +1,11 @@
-from fastapi import APIRouter
-from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
-
-import schemas
-import models
-from modules import computed_data_app
 import crud
+import models
+import schemas
 import utils
 from core.db import get_db
+from fastapi import APIRouter, Depends, HTTPException
+from modules import computed_data_app
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 

@@ -1,8 +1,9 @@
-from pydantic import AnyHttpUrl
-from typing import List
-from pathlib import Path
-import os
 import json
+import os
+from pathlib import Path
+from typing import List
+
+from pydantic import AnyHttpUrl
 
 with open('./env.json') as f:
     data = json.load(f)

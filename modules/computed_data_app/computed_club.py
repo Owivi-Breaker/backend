@@ -1,10 +1,10 @@
-import schemas
-from utils import logger
-import models
-import crud
-
-from sqlalchemy.orm import Session
 from typing import Optional
+
+import crud
+import models
+import schemas
+from sqlalchemy.orm import Session
+from utils import logger
 
 
 class ComputedClub:

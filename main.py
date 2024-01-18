@@ -1,7 +1,7 @@
+from core.config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.apis import api_router
-from core.config import settings
 from utils import logger
 
 app = FastAPI(title=settings.APP_NAME)

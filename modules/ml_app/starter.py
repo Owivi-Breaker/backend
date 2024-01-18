@@ -1,11 +1,12 @@
-from sqlalchemy.orm import Session
-from game_configs import formations
-import random
-from modules.ml_app.base_game.base_game import BaseGame
-from typing import Dict
-import pandas as pd
 import os
+import random
+from typing import Dict
+
+import pandas as pd
 from core.db import get_session
+from game_configs import formations
+from modules.ml_app.base_game.base_game import BaseGame
+from sqlalchemy.orm import Session
 from utils import logger
 
 pos_formations = {

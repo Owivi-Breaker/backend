@@ -2,13 +2,11 @@ import json
 import random
 from typing import List, Tuple
 
-from sqlalchemy.orm import Session
-
 import crud
-import schemas
 import game_configs
-from modules.game_app import game_eve_app
-from modules.game_app import game_pve_app
+import schemas
+from modules.game_app import game_eve_app, game_pve_app
+from sqlalchemy.orm import Session
 from utils import logger
 
 

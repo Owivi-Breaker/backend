@@ -1,11 +1,11 @@
 
-from utils import logger
-import schemas
-from modules.ml_app.base_game import BaseTeam
-
 import random
 from typing import Dict, List, Tuple
+
+import schemas
+from modules.ml_app.base_game import BaseTeam
 from sqlalchemy.orm import Session
+from utils import logger
 
 
 class BaseGame:

@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-
 import crud
 import utils
-from core.db import get_db, drop_all
-from modules import game_app, computed_data_app, transfer_app
+from core.db import drop_all, get_db
+from fastapi import APIRouter, Depends
+from modules import computed_data_app, game_app, transfer_app
+from sqlalchemy.orm import Session
 from utils import Date
 
 router = APIRouter()

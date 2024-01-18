@@ -1,15 +1,15 @@
-import models
-from utils import utils
-import game_configs
-import crud
-import schemas
-
-import random
-import json
-from faker import Faker
 import datetime
+import json
+import random
 from typing import Tuple
+
+import crud
+import game_configs
+import models
+import schemas
+from faker import Faker
 from sqlalchemy.orm import Session
+from utils import utils
 
 
 class PlayerGenerator:
