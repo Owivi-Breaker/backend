@@ -15,6 +15,7 @@ class Token(BaseModel):
     """
     token的返回格式
     """
+
     access_token: str
     token_type: str
 
@@ -29,10 +30,9 @@ async def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestF
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = datetime.timedelta(minutes=game_configs.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = utils.create_access_token(
-        data={"sub": user_model.email}, expires_delta=access_token_expires
-    )
+    access_token = utils.create_access_token(data={"sub": user_model.email}, expires_delta=access_token_expires)
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 # @router.get("/users/me", response_model=list)  # 返回用户名、帐号状态
 # async def read_users_me(current_user: models.User = Depends(get_current_user)):  # models中的user类

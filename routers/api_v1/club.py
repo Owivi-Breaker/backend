@@ -15,7 +15,7 @@ from utils import logger
 router = APIRouter()
 
 
-@router.get('/', response_model=List[schemas.ClubShow])
+@router.get("/", response_model=List[schemas.ClubShow])
 def get_clubs(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubShow]:
     """
     获取指定存档的所有俱乐部信息
@@ -23,37 +23,35 @@ def get_clubs(save_id: int, db: Session = Depends(get_db)) -> List[schemas.ClubS
     """
     db_clubs: List[models.Club] = crud.get_clubs_by_save(db=db, save_id=save_id)
     club_shows: List[schemas.ClubShow] = [
-        computed_data_app.ComputedClub(
-            club_id=club_model.id, db=db, club_model=club_model).get_show_data()
-        for club_model in db_clubs]
+        computed_data_app.ComputedClub(club_id=club_model.id, db=db, club_model=club_model).get_show_data()
+        for club_model in db_clubs
+    ]
     return club_shows
 
 
-@router.get('/me', response_model=schemas.ClubShow, tags=['me api'])
+@router.get("/me", response_model=schemas.ClubShow, tags=["me api"])
 def get_club_by_user(save_model=Depends(utils.get_current_save), db: Session = Depends(get_db)) -> schemas.ClubShow:
     """
     获取玩家俱乐部信的信息
     """
     club_model: models.Club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
 
-    return computed_data_app.ComputedClub(
-        club_id=club_model.id, db=db).get_show_data()
+    return computed_data_app.ComputedClub(club_id=club_model.id, db=db).get_show_data()
 
 
-@router.get('/{club_id}', response_model=schemas.ClubShow)
+@router.get("/{club_id}", response_model=schemas.ClubShow)
 def get_club_by_id(club_id: int, db: Session = Depends(get_db)) -> schemas.ClubShow:
     """
     获取指定id的俱乐部信息
     """
     club_model = crud.get_club_by_id(db=db, club_id=club_id)
-    return computed_data_app.ComputedClub(
-        club_id=club_model.id, db=db, club_model=club_model).get_show_data()
+    return computed_data_app.ComputedClub(club_id=club_model.id, db=db, club_model=club_model).get_show_data()
 
 
-@router.get('/me/player', response_model=List[schemas.PlayerShow], tags=['player api', 'me api'])
+@router.get("/me/player", response_model=List[schemas.PlayerShow], tags=["player api", "me api"])
 def get_players_by_user(
-        db: Session = Depends(get_db),
-        save_model=Depends(utils.get_current_save)) -> List[schemas.PlayerShow]:
+    db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)
+) -> List[schemas.PlayerShow]:
     """
     获取玩家俱乐部的球员信息
     :param save_model: 存档实例
@@ -61,16 +59,21 @@ def get_players_by_user(
     """
 
     club_model = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
-    return [computed_data_app.ComputedPlayer(
-        player_id=player_model.id, db=db, player_model=player_model,
-        season=save_model.season, date=save_model.date).get_show_data()
-            for player_model in club_model.players]
+    return [
+        computed_data_app.ComputedPlayer(
+            player_id=player_model.id, db=db, player_model=player_model, season=save_model.season, date=save_model.date
+        ).get_show_data()
+        for player_model in club_model.players
+    ]
 
 
-@router.get('/{club_id}/player', response_model=List[schemas.PlayerShow], tags=['player api'])
+@router.get("/{club_id}/player", response_model=List[schemas.PlayerShow], tags=["player api"])
 def get_players_by_club(
-        club_id: int, db: Session = Depends(get_db),
-        save_model=Depends(utils.get_current_save), is_player_club: bool = False) -> List[schemas.PlayerShow]:
+    club_id: int,
+    db: Session = Depends(get_db),
+    save_model=Depends(utils.get_current_save),
+    is_player_club: bool = False,
+) -> List[schemas.PlayerShow]:
     """
     获取指定俱乐部的球员信息
     :param club_id: 俱乐部 id
@@ -82,17 +85,21 @@ def get_players_by_club(
         club_model = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
     else:
         club_model = crud.get_club_by_id(db=db, club_id=club_id)
-    return [computed_data_app.ComputedPlayer(
-        player_id=player_model.id, db=db, player_model=player_model,
-        season=save_model.season, date=save_model.date).get_show_data()
-            for player_model in club_model.players]
+    return [
+        computed_data_app.ComputedPlayer(
+            player_id=player_model.id, db=db, player_model=player_model, season=save_model.season, date=save_model.date
+        ).get_show_data()
+        for player_model in club_model.players
+    ]
 
 
-@router.get('/me/player/total-game-data', response_model=List[schemas.TotalGamePlayerDataShow], tags=['player api'])
+@router.get("/me/player/total-game-data", response_model=List[schemas.TotalGamePlayerDataShow], tags=["player api"])
 def get_total_game_players_data_by_user(
-        start_season: int = None, end_season: int = None,
-        db: Session = Depends(get_db),
-        save_model=Depends(utils.get_current_save)) -> List[schemas.TotalGamePlayerDataShow]:
+    start_season: int = None,
+    end_season: int = None,
+    db: Session = Depends(get_db),
+    save_model=Depends(utils.get_current_save),
+) -> List[schemas.TotalGamePlayerDataShow]:
     """
     获取玩家俱乐部所有球员的赛季比赛信息
     :param start_season: 开始赛季，若为空，默认1开始
@@ -102,21 +109,24 @@ def get_total_game_players_data_by_user(
 
     game_players_data = [
         computed_data_app.ComputedPlayer(
-            player_id=player_model.id, db=db,
-            season=save_model.season, date=save_model.date,
-            player_model=player_model).get_total_game_player_data(start_season=start_season, end_season=end_season)
-        for player_model in club_model.players]
+            player_id=player_model.id, db=db, season=save_model.season, date=save_model.date, player_model=player_model
+        ).get_total_game_player_data(start_season=start_season, end_season=end_season)
+        for player_model in club_model.players
+    ]
     logger.info(game_players_data[0])
     return game_players_data
 
 
-@router.get('/{club_id}/player/total-game-data', response_model=List[schemas.TotalGamePlayerDataShow],
-            tags=['player api'])
+@router.get(
+    "/{club_id}/player/total-game-data", response_model=List[schemas.TotalGamePlayerDataShow], tags=["player api"]
+)
 def get_total_game_players_data_by_club(
-        club_id: int,
-        start_season: int = None, end_season: int = None,
-        db: Session = Depends(get_db),
-        save_model=Depends(utils.get_current_save)) -> List[schemas.TotalGamePlayerDataShow]:
+    club_id: int,
+    start_season: int = None,
+    end_season: int = None,
+    db: Session = Depends(get_db),
+    save_model=Depends(utils.get_current_save),
+) -> List[schemas.TotalGamePlayerDataShow]:
     """
     获取指定俱乐部所有球员的赛季比赛信息
     :param club_id: 俱乐部id
@@ -127,22 +137,22 @@ def get_total_game_players_data_by_club(
 
     game_players_data = [
         computed_data_app.ComputedPlayer(
-            player_id=player_model.id, db=db,
-            season=save_model.season, date=save_model.date,
-            player_model=player_model).get_total_game_player_data(start_season=start_season, end_season=end_season)
-        for player_model in club_model.players]
+            player_id=player_model.id, db=db, season=save_model.season, date=save_model.date, player_model=player_model
+        ).get_total_game_player_data(start_season=start_season, end_season=end_season)
+        for player_model in club_model.players
+    ]
 
     return game_players_data
 
 
-@router.get('/me/estimate-finance')
+@router.get("/me/estimate-finance")
 def get_estimate_finance(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     获取玩家俱乐部的预计收入与支出
     """
     user_club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
     tickets = user_club.reputation * 8  # 门票
-    ad = user_club.reputation ** 3 * 0.02 + 500  # 广告
+    ad = user_club.reputation**3 * 0.02 + 500  # 广告
     tv = 0  # 转播
     bonus = 0  # 奖金
     player_wage = 0
@@ -261,7 +271,7 @@ def get_estimate_finance(db: Session = Depends(get_db), save_model=Depends(utils
     return {"门票": tickets, "广告": ad, "转播": tv, "赛事奖金": bonus, "球员工资": player_wage, "职员工资": crew_wage}
 
 
-@router.get('/me/best-players')
+@router.get("/me/best-players")
 def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     获取玩家俱乐部中数据最好的一些球员
@@ -269,11 +279,10 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
     club_model = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
     game_players_data = [
         computed_data_app.ComputedPlayer(
-            player_id=player_model.id, db=db,
-            season=save_model.season, date=save_model.date,
-            player_model=player_model).get_total_game_player_data(start_season=save_model.season,
-                                                                  end_season=save_model.season)
-        for player_model in club_model.players]
+            player_id=player_model.id, db=db, season=save_model.season, date=save_model.date, player_model=player_model
+        ).get_total_game_player_data(start_season=save_model.season, end_season=save_model.season)
+        for player_model in club_model.players
+    ]
     most_score = 0
     highest_rate = 0
     most_assistant = 0
@@ -305,90 +314,108 @@ def get_best_players(db: Session = Depends(get_db), save_model=Depends(utils.get
     if best_shooter == -1:
         best_shooter = club_model.players[0]
         best_shooter_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_shooter.id, db=db,
-            player_model=best_shooter, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_shooter.id, db=db, player_model=best_shooter, season=save_model.season, date=save_model.date
+        ).get_show_data()
     else:
         best_shooter = crud.get_player_by_id(player_id=best_shooter, db=db)
         best_shooter_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_shooter.id, db=db,
-            player_model=best_shooter, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_shooter.id, db=db, player_model=best_shooter, season=save_model.season, date=save_model.date
+        ).get_show_data()
     if best_assistant == -1:
         best_assistant = club_model.players[0]
         best_assistant_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_assistant.id, db=db,
-            player_model=best_assistant, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_assistant.id,
+            db=db,
+            player_model=best_assistant,
+            season=save_model.season,
+            date=save_model.date,
+        ).get_show_data()
     else:
         best_assistant = crud.get_player_by_id(player_id=best_assistant, db=db)
         best_assistant_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_assistant.id, db=db,
-            player_model=best_assistant, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_assistant.id,
+            db=db,
+            player_model=best_assistant,
+            season=save_model.season,
+            date=save_model.date,
+        ).get_show_data()
     if best_passer == -1:
         best_passer = club_model.players[0]
         best_passer_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_passer.id, db=db,
-            player_model=best_passer, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_passer.id, db=db, player_model=best_passer, season=save_model.season, date=save_model.date
+        ).get_show_data()
     else:
         best_passer = crud.get_player_by_id(player_id=best_passer, db=db)
         best_passer_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_passer.id, db=db,
-            player_model=best_passer, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_passer.id, db=db, player_model=best_passer, season=save_model.season, date=save_model.date
+        ).get_show_data()
     if best_tackler == -1:
         best_tackler = club_model.players[0]
         best_tackler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_tackler.id, db=db,
-            player_model=best_tackler, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_tackler.id, db=db, player_model=best_tackler, season=save_model.season, date=save_model.date
+        ).get_show_data()
     else:
         best_tackler = crud.get_player_by_id(player_id=best_tackler, db=db)
         best_tackler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_tackler.id, db=db,
-            player_model=best_tackler, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_tackler.id, db=db, player_model=best_tackler, season=save_model.season, date=save_model.date
+        ).get_show_data()
     if best_dribbler == -1:
         best_dribbler = club_model.players[0]
         best_dribbler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_dribbler.id, db=db,
-            player_model=best_dribbler, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_dribbler.id,
+            db=db,
+            player_model=best_dribbler,
+            season=save_model.season,
+            date=save_model.date,
+        ).get_show_data()
     else:
         best_dribbler = crud.get_player_by_id(player_id=best_dribbler, db=db)
         best_dribbler_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_dribbler.id, db=db,
-            player_model=best_dribbler, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_dribbler.id,
+            db=db,
+            player_model=best_dribbler,
+            season=save_model.season,
+            date=save_model.date,
+        ).get_show_data()
     if best_player == -1:
         best_player = club_model.players[0]
         best_player_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_player.id, db=db,
-            player_model=best_player, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_player.id, db=db, player_model=best_player, season=save_model.season, date=save_model.date
+        ).get_show_data()
     else:
         best_player = crud.get_player_by_id(player_id=best_player, db=db)
         best_player_show: schemas.PlayerShow = computed_data_app.ComputedPlayer(
-            player_id=best_player.id, db=db,
-            player_model=best_player, season=save_model.season, date=save_model.date).get_show_data()
+            player_id=best_player.id, db=db, player_model=best_player, season=save_model.season, date=save_model.date
+        ).get_show_data()
 
-    return {"最佳射手": best_shooter_show,
-            "进球": most_score,
-            "平均评分最高": best_player_show,
-            "评分": highest_rate,
-            "助攻最多": best_assistant_show,
-            "助攻": most_assistant,
-            "传球成功率最高": best_passer_show,
-            "传球成功率": highest_passing,
-            "拦截成功率最高": best_tackler_show,
-            "拦截成功率": highest_tackle,
-            "过人成功率最高": best_dribbler_show,
-            "过人成功率": highest_dribble}
+    return {
+        "最佳射手": best_shooter_show,
+        "进球": most_score,
+        "平均评分最高": best_player_show,
+        "评分": highest_rate,
+        "助攻最多": best_assistant_show,
+        "助攻": most_assistant,
+        "传球成功率最高": best_passer_show,
+        "传球成功率": highest_passing,
+        "拦截成功率最高": best_tackler_show,
+        "拦截成功率": highest_tackle,
+        "过人成功率最高": best_dribbler_show,
+        "过人成功率": highest_dribble,
+    }
 
 
-@router.get('/me/finance-history')
+@router.get("/me/finance-history")
 def get_finance_history(days: int, db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     获取指定天数内玩家收支情况
     """
-    year, month, day = save_model.date.split('-')
+    year, month, day = save_model.date.split("-")
     limit_date = datetime.date(int(year), int(month), int(day)) + timedelta(-days)
     finance_history = crud.get_user_finance_by_save(db=db, save_id=save_model.id, limit_date=limit_date)
     return finance_history
 
 
-@router.get('/me/season-finance')
+@router.get("/me/season-finance")
 def get_season_finance(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     获取当前赛季收益情况
@@ -403,7 +430,7 @@ def get_season_finance(db: Session = Depends(get_db), save_model=Depends(utils.g
     return total_amount
 
 
-@router.get('/me/player-statistics')
+@router.get("/me/player-statistics")
 def get_players_statistics(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     sum_age = 0
     sum_players = 0
@@ -422,14 +449,16 @@ def get_players_statistics(db: Session = Depends(get_db), save_model=Depends(uti
             lowest_wage_player = player.translated_name
     average_age: float = sum_age / sum_players
 
-    return {"平均年龄": average_age,
-            "最高工资": highest_wage,
-            "最高工资球员": highest_wage_player,
-            "最低工资": lowest_wage,
-            "最低工资球员": lowest_wage_player}
+    return {
+        "平均年龄": average_age,
+        "最高工资": highest_wage,
+        "最高工资球员": highest_wage_player,
+        "最低工资": lowest_wage,
+        "最低工资球员": lowest_wage_player,
+    }
 
 
-@router.get('/me/season-goal-statistics')
+@router.get("/me/season-goal-statistics")
 def get_season_goal_statistics(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     computed_game = computed_data_app.ComputedGame(db=db, save_id=save_model.id)
     user_club = crud.get_club_by_id(db=db, club_id=save_model.player_club_id)
@@ -442,14 +471,12 @@ def get_season_goal_statistics(db: Session = Depends(get_db), save_model=Depends
             if point_table[rank][1] == user_club.name:
                 goal = point_table[rank][5]
                 lost = point_table[rank][6]
-                return {"进球": goal,
-                        "失球": lost}
+                return {"进球": goal, "失球": lost}
     else:
-        return {"进球": goal,
-                "失球": lost}
+        return {"进球": goal, "失球": lost}
 
 
-@router.get('/me/season-tactics-statistics')
+@router.get("/me/season-tactics-statistics")
 def get_season_tactics_statistics(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     获取当前赛季俱乐部各战术成功率
@@ -461,8 +488,7 @@ def get_season_tactics_statistics(db: Session = Depends(get_db), save_model=Depe
     middle = middle_success = middle_rate = 0
     under_cut = under_cut_success = under_rate = 0
     counter = counter_success = counter_rate = 0
-    game_datas = [game_info.team_data
-                  for game_info in game_infos]
+    game_datas = [game_info.team_data for game_info in game_infos]
     if game_datas:
         for game_data in game_datas:
             wing_cross += game_data.wing_cross
@@ -495,5 +521,5 @@ def get_season_tactics_statistics(db: Session = Depends(get_db), save_model=Depe
         "边路内切成功率": under_rate,
         "防守反击": counter,
         "防守反击成功": counter_success,
-        "防守反击成功率": counter_rate
+        "防守反击成功率": counter_rate,
     }

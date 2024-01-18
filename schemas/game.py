@@ -49,7 +49,7 @@ class GamePlayerData(GamePlayerDataCreate):
 
 class GamePlayerDataShow(BaseModel):
     id: int
-    location: Location = 'ST'
+    location: Location = "ST"
 
     final_rating: float = 6.0
     actions: int = 0
@@ -161,7 +161,7 @@ class GameCreate(BaseModel):
     mvp: int  # mvp球员id
 
     winner_id: int = 0  # 胜利球队id 平局为0
-    goal_record: str = ''  # 进球纪录
+    goal_record: str = ""  # 进球纪录
 
     class Config:
         orm_mode = True
@@ -174,6 +174,7 @@ class Game(BaseModel):
 
 # endregion
 
+
 # region 比赛中出现的数据结构
 class GoalRecord(BaseModel):
     player_id: int
@@ -184,6 +185,7 @@ class GoalRecord(BaseModel):
 
 
 # endregion
+
 
 # region 比赛展示
 class GamePlayerShow(BaseModel):
@@ -253,5 +255,6 @@ class GameShow(BaseModel):
     goal_record: List[GoalRecord]
 
     teams_info: List[GameTeamShow]
+
 
 # endregion

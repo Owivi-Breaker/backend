@@ -32,15 +32,15 @@ class PlayerGenerator:
         """
         导入人名、国家名和头像风格文件
         """
-        with open('./assets/country_names.json', encoding='utf-8') as file_obj:
+        with open("./assets/country_names.json", encoding="utf-8") as file_obj:
             self.country_names = json.load(file_obj)
-        with open('./assets/English_names.txt', encoding='utf-8') as file_obj:
+        with open("./assets/English_names.txt", encoding="utf-8") as file_obj:
             for line in file_obj:
-                self.en_names.append(line.rstrip().split('|')[:2])
-        with open('./assets/Chinese_names.txt', encoding='utf-8') as file_obj:
+                self.en_names.append(line.rstrip().split("|")[:2])
+        with open("./assets/Chinese_names.txt", encoding="utf-8") as file_obj:
             for line in file_obj:
                 self.cn_names.append(line.rstrip())
-        with open('./assets/Japanese_names.txt', encoding='utf-8') as file_obj:
+        with open("./assets/Japanese_names.txt", encoding="utf-8") as file_obj:
             for line in file_obj:
                 self.jp_names.append(line.rstrip())
 
@@ -77,14 +77,14 @@ class PlayerGenerator:
         按概率获取一个中文、英文或日文名
         :return: (语言, 人名, 译名)
         """
-        pro = {'cn': 12, 'jp': 3, 'en': 985}
+        pro = {"cn": 12, "jp": 3, "en": 985}
         nation = utils.select_by_pro(pro)
-        if nation == 'cn':
-            return 'cn', *self.get_cn_name()
-        elif nation == 'en':
-            return 'en', *self.get_en_name()
+        if nation == "cn":
+            return "cn", *self.get_cn_name()
+        elif nation == "en":
+            return "en", *self.get_en_name()
         else:
-            return 'jp', *self.get_jp_name()
+            return "jp", *self.get_jp_name()
 
     def get_nationality(self) -> Tuple[str, str]:
         """
@@ -100,7 +100,7 @@ class PlayerGenerator:
         随机获取生日
         :return: 生日字符串
         """
-        return self.fake.date(pattern='%m-%d')
+        return self.fake.date(pattern="%m-%d")
 
     @staticmethod
     def get_height() -> int:
@@ -128,8 +128,10 @@ class PlayerGenerator:
 
         return random.randint(2, 30)
 
-
-    def get_capa_potential(self, local_nationality: str = '', ) -> int:
+    def get_capa_potential(
+        self,
+        local_nationality: str = "",
+    ) -> int:
         """
         生成潜力值
         :param local_nationality: 国籍
@@ -138,11 +140,12 @@ class PlayerGenerator:
         ori_mean_potential_capa = self.ori_mean_potential_capa
         if local_nationality in game_configs.country_potential.keys():
             return int(
-                utils.normalvariate(ori_mean_potential_capa + game_configs.country_potential[local_nationality], 5))
+                utils.normalvariate(ori_mean_potential_capa + game_configs.country_potential[local_nationality], 5)
+            )
         else:
             return int(utils.normalvariate(ori_mean_potential_capa, 5))
 
-    def get_capa(self, local_nationality: str = ''):
+    def get_capa(self, local_nationality: str = ""):
         """
         获取初始能力值
         :param local_nationality: 国籍
@@ -154,8 +157,13 @@ class PlayerGenerator:
         else:
             return float(utils.retain_decimal(int(utils.normalvariate(ori_mean_capa, 6))))
 
-    def generate(self, ori_mean_capa: int = None, ori_mean_potential_capa: int = None,
-                 average_age: int = None, location: str = '') -> schemas.PlayerCreate:
+    def generate(
+        self,
+        ori_mean_capa: int = None,
+        ori_mean_potential_capa: int = None,
+        average_age: int = None,
+        location: str = "",
+    ) -> schemas.PlayerCreate:
         """
         随机生成一名球员
         若传入除location外的三个参数，则生成随机位置的成年球员
@@ -178,58 +186,59 @@ class PlayerGenerator:
             original_location = dict()
             if location:
                 for x in game_configs.location_capability:
-                    if x['name'] == location:
+                    if x["name"] == location:
                         original_location = x
                         break
             else:
                 original_location = random.choice(game_configs.location_capability)
-            self.data[original_location['name'] + '_num'] = 1
+            self.data[original_location["name"] + "_num"] = 1
             # 重写一遍位置对应的能力与潜力
 
             # 正态分布获取一个预期的综合能力值
-            target_lo_capa = min(self.get_capa(self.data['translated_nationality']), 88)
+            target_lo_capa = min(self.get_capa(self.data["translated_nationality"]), 88)
             #  根据综合能力值计算初始身价
-            self.data['values'] = target_lo_capa**3/70
-            self.data['wages'] = target_lo_capa**3/70/500
+            self.data["values"] = target_lo_capa**3 / 70
+            self.data["wages"] = target_lo_capa**3 / 70 / 500
             while True:
                 # 模拟球员按照位置权重成长的过程
-                capa_name = utils.select_by_pro(original_location['weight'])
+                capa_name = utils.select_by_pro(original_location["weight"])
                 if self.data[capa_name] <= 90:
                     # 防止溢出
                     self.data[capa_name] += 1
                 # 获取综合能力值
                 lo_capa = 0
-                for capa, weight in original_location['weight'].items():
+                for capa, weight in original_location["weight"].items():
                     lo_capa += self.data[capa] * weight
                 if lo_capa >= target_lo_capa:
                     # logger.info("综合能力为{}".format(lo_capa))
                     break
 
-            for capa in original_location['weight'].keys():
+            for capa in original_location["weight"].keys():
                 # 把这个位置相应的潜力设置以ori_mean_potential_capa正态分布的值
-                self.data[capa + '_limit'] = max(self.get_capa_potential(
-                    self.data['translated_nationality']), int(self.data[capa]) + 1)
+                self.data[capa + "_limit"] = max(
+                    self.get_capa_potential(self.data["translated_nationality"]), int(self.data[capa]) + 1
+                )
                 # 保证能力不超过上限
-                self.data[capa] = self.adjust_capa(
-                    self.data[capa], self.data[capa + '_limit'])
+                self.data[capa] = self.adjust_capa(self.data[capa], self.data[capa + "_limit"])
             # 额外设置体力
-            self.data['stamina'] = self.adjust_capa(
-                self.get_capa(self.data['translated_nationality']),
-                self.data['stamina_limit'])
+            self.data["stamina"] = self.adjust_capa(
+                self.get_capa(self.data["translated_nationality"]), self.data["stamina_limit"]
+            )
 
         else:
             # 生成年轻球员
             self.generate_data()
             #  默认身价
-            self.data['values'] = 10
-            self.data['wages'] = 0.02
+            self.data["values"] = 10
+            self.data["wages"] = 0.02
             # 为球员选择先天位置，并增强相应能力
             original_location = random.choice(game_configs.capa_potential)
-            self.data[original_location['name'] + '_num'] = 1
-            for key, value in original_location['offset'].items():
+            self.data[original_location["name"] + "_num"] = 1
+            for key, value in original_location["offset"].items():
                 # 先把相应能力值+5，再乘上偏移量
                 self.data[key] = self.adjust_capa(
-                    utils.get_offset(self.data[key] + 5, value), self.data[key + '_limit'])
+                    utils.get_offset(self.data[key] + 5, value), self.data[key + "_limit"]
+                )
         # player_model = self.save_in_db() # 不在computed类里写入数据库
         player_create_schemas = schemas.PlayerCreate(**self.data)
         self.data = dict()  # 清空数据
@@ -244,60 +253,71 @@ class PlayerGenerator:
         self.ori_mean_capa = game_configs.ori_mean_capa
         self.ori_mean_potential_capa = game_configs.ori_mean_potential_capa
 
-        self.data['created_time'] = datetime.datetime.now()
-        nation, self.data['name'], self.data['translated_name'] = self.get_name()
+        self.data["created_time"] = datetime.datetime.now()
+        nation, self.data["name"], self.data["translated_name"] = self.get_name()
         # 判断国籍
-        if nation == 'cn':
-            self.data['nationality'], self.data['translated_nationality'] = 'China', '中国'
-        elif nation == 'jp':
-            self.data['nationality'], self.data['translated_nationality'] = 'Japan', '日本'
+        if nation == "cn":
+            self.data["nationality"], self.data["translated_nationality"] = "China", "中国"
+        elif nation == "jp":
+            self.data["nationality"], self.data["translated_nationality"] = "Japan", "日本"
         else:
-            self.data['nationality'], self.data['translated_nationality'] = self.get_nationality()
+            self.data["nationality"], self.data["translated_nationality"] = self.get_nationality()
         # 年龄
         if average_age:
-            self.data['age'] = utils.normalvariate(average_age, 3)
+            self.data["age"] = utils.normalvariate(average_age, 3)
         else:
-            self.data['age'] = 15
-        self.data['height'] = self.get_height()
-        self.data['weight'] = self.get_weight()
-        self.data['birth_date'] = self.get_birthday()
-        self.data['wages'] = self.get_wages()
-        self.data['avatar'] = self.get_avatar()
+            self.data["age"] = 15
+        self.data["height"] = self.get_height()
+        self.data["weight"] = self.get_weight()
+        self.data["birth_date"] = self.get_birthday()
+        self.data["wages"] = self.get_wages()
+        self.data["avatar"] = self.get_avatar()
         # capa limit generation
-        self.data['shooting_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['passing_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['dribbling_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['interception_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['pace_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['strength_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['aggression_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['anticipation_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['free_kick_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['stamina_limit'] = self.get_capa_potential(self.data['translated_nationality'])
-        self.data['goalkeeping_limit'] = self.get_capa_potential(self.data['translated_nationality'])
+        self.data["shooting_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["passing_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["dribbling_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["interception_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["pace_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["strength_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["aggression_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["anticipation_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["free_kick_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["stamina_limit"] = self.get_capa_potential(self.data["translated_nationality"])
+        self.data["goalkeeping_limit"] = self.get_capa_potential(self.data["translated_nationality"])
         # capa generation
-        self.data['shooting'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['shooting_limit'])
-        self.data['passing'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['passing_limit'])
-        self.data['dribbling'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['dribbling_limit'])
-        self.data['interception'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['interception_limit'])
-        self.data['pace'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['pace_limit'])
-        self.data['strength'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['strength_limit'])
-        self.data['aggression'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['aggression_limit'])
-        self.data['anticipation'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['anticipation_limit'])
-        self.data['free_kick'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['free_kick_limit'])
-        self.data['stamina'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['stamina_limit'])
-        self.data['goalkeeping'] = self.adjust_capa(
-            self.get_capa(self.data['translated_nationality']), self.data['goalkeeping_limit'])
+        self.data["shooting"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["shooting_limit"]
+        )
+        self.data["passing"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["passing_limit"]
+        )
+        self.data["dribbling"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["dribbling_limit"]
+        )
+        self.data["interception"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["interception_limit"]
+        )
+        self.data["pace"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["pace_limit"]
+        )
+        self.data["strength"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["strength_limit"]
+        )
+        self.data["aggression"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["aggression_limit"]
+        )
+        self.data["anticipation"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["anticipation_limit"]
+        )
+        self.data["free_kick"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["free_kick_limit"]
+        )
+        self.data["stamina"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["stamina_limit"]
+        )
+        self.data["goalkeeping"] = self.adjust_capa(
+            self.get_capa(self.data["translated_nationality"]), self.data["goalkeeping_limit"]
+        )
 
     def save_in_db(self) -> models.Player:
         """
@@ -327,6 +347,6 @@ class PlayerGenerator:
         style = dict()
         for key, value in self.avatar_style.items():
             style[key] = utils.select_by_pro(value)
-        style['facialHairColor'] = style['hairColor']
-        style['topColor'] = style['clotheColor']
+        style["facialHairColor"] = style["hairColor"]
+        style["topColor"] = style["clotheColor"]
         return utils.turn_dict2str(style)

@@ -29,6 +29,7 @@ from utils import get_current_user, oauth2_scheme
 #         raise credentials_exception
 #     return user_model
 
+
 async def verify_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """
     验证token, 调用get_current_user, 只是换了个名字好听一点罢了。。

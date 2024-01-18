@@ -11,8 +11,9 @@ router = APIRouter()
 
 
 @router.get("/{game_id}", response_model=schemas.GameShow)
-def get_game_by_id(game_id: int, db: Session = Depends(get_db),
-                   save_model: models.Save = Depends(utils.get_current_save)):
+def get_game_by_id(
+    game_id: int, db: Session = Depends(get_db), save_model: models.Save = Depends(utils.get_current_save)
+):
     game = crud.get_game_by_id(db, game_id)
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")

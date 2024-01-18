@@ -87,7 +87,7 @@ class GamePvECreate(BaseModel):
     player_club_id: int  # 玩家俱乐部id外键
     computer_club_id: int  # 电脑俱乐部id外键
     home_club_id: int  # 主场俱乐部id
-    goal_record: str = '[]'  # 进球记录
+    goal_record: str = "[]"  # 进球记录
 
     name: str
     type: str
@@ -189,6 +189,7 @@ class GamePvEInfo(BaseModel):
     """
     发送给前端的整合数据
     """
+
     game_id: int = 0  # 比赛结束后 生成的比赛id 只有在 game_pve 最后一回合才会赋值成非0值
     game_info: GamePvEShow
     player_team_info: TeamPvEShow

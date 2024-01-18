@@ -8,7 +8,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 from utils import logger
 
-engine = create_engine(settings.DB_URL[dburl.mysql_db_url], encoding='utf-8')
+engine = create_engine(settings.DB_URL[dburl.mysql_db_url], encoding="utf-8")
 # 建数据库
 if not database_exists(engine.url):
     create_database(engine.url)
@@ -17,7 +17,7 @@ ScopedSession = scoped_session(SessionLocal)  # 使用安全的线程
 Base.metadata.create_all(bind=engine)
 # 构建索引 老存档只需运行一次即可
 try:
-    player_id_index = Index('player_id_idx', models.GamePlayerData.player_id)
+    player_id_index = Index("player_id_idx", models.GamePlayerData.player_id)
     player_id_index.create(bind=engine)
 except OperationalError:
     logger.warning("player_id_idx already exists")

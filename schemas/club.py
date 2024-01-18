@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class ClubCreate(BaseModel):
     created_time: datetime
-    name: str = 'default'
+    name: str = "default"
     finance: float = 0  # 单位：万
     reputation: float = 0
     assistant: int = 0  # 助理教练

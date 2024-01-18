@@ -37,17 +37,26 @@ def get_target_by_player_id_n_buyer_id(db: Session, target_id: int, buyer_id: in
     """
     根据指定球员id和买房俱乐部id获取目标球员实例
     """
-    db_target = db.query(models.TargetPlayer).filter(
-        and_(models.TargetPlayer.target_id == target_id,
-             models.TargetPlayer.buyer_id == buyer_id)).first()
+    db_target = (
+        db.query(models.TargetPlayer)
+        .filter(and_(models.TargetPlayer.target_id == target_id, models.TargetPlayer.buyer_id == buyer_id))
+        .first()
+    )
     return db_target
 
 
 def get_targets_by_club(db: Session, save_id: int, club_id: int, season: int) -> List[models.TargetPlayer]:
-    db_targets = db.query(models.TargetPlayer).filter(
-        and_(models.TargetPlayer.save_id == save_id,
-             models.TargetPlayer.buyer_id == club_id,
-             models.TargetPlayer.season == season)).all()
+    db_targets = (
+        db.query(models.TargetPlayer)
+        .filter(
+            and_(
+                models.TargetPlayer.save_id == save_id,
+                models.TargetPlayer.buyer_id == club_id,
+                models.TargetPlayer.season == season,
+            )
+        )
+        .all()
+    )
     return db_targets
 
 
@@ -55,6 +64,9 @@ def delete_target_by_player_id_n_buyer_id(db: Session, target_id: int, buyer_id:
     """
     根据指定球员id和买房俱乐部id删除目标球员实例
     """
-    db_target = db.query(models.TargetPlayer).filter(and_(models.TargetPlayer.target_id == target_id,
-                                                          models.TargetPlayer. buyer_id == buyer_id)).first()
+    db_target = (
+        db.query(models.TargetPlayer)
+        .filter(and_(models.TargetPlayer.target_id == target_id, models.TargetPlayer.buyer_id == buyer_id))
+        .first()
+    )
     db.delete(db_target)

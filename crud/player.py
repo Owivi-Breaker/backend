@@ -28,15 +28,12 @@ def create_player_bulk(players: List[schemas.PlayerCreate], club_id: int):
 
     def add_club_id(p):
         p = p.dict()
-        p['club_id'] = club_id
+        p["club_id"] = club_id
         return p
 
     players = list(map(add_club_id, players))
     # db.bulk_save_objects(db_players) # 不要用这个啦，这个是基于ORM的
-    engine.execute(
-        models.Player.__table__.insert(),
-        players
-    )
+    engine.execute(models.Player.__table__.insert(), players)
 
 
 def update_player(db: Session, player_id: int, attri: dict):
@@ -60,72 +57,105 @@ def get_players_by_save(db: Session, save_id: int, skip: int, limit: int) -> Lis
     player_list: List[models.Player] = []
     for club in db_clubs:
         player_list.extend(club.players)
-    return player_list[skip:skip + limit]
+    return player_list[skip : skip + limit]
 
 
-def get_on_sale_players_by_save(db: Session, save_id: int, offset: int, limit: int, order: int, attri: string) -> List[
-    models.Player]:
+def get_on_sale_players_by_save(
+    db: Session, save_id: int, offset: int, limit: int, order: int, attri: string
+) -> List[models.Player]:
     """
     根据属性，获取一定数量指定存档被挂牌球员db实例
     """
     if order == "0":
-        player_list = db.query(models.Player). \
-            join(models.Club, models.Player.club_id == models.Club.id). \
-            join(models.League, models.Club.league_id == models.League.id). \
-            filter(models.League.save_id == save_id). \
-            filter(models.Player.on_sale == 1). \
-            order_by(asc(attri)).limit(limit).offset(offset).all()
+        player_list = (
+            db.query(models.Player)
+            .join(models.Club, models.Player.club_id == models.Club.id)
+            .join(models.League, models.Club.league_id == models.League.id)
+            .filter(models.League.save_id == save_id)
+            .filter(models.Player.on_sale == 1)
+            .order_by(asc(attri))
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
     else:
-        player_list = db.query(models.Player). \
-            join(models.Club, models.Player.club_id == models.Club.id). \
-            join(models.League, models.Club.league_id == models.League.id). \
-            filter(models.League.save_id == save_id). \
-            filter(models.Player.on_sale == 1). \
-            order_by(desc(attri)).limit(limit).offset(offset).all()
+        player_list = (
+            db.query(models.Player)
+            .join(models.Club, models.Player.club_id == models.Club.id)
+            .join(models.League, models.Club.league_id == models.League.id)
+            .filter(models.League.save_id == save_id)
+            .filter(models.Player.on_sale == 1)
+            .order_by(desc(attri))
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
 
     return player_list
 
 
-def get_all_players_by_save_n_attri(db: Session, save_id: int, offset: int,
-                                    limit: int, attri: string, value: string) -> List[models.Player]:
+def get_all_players_by_save_n_attri(
+    db: Session, save_id: int, offset: int, limit: int, attri: string, value: string
+) -> List[models.Player]:
     """
     根据属性，获取一定数量指定存档球员db实例
     """
     if attri == "translated_name":
-        player_list = db.query(models.Player). \
-            join(models.Club, models.Player.club_id == models.Club.id). \
-            join(models.League, models.Club.league_id == models.League.id). \
-            filter(models.League.save_id == save_id). \
-            filter(models.Player.translated_name == value).all()  # 用all得到一个list，不能用first
+        player_list = (
+            db.query(models.Player)
+            .join(models.Club, models.Player.club_id == models.Club.id)
+            .join(models.League, models.Club.league_id == models.League.id)
+            .filter(models.League.save_id == save_id)
+            .filter(models.Player.translated_name == value)
+            .all()
+        )  # 用all得到一个list，不能用first
     elif attri == "club_name":
-        club = db.query(models.Club). \
-            join(models.League, models.Club.league_id == models.League.id). \
-            filter(models.League.save_id == save_id). \
-            filter(models.Club.name == value).first()  # 先查俱乐部id
+        club = (
+            db.query(models.Club)
+            .join(models.League, models.Club.league_id == models.League.id)
+            .filter(models.League.save_id == save_id)
+            .filter(models.Club.name == value)
+            .first()
+        )  # 先查俱乐部id
         if club:
             club_id = club.id
-            player_list = db.query(models.Player). \
-                join(models.Club, models.Player.club_id == models.Club.id). \
-                join(models.League, models.Club.league_id == models.League.id). \
-                filter(models.League.save_id == save_id). \
-                filter(models.Player.club_id == club_id).limit(limit).offset(offset).all()
+            player_list = (
+                db.query(models.Player)
+                .join(models.Club, models.Player.club_id == models.Club.id)
+                .join(models.League, models.Club.league_id == models.League.id)
+                .filter(models.League.save_id == save_id)
+                .filter(models.Player.club_id == club_id)
+                .limit(limit)
+                .offset(offset)
+                .all()
+            )
         else:
             return []
     elif attri == "translated_nationality":
-        player_list = db.query(models.Player). \
-            join(models.Club, models.Player.club_id == models.Club.id). \
-            join(models.League, models.Club.league_id == models.League.id). \
-            filter(models.League.save_id == save_id). \
-            filter(models.Player.translated_nationality == value).limit(limit).offset(offset).all()
+        player_list = (
+            db.query(models.Player)
+            .join(models.Club, models.Player.club_id == models.Club.id)
+            .join(models.League, models.Club.league_id == models.League.id)
+            .filter(models.League.save_id == save_id)
+            .filter(models.Player.translated_nationality == value)
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
     elif attri == "location":
         if value in {"ST", "LW", "RW", "CB", "LB", "RB", "GK"}:
             attri = value + "_num"
-            player_list = db.query(models.Player). \
-                join(models.Club, models.Player.club_id == models.Club.id). \
-                join(models.League, models.Club.league_id == models.League.id). \
-                filter(models.League.save_id == save_id).\
-                order_by(desc(attri)).order_by(desc("values")).\
-                limit(limit).offset(offset).all()
+            player_list = (
+                db.query(models.Player)
+                .join(models.Club, models.Player.club_id == models.Club.id)
+                .join(models.League, models.Club.league_id == models.League.id)
+                .filter(models.League.save_id == save_id)
+                .order_by(desc(attri))
+                .order_by(desc("values"))
+                .limit(limit)
+                .offset(offset)
+                .all()
+            )
         else:
             return []
     else:
@@ -157,17 +187,26 @@ def delete_player(player_id: int, db: Session):
 
 
 def get_player_game_data(
-        player_id: int, db: Session, start_season: int, end_season: int) -> List[models.GamePlayerData]:
+    player_id: int, db: Session, start_season: int, end_season: int
+) -> List[models.GamePlayerData]:
     """
     获取指定球员某赛季的比赛信息
     """
     s = time.time()
-    db_game_player_data: List[models.GamePlayerData] = db.query(models.GamePlayerData).filter(
-        and_(models.GamePlayerData.player_id == player_id,
-             models.GamePlayerData.season >= start_season,
-             models.GamePlayerData.season <= end_season)).all()
+    db_game_player_data: List[models.GamePlayerData] = (
+        db.query(models.GamePlayerData)
+        .filter(
+            and_(
+                models.GamePlayerData.player_id == player_id,
+                models.GamePlayerData.season >= start_season,
+                models.GamePlayerData.season <= end_season,
+            )
+        )
+        .all()
+    )
     e = time.time()
     print(e - s)
     return db_game_player_data
+
 
 # endregion

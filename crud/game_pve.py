@@ -36,9 +36,11 @@ def get_game_pve_by_save_id(db: Session, save_id: int) -> models.GamePvE:
 
 
 def get_game_pve_by_club_id(db: Session, player_club_id: int, computer_club_id: int) -> models.GamePvE:
-    db_game_pve = db.query(models.GamePvE).filter(
-        models.GamePvE.player_club_id == player_club_id,
-        models.GamePvE.club_id == computer_club_id).first()
+    db_game_pve = (
+        db.query(models.GamePvE)
+        .filter(models.GamePvE.player_club_id == player_club_id, models.GamePvE.club_id == computer_club_id)
+        .first()
+    )
     if not db_game_pve:
         logger.error("Can't find models.GamePvE")
     return db_game_pve

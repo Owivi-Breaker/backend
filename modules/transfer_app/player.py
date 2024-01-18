@@ -20,8 +20,12 @@ class Player:
         self.player_id = player_id
         self.player_model = player_model if player_model else crud.get_player_by_id(db=self.db, player_id=player_id)
         self.computed_player = computed_data_app.ComputedPlayer(
-            player_id=self.player_model.id, db=self.db,
-            player_model=self.player_model, season=self.season, date=self.date)
+            player_id=self.player_model.id,
+            db=self.db,
+            player_model=self.player_model,
+            season=self.season,
+            date=self.date,
+        )
         self.age = self.player_model.age
         self.on_sale = self.player_model.on_sale
 
@@ -29,8 +33,9 @@ class Player:
         """
         获取每赛季出场次数
         """
-        age_diff = self.computed_player.get_age() - self.age if \
-            (self.computed_player.get_age() - self.age) > 1 else 1  # 职业生涯年数
+        age_diff = (
+            self.computed_player.get_age() - self.age if (self.computed_player.get_age() - self.age) > 1 else 1
+        )  # 职业生涯年数
         appearance = self.get_total_appearance()
         ratio = (appearance // age_diff) + 1  # 出场次数除年数，计算每赛季出场次数
         return ratio
@@ -59,18 +64,20 @@ class Player:
         """
         获取总出场次数
         """
-        total = self.player_model.ST_num + \
-                self.player_model.CM_num + \
-                self.player_model.LW_num + \
-                self.player_model.RW_num + \
-                self.player_model.CB_num + \
-                self.player_model.LB_num + \
-                self.player_model.RB_num + \
-                self.player_model.GK_num + \
-                self.player_model.CAM_num + \
-                self.player_model.LM_num + \
-                self.player_model.RM_num + \
-                self.player_model.CDM_num
+        total = (
+            self.player_model.ST_num
+            + self.player_model.CM_num
+            + self.player_model.LW_num
+            + self.player_model.RW_num
+            + self.player_model.CB_num
+            + self.player_model.LB_num
+            + self.player_model.RB_num
+            + self.player_model.GK_num
+            + self.player_model.CAM_num
+            + self.player_model.LM_num
+            + self.player_model.RM_num
+            + self.player_model.CDM_num
+        )
         return total
 
     def wanna_wage(self):
@@ -114,7 +121,8 @@ class Player:
             want_wage = self.wanna_wage()
         offer_found = 0
         offer_list: List[models.Offer] = crud.get_offers_by_buyer(
-            db=self.db, save_id=save_id, buyer_id=buyer_club_id, season=self.season)  # 查找玩家发出的所有报价
+            db=self.db, save_id=save_id, buyer_id=buyer_club_id, season=self.season
+        )  # 查找玩家发出的所有报价
         for offer in offer_list:
             if offer.target_id == self.player_id:  # 找到玩家对这个球员的报价
                 offer_found = 1
@@ -126,22 +134,21 @@ class Player:
                 i = randint(1, 100)
                 if i < rate:
                     crud.update_player(
-                        db=self.db, player_id=self.player_id,
-                        attri={"club_id": offer.buyer_id,
-                               "on_sale": False})  # 修改球员所属俱乐部
+                        db=self.db, player_id=self.player_id, attri={"club_id": offer.buyer_id, "on_sale": False}
+                    )  # 修改球员所属俱乐部
                     self.adjust_wage(real_wage=offer_wage)  # 修改球员工资
-                    offer.status = 's'  # 交易完成
+                    offer.status = "s"  # 交易完成
                     buyer = crud.get_club_by_id(club_id=buyer_club_id, db=self.db)
                     buyer.finance -= offer.offer_price
-                    year, month, day = self.date.split('-')
+                    year, month, day = self.date.split("-")
                     date = datetime.datetime(int(year), int(month), int(day))
-                    user_finance = schemas.UserFinanceCreate(save_id=save_id, amount=-offer.offer_price,
-                                                             event="球员买入",
-                                                             date=date)
+                    user_finance = schemas.UserFinanceCreate(
+                        save_id=save_id, amount=-offer.offer_price, event="球员买入", date=date
+                    )
                     crud.add_user_finance(db=self.db, user_finance=user_finance)
                     seller = crud.get_club_by_id(db=self.db, club_id=offer.target_club_id)
                     seller.finance += offer.offer_price
-                    year, month, day = self.date.split('-')
+                    year, month, day = self.date.split("-")
                     success_date = datetime.date(int(year), int(month), int(day))
                     offer.date = success_date  # 记录交易成功日期
                     return 1

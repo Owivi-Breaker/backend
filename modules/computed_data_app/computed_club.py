@@ -24,24 +24,20 @@ class ComputedClub:
         :return: schemas.PlayerShow
         """
         data = dict()
-        data['id'] = self.club_model.id
-        data['name'] = self.club_model.name
-        data['finance'] = self.club_model.finance
-        data['reputation'] = self.club_model.reputation
-        data['assistant'] = self.club_model.assistant
-        data['doctor'] = self.club_model.doctor
-        data['scout'] = self.club_model.scout
-        data['negotiator'] = self.club_model.negotiator
+        data["id"] = self.club_model.id
+        data["name"] = self.club_model.name
+        data["finance"] = self.club_model.finance
+        data["reputation"] = self.club_model.reputation
+        data["assistant"] = self.club_model.assistant
+        data["doctor"] = self.club_model.doctor
+        data["scout"] = self.club_model.scout
+        data["negotiator"] = self.club_model.negotiator
 
-        data['formation'] = self.club_model.coach.formation
-        data['wing_cross'] = self.club_model.coach.wing_cross
-        data['under_cutting'] = self.club_model.coach.under_cutting
-        data['pull_back'] = self.club_model.coach.pull_back
-        data['middle_attack'] = self.club_model.coach.middle_attack
-        data['counter_attack'] = self.club_model.coach.counter_attack
+        data["formation"] = self.club_model.coach.formation
+        data["wing_cross"] = self.club_model.coach.wing_cross
+        data["under_cutting"] = self.club_model.coach.under_cutting
+        data["pull_back"] = self.club_model.coach.pull_back
+        data["middle_attack"] = self.club_model.coach.middle_attack
+        data["counter_attack"] = self.club_model.coach.counter_attack
         logger.debug(data)
         return schemas.ClubShow(**data)
-
-
-
-

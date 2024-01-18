@@ -4,7 +4,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 # region 教练数据
 class Coach(Base):
-    __tablename__ = 'coach'
+    __tablename__ = "coach"
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
@@ -24,6 +24,7 @@ class Coach(Base):
     middle_attack = Column(Integer)
     counter_attack = Column(Integer)
 
-    club_id = Column(Integer, ForeignKey('club.id'))
+    club_id = Column(Integer, ForeignKey("club.id"))
+
 
 # endregion

@@ -1,4 +1,3 @@
-
 import random
 from typing import Dict, List, Tuple
 
@@ -11,7 +10,7 @@ from utils import logger
 class BaseGame:
     def __init__(self, db: Session, pos: str):
         self.db = db
-        self.script = ''
+        self.script = ""
         self.goal_record: List[schemas.GoalRecord] = []  # 进球记录
         self.turns = 0  # 比赛进行的回合数 用于记录进球回合
         self.lteam = BaseTeam(db=self.db, game=self)
@@ -28,7 +27,7 @@ class BaseGame:
                 p.capa = capa
                 break
         else:
-            logger.error('阵容中找不到目标位置球员！')
+            logger.error("阵容中找不到目标位置球员！")
 
         # 模拟20场比赛
         for i in range(20):

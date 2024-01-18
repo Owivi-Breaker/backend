@@ -11,11 +11,11 @@ from utils import logger
 
 
 class GamePvE(game_eve_app.GameEvE):
-    def __init__(self, save_id: int, db: Session, player_tactic: str = ''):
+    def __init__(self, save_id: int, db: Session, player_tactic: str = ""):
         # 新添加的成员变量
         self.game_pve_models = crud.get_game_pve_by_save_id(db=db, save_id=save_id)
         self.is_extra_time = self.game_pve_models.is_extra_time
-        self.new_script = ''  # 本回合的解说
+        self.new_script = ""  # 本回合的解说
         self.player_tactic = player_tactic  # 本回合玩家选择的战术名
         self.turns = self.game_pve_models.turns  # 本回合的序号
         self.is_player_turn: bool = False  # 本回合玩家是否是进攻方
@@ -46,7 +46,7 @@ class GamePvE(game_eve_app.GameEvE):
         :param text: 解说词
         :param status: 解说状态
         """
-        self.new_script += text + '@' + status + '\n'
+        self.new_script += text + "@" + status + "\n"
 
     def judge_attacker(self):
         """
@@ -88,26 +88,26 @@ class GamePvE(game_eve_app.GameEvE):
         print(self.new_script)
         turns: int = self.game_pve_models.turns - 1
         ingame_time = turns * 108 // 60 * 100 + turns * 108 % 60
-        temp = self.new_script.split('\n')
+        temp = self.new_script.split("\n")
         for i in range(len(temp)):
-            if temp[i] == '':
+            if temp[i] == "":
                 continue
             text, status = tuple(temp[i].split("@"))
-            grade = '@' + str(random.randint(1, 5))
-            if status == 's':  # 开始
-                str_time = '@00:00'
+            grade = "@" + str(random.randint(1, 5))
+            if status == "s":  # 开始
+                str_time = "@00:00"
                 ingame_time = 0
-                temp[i] = text + str_time + grade + '\n'
-            elif status == 'as':  # 加时开始
-                str_time = '@090:00'
+                temp[i] = text + str_time + grade + "\n"
+            elif status == "as":  # 加时开始
+                str_time = "@090:00"
                 ingame_time = 9000
-                temp[i] = text + str_time + grade + '\n'
-            elif status == 'e':  # 结束
-                str_time = '@90:00'
-                temp[i] = text + str_time + grade + '\n'
-            elif status == 'ae':
-                str_time = '@120:00'  # 加时结束
-                temp[i] = text + str_time + grade + '\n'
+                temp[i] = text + str_time + grade + "\n"
+            elif status == "e":  # 结束
+                str_time = "@90:00"
+                temp[i] = text + str_time + grade + "\n"
+            elif status == "ae":
+                str_time = "@120:00"  # 加时结束
+                temp[i] = text + str_time + grade + "\n"
             elif status == "d" or status == "c":
                 if status == "d":
                     happening_time = random.randint(ingame_time + 30, ingame_time + 90)
@@ -133,11 +133,11 @@ class GamePvE(game_eve_app.GameEvE):
                     str_sec = cstr_time[-2:]
                     str_min = cstr_time[:3]
                     str_time = str_min + ":" + str_sec
-                temp[i] = text + '@' + str_time + grade + '\n'
-            elif status == 'n':  # 纯解说
-                temp[i] = text + grade + '\n'
-        self.new_script = ''.join(temp)
-        self.script += self.new_script + '\n'
+                temp[i] = text + "@" + str_time + grade + "\n"
+            elif status == "n":  # 纯解说
+                temp[i] = text + grade + "\n"
+        self.new_script = "".join(temp)
+        self.script += self.new_script + "\n"
 
     def start_one_turn(self) -> Tuple[bool, int]:
         """
@@ -145,7 +145,7 @@ class GamePvE(game_eve_app.GameEvE):
         :return: 比赛是否结束; game id 若无则为0
         """
         if self.turns == 1:
-            self.add_script('比赛开始！', 's')
+            self.add_script("比赛开始！", "s")
         hold_ball_team, no_ball_team = self.init_hold_ball_team()
         counter_attack_permitted = self.game_pve_models.counter_attack_permitted
 
@@ -157,33 +157,35 @@ class GamePvE(game_eve_app.GameEvE):
             else:
                 tactic_name = self.player_tactic
             # 玩家进攻
-            if tactic_name == 'wing_cross':
-                if hold_ball_team.get_location_players((game_configs.Location.LW, game_configs.Location.LB)) or hold_ball_team.get_location_players((game_configs.Location.RW, game_configs.Location.RB)):
+            if tactic_name == "wing_cross":
+                if hold_ball_team.get_location_players(
+                    (game_configs.Location.LW, game_configs.Location.LB)
+                ) or hold_ball_team.get_location_players((game_configs.Location.RW, game_configs.Location.RB)):
                     exchange_ball = hold_ball_team.wing_cross(no_ball_team)
                 else:
                     return True, 0
-            elif tactic_name == 'under_cutting':
+            elif tactic_name == "under_cutting":
                 if hold_ball_team.get_location_players((game_configs.Location.LW, game_configs.Location.RW)):
                     exchange_ball = hold_ball_team.under_cutting(no_ball_team)
                 else:
                     return True, 0
-            elif tactic_name == 'pull_back':
+            elif tactic_name == "pull_back":
                 if hold_ball_team.get_location_players((game_configs.Location.LW, game_configs.Location.RW)):
                     exchange_ball = hold_ball_team.pull_back(no_ball_team)
                 else:
                     return True, 0
-            elif tactic_name == 'middle_attack':
+            elif tactic_name == "middle_attack":
                 if hold_ball_team.get_location_players((game_configs.Location.CM,)):
                     exchange_ball = hold_ball_team.middle_attack(no_ball_team)
                 else:
                     return True, 0
-            elif tactic_name == 'counter_attack' and counter_attack_permitted:
-                if hold_ball_team.get_location_players((game_configs.Location.GK,game_configs.Location.CB)):
+            elif tactic_name == "counter_attack" and counter_attack_permitted:
+                if hold_ball_team.get_location_players((game_configs.Location.GK, game_configs.Location.CB)):
                     exchange_ball = hold_ball_team.counter_attack(no_ball_team)
                 else:
                     return True, 0
             else:
-                logger.error('战术名称{}错误或不可用！'.format(self.player_tactic))
+                logger.error("战术名称{}错误或不可用！".format(self.player_tactic))
                 exchange_ball = hold_ball_team
         else:
             # 电脑进攻
@@ -197,14 +199,14 @@ class GamePvE(game_eve_app.GameEvE):
             if self.is_need_extra_time():
                 if self.is_extra_time:
                     # 此时加时赛结束 两队仍然平分 需要进入点球阶段
-                    self.add_script('\n开始点球！', 'ae')
+                    self.add_script("\n开始点球！", "ae")
                     self.penalty()
                     game_id = self.end_game(exchange_ball, original_score)
                     return False, game_id
                 else:
                     # 常规比赛时间结束 需要进入加时阶段
                     self.is_extra_time = True
-                    self.add_script('\n开始加时比赛！', 'as')
+                    self.add_script("\n开始加时比赛！", "as")
             else:
                 # 结束比赛
                 game_id = self.end_game(exchange_ball, original_score)
@@ -228,8 +230,9 @@ class GamePvE(game_eve_app.GameEvE):
         elif self.lteam.score < self.rteam.score:
             self.winner_id = self.rteam.club_id  # 常规时间胜负关系
 
-        self.add_script('比赛结束！ {} {}:{} {}'.format(
-            self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name), 'n')
+        self.add_script(
+            "比赛结束！ {} {}:{} {}".format(self.lteam.name, self.lteam.score, self.rteam.score, self.rteam.name), "n"
+        )
         # 记录胜者队名
         if self.winner_id == self.lteam.club_id:
             winner_name = self.lteam.name
@@ -239,9 +242,9 @@ class GamePvE(game_eve_app.GameEvE):
             winner_name = None
 
         if winner_name:
-            self.add_script('胜者为{}！'.format(winner_name), 'n')
+            self.add_script("胜者为{}！".format(winner_name), "n")
         else:
-            self.add_script('平局', 'n')
+            self.add_script("平局", "n")
 
         self.rate()  # 球员评分
         self.deal_new_script()
@@ -255,14 +258,17 @@ class GamePvE(game_eve_app.GameEvE):
         判断是否需要进行加时比赛
         """
         if self.rteam.score == self.lteam.score:
-            if 'cup' in self.type:
+            if "cup" in self.type:
                 return True
-            if 'champion' in self.type and 'group' not in self.type:
-                if self.type == 'champions2to1':
+            if "champion" in self.type and "group" not in self.type:
+                if self.type == "champions2to1":
                     return True
                 else:
-                    query_str = "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.type=='{}')".format(
-                        self.save_id, int(self.season), self.type)
+                    query_str = (
+                        "and_(models.Game.save_id=='{}', models.Game.season=='{}', models.Game.type=='{}')".format(
+                            self.save_id, int(self.season), self.type
+                        )
+                    )
                     games = crud.get_games_by_attri(db=self.db, query_str=query_str)  # 查找同阶段的其他比赛
                     for game in games:
                         team1 = game.teams[0]
@@ -284,9 +290,9 @@ class GamePvE(game_eve_app.GameEvE):
         self.game_pve_models.is_extra_time = self.is_extra_time
         self.game_pve_models.goal_record = self.goal_record2str()
         if exchange_ball:
-            self.game_pve_models.cur_attacker = self.game_pve_models.computer_club_id \
-                if self.is_player_turn \
-                else self.game_pve_models.player_club_id
+            self.game_pve_models.cur_attacker = (
+                self.game_pve_models.computer_club_id if self.is_player_turn else self.game_pve_models.player_club_id
+            )
         if exchange_ball and original_score == (self.lteam.score, self.rteam.score):
             # 若球权易位且比分未变，允许使用防守反击
             self.game_pve_models.counter_attack_permitted = True

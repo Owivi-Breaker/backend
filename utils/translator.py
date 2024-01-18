@@ -12,11 +12,11 @@ class Translator:
     def __init__(self):
         self.translator = Translate()
 
-    def translate(self, text: str, target_lang: str = 'zh-CN') -> (str, bool):
+    def translate(self, text: str, target_lang: str = "zh-CN") -> (str, bool):
         try:
             result = self.translator.translate(text, target=target_lang).translatedText
         except ConnectionError:
-            logger.warning('翻译次数过多！')
+            logger.warning("翻译次数过多！")
             time.sleep(50)
             return text, False
         return result, True

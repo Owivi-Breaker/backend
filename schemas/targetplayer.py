@@ -6,7 +6,7 @@ class TargetPlayerCreate(BaseModel):
     target_id: int
     season: int
     save_id: int
-    rejected_date: str = ''
+    rejected_date: str = ""
 
     class Config:
         orm_mode = True

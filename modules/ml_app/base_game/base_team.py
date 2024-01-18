@@ -10,10 +10,10 @@ from utils import logger, utils
 
 
 class BaseTeam:
-    def __init__(self, db: Session, game: 'BaseGame'):
+    def __init__(self, db: Session, game: "BaseGame"):
         self.db = db
         self.game = game
-        self.name = 'a'  # 解说用
+        self.name = "a"  # 解说用
         self.tactic = dict()  # 战术比重字典
         self.init_tactic()
         self.players: List[BasePlayer] = []  # 球员列表
@@ -35,7 +35,7 @@ class BaseTeam:
 
     def init_data(self):
         self.data = {
-            'attempts': 0,
+            "attempts": 0,
             "wing_cross": 0,
             "wing_cross_success": 0,
             "under_cutting": 0,
@@ -45,18 +45,18 @@ class BaseTeam:
             "middle_attack": 0,
             "middle_attack_success": 0,
             "counter_attack": 0,
-            "counter_attack_success": 0
+            "counter_attack_success": 0,
         }
 
     def init_tactic(self):
         """
         初始化战术比重
         """
-        self.tactic['wing_cross'] = 50
-        self.tactic['under_cutting'] = 50
-        self.tactic['pull_back'] = 50
-        self.tactic['middle_attack'] = 50
-        self.tactic['counter_attack'] = 50
+        self.tactic["wing_cross"] = 50
+        self.tactic["under_cutting"] = 50
+        self.tactic["pull_back"] = 50
+        self.tactic["middle_attack"] = 50
+        self.tactic["counter_attack"] = 50
 
     def init_players(self, formation: Dict):
         """
@@ -70,7 +70,7 @@ class BaseTeam:
                 count -= 1
 
         if len(self.players) != 11:
-            logger.error('球员数量不等于11')
+            logger.error("球员数量不等于11")
 
     def export_game_team_data_schemas(self, created_time=datetime.datetime.now()) -> schemas.GameTeamDataCreate:
         """
@@ -78,10 +78,7 @@ class BaseTeam:
         :param created_time: 创建时间
         :return: schemas.GameTeamData
         """
-        data = {
-            'created_time': created_time,
-            **self.data
-        }
+        data = {"created_time": created_time, **self.data}
         game_team_data = schemas.GameTeamDataCreate(**data)
         return game_team_data
 
@@ -92,9 +89,9 @@ class BaseTeam:
         :return: 球队比赛信息
         """
         data = {
-            'created_time': created_time,
-            'club_id': self.club_id,
-            'score': self.score,
+            "created_time": created_time,
+            "club_id": self.club_id,
+            "score": self.score,
         }
         game_team_info = schemas.GameTeamInfoCreate(**data)
         return game_team_info
@@ -114,7 +111,7 @@ class BaseTeam:
         for player in self.players:
             player.capa[capa_name] = num
 
-    def get_rival_team(self) -> 'BaseTeam':
+    def get_rival_team(self) -> "BaseTeam":
         """
         获取对手实例
         :return: Team实例
@@ -129,9 +126,14 @@ class BaseTeam:
         球队战术次数+1
         :param data_name: 战术名
         """
-        if data_name == "wing_cross" or data_name == "under_cutting" or data_name == "pull_back" \
-                or data_name == "middle_attack" or data_name == "counter_attack":
-            self.data['attempts'] += 1
+        if (
+            data_name == "wing_cross"
+            or data_name == "under_cutting"
+            or data_name == "pull_back"
+            or data_name == "middle_attack"
+            or data_name == "counter_attack"
+        ):
+            self.data["attempts"] += 1
         self.data[data_name] += 1
 
     def select_tactic(self, counter_attack_permitted: bool):
@@ -144,20 +146,22 @@ class BaseTeam:
         tactic_pro = self.tactic.copy()
         tactic_pro.pop("counter_attack")  # 无防反
         while True:
-            tactic_name = utils.select_by_pro(tactic_pro_total) \
-                if counter_attack_permitted \
-                else utils.select_by_pro(tactic_pro)
-            if tactic_name == 'wing_cross' and not self.get_location_players(
-                    (game_configs.Location.LW, game_configs.Location.RW, game_configs.Location.LB,
-                     game_configs.Location.RB)):
+            tactic_name = (
+                utils.select_by_pro(tactic_pro_total) if counter_attack_permitted else utils.select_by_pro(tactic_pro)
+            )
+            if tactic_name == "wing_cross" and not self.get_location_players(
+                (game_configs.Location.LW, game_configs.Location.RW, game_configs.Location.LB, game_configs.Location.RB)
+            ):
                 continue
-            if tactic_name == 'under_cutting' and not self.get_location_players(
-                    (game_configs.Location.LW, game_configs.Location.RW)):
+            if tactic_name == "under_cutting" and not self.get_location_players(
+                (game_configs.Location.LW, game_configs.Location.RW)
+            ):
                 continue
-            if tactic_name == 'pull_back' and not self.get_location_players(
-                    (game_configs.Location.LW, game_configs.Location.RW)):
+            if tactic_name == "pull_back" and not self.get_location_players(
+                (game_configs.Location.LW, game_configs.Location.RW)
+            ):
                 continue
-            if tactic_name == 'middle_attack' and not self.get_location_players((game_configs.Location.CM,)):
+            if tactic_name == "middle_attack" and not self.get_location_players((game_configs.Location.CM,)):
                 self.shift_location()
             else:
                 break
@@ -193,7 +197,7 @@ class BaseTeam:
         #         player_list.append(player)
         # return player_list
 
-    def attack(self, rival_team: 'BaseTeam', counter_attack_permitted=False) -> bool:
+    def attack(self, rival_team: "BaseTeam", counter_attack_permitted=False) -> bool:
         """
         执行战术
         :param rival_team: 防守队伍实例
@@ -202,24 +206,24 @@ class BaseTeam:
         """
         tactic_name = self.select_tactic(counter_attack_permitted)
         exchange_ball = False
-        if tactic_name == 'wing_cross':
+        if tactic_name == "wing_cross":
             exchange_ball = self.wing_cross(rival_team)
-        elif tactic_name == 'under_cutting':
+        elif tactic_name == "under_cutting":
             exchange_ball = self.under_cutting(rival_team)
-        elif tactic_name == 'pull_back':
+        elif tactic_name == "pull_back":
             exchange_ball = self.pull_back(rival_team)
-        elif tactic_name == 'middle_attack':
+        elif tactic_name == "middle_attack":
             exchange_ball = self.middle_attack(rival_team)
-        elif tactic_name == 'counter_attack':
+        elif tactic_name == "counter_attack":
             exchange_ball = self.counter_attack(rival_team)
         else:
-            logger.error('战术名称{}错误！'.format(tactic_name))
+            logger.error("战术名称{}错误！".format(tactic_name))
         return exchange_ball
 
     def get_best_shooter(self) -> List[BasePlayer]:
-        return sorted(self.players, key=lambda x: x.get_capa('shooting'))
+        return sorted(self.players, key=lambda x: x.get_capa("shooting"))
 
-    def making_final_penalty(self, rival_team: 'BaseTeam', num):
+    def making_final_penalty(self, rival_team: "BaseTeam", num):
         """
         点球过程
         num:点球轮次
@@ -233,17 +237,17 @@ class BaseTeam:
         点球与扑救
         :return: 是否进球
         """
-        self.add_script('{}罚出点球！'.format(shooter.name), "n")
+        self.add_script("{}罚出点球！".format(shooter.name), "n")
         # 点球 为射手增加30点能力
         win_player = utils.select_by_pro(
-            {shooter: shooter.get_capa('shooting') + 30, keeper: keeper.get_capa('goalkeeping')})
+            {shooter: shooter.get_capa("shooting") + 30, keeper: keeper.get_capa("goalkeeping")}
+        )
         if win_player == shooter:
             return True
         else:
             return False
 
-    def shot_and_save(self, attacker: BasePlayer, defender: BasePlayer,
-                      assister: Optional[BasePlayer] = None) -> bool:
+    def shot_and_save(self, attacker: BasePlayer, defender: BasePlayer, assister: Optional[BasePlayer] = None) -> bool:
         """
         射门与扑救，一对一
         :param attacker: 进攻球员实例
@@ -251,37 +255,42 @@ class BaseTeam:
         :param assister: 助攻球员实例
         :return: 进攻是否成功
         """
-        self.add_script('{}起脚打门！'.format(attacker.name), 'c')
+        self.add_script("{}起脚打门！".format(attacker.name), "c")
         if defender:
-            average_stamina = self.get_rival_team().get_average_capability('stamina')
-            attacker.plus_data('shots', average_stamina)
-            defender.plus_data('saves', average_stamina)
+            average_stamina = self.get_rival_team().get_average_capability("stamina")
+            attacker.plus_data("shots", average_stamina)
+            defender.plus_data("saves", average_stamina)
             win_player = utils.select_by_pro(
-                {attacker: attacker.get_capa('shooting'), defender: defender.get_capa('goalkeeping')})
+                {attacker: attacker.get_capa("shooting"), defender: defender.get_capa("goalkeeping")}
+            )
         else:
-            average_stamina = self.get_rival_team().get_average_capability('stamina')
-            attacker.plus_data('shots', average_stamina)
+            average_stamina = self.get_rival_team().get_average_capability("stamina")
+            attacker.plus_data("shots", average_stamina)
             win_player = attacker
         if win_player == attacker:
             # 比分直接在这儿改写，省的在每处调用后都要改写比分
             self.score += 1
-            attacker.plus_data('goals')
+            attacker.plus_data("goals")
             if assister:
-                assister.plus_data('assists')
-            self.add_script('球进啦！{} {}:{} {}'.format(
-                self.game.lteam.name, self.game.lteam.score, self.game.rteam.score, self.game.rteam.name), 'n')
-            if attacker.get_data('goals') == 2:
-                self.add_script('{}梅开二度！'.format(attacker.name), 'n')
-            if attacker.get_data('goals') == 3:
-                self.add_script('{}帽子戏法！'.format(attacker.name), 'n')
-            if attacker.get_data('goals') == 4:
-                self.add_script('{}大四喜！'.format(attacker.name), 'n')
+                assister.plus_data("assists")
+            self.add_script(
+                "球进啦！{} {}:{} {}".format(
+                    self.game.lteam.name, self.game.lteam.score, self.game.rteam.score, self.game.rteam.name
+                ),
+                "n",
+            )
+            if attacker.get_data("goals") == 2:
+                self.add_script("{}梅开二度！".format(attacker.name), "n")
+            if attacker.get_data("goals") == 3:
+                self.add_script("{}帽子戏法！".format(attacker.name), "n")
+            if attacker.get_data("goals") == 4:
+                self.add_script("{}大四喜！".format(attacker.name), "n")
             # 记录进球
             # self.record_goal(player=attacker)
             return True
         else:
-            defender.plus_data('save_success')
-            self.add_script('{}发挥神勇，扑出这脚劲射'.format(defender.name), 'c')
+            defender.plus_data("save_success")
+            self.add_script("{}发挥神勇，扑出这脚劲射".format(defender.name), "c")
             return False
 
     def dribble_and_block(self, attacker: BasePlayer, defender: BasePlayer) -> bool:
@@ -291,37 +300,38 @@ class BaseTeam:
         :param defender: 防守球员（中卫）实例
         :return: 进攻是否成功
         """
-        average_stamina = self.get_rival_team().get_average_capability('stamina')
+        average_stamina = self.get_rival_team().get_average_capability("stamina")
         if not defender:
             return True
         if not attacker:
             return False
 
         # 更新数据，并判定实时体力是否下降
-        attacker.plus_data('dribbles', average_stamina)
-        defender.plus_data('tackles', average_stamina)
+        attacker.plus_data("dribbles", average_stamina)
+        defender.plus_data("tackles", average_stamina)
         # 比拼进攻球员的过人与防守球员的抢断
         win_player = utils.select_by_pro(
-            {attacker: attacker.get_capa('dribbling'),
-             defender: defender.get_capa('interception')})
+            {attacker: attacker.get_capa("dribbling"), defender: defender.get_capa("interception")}
+        )
         if win_player == attacker:
-            attacker.plus_data('dribble_success')
-            self.add_script('{}过掉了{}'.format(attacker.name, defender.name), 'c')
+            attacker.plus_data("dribble_success")
+            self.add_script("{}过掉了{}".format(attacker.name, defender.name), "c")
             return True
         else:
-            defender.plus_data('tackle_success')
-            self.add_script('{}阻截了{}的进攻'.format(defender.name, attacker.name), 'c')
+            defender.plus_data("tackle_success")
+            self.add_script("{}阻截了{}的进攻".format(defender.name, attacker.name), "c")
             return False
 
-    def sprint_dribble_and_block(self, attackers: List[BasePlayer],
-                                 defenders: List[BasePlayer]) -> Tuple[bool, BasePlayer]:
+    def sprint_dribble_and_block(
+        self, attackers: List[BasePlayer], defenders: List[BasePlayer]
+    ) -> Tuple[bool, BasePlayer]:
         """
         冲刺、过人与抢断，多对多
         :param attackers: 进攻球员组
         :param defenders: 防守球员组 可能为空列表
         :return: 进攻是否成功、持球球员
         """
-        average_stamina = self.get_rival_team().get_average_capability('stamina')
+        average_stamina = self.get_rival_team().get_average_capability("stamina")
         if not defenders:
             return True, random.choice(attackers)  # 随机选一个进攻球员持球
         if not attackers:
@@ -329,29 +339,31 @@ class BaseTeam:
         while True:
             attacker = random.choice(attackers)
             defender = random.choice(defenders)
-            attacker.plus_data('dribbles', average_stamina)
-            defender.plus_data('tackles', average_stamina)
+            attacker.plus_data("dribbles", average_stamina)
+            defender.plus_data("tackles", average_stamina)
             # 开始数值判定
             win_player = utils.select_by_pro(
-                {attacker: attacker.get_capa('dribbling') + attacker.get_capa('pace'),
-                 defender: defender.get_capa('interception') + defender.get_capa('pace')})
+                {
+                    attacker: attacker.get_capa("dribbling") + attacker.get_capa("pace"),
+                    defender: defender.get_capa("interception") + defender.get_capa("pace"),
+                }
+            )
             if win_player == attacker:
-                attacker.plus_data('dribble_success')
+                attacker.plus_data("dribble_success")
                 defenders.remove(defender)
             else:
-                defender.plus_data('tackle_success')
+                defender.plus_data("tackle_success")
                 attackers.remove(attacker)
             if not attackers:
-                self.add_script('{}抢到皮球'.format(win_player.name), 'c')
+                self.add_script("{}抢到皮球".format(win_player.name), "c")
                 return False, win_player
             elif not defenders:
-                self.add_script('{}过掉了{}'.format(win_player.name, defender.name), 'c')
+                self.add_script("{}过掉了{}".format(win_player.name, defender.name), "c")
                 return True, win_player
             else:
                 pass
 
-    def drop_ball(self, attackers: List[BasePlayer],
-                  defenders: List[BasePlayer]) -> Tuple[bool, BasePlayer]:
+    def drop_ball(self, attackers: List[BasePlayer], defenders: List[BasePlayer]) -> Tuple[bool, BasePlayer]:
         """
         争顶
         :param attackers: 进攻球员组
@@ -363,21 +375,24 @@ class BaseTeam:
         if not attackers:
             return False, random.choice(defenders)  # 随机选一个防守球员持球
 
-        self.add_script('球员们尝试争顶', 'c')
-        average_stamina = self.get_rival_team().get_average_capability('stamina')
+        self.add_script("球员们尝试争顶", "c")
+        average_stamina = self.get_rival_team().get_average_capability("stamina")
         while True:
             attacker = random.choice(attackers)
             defender = random.choice(defenders)
-            attacker.plus_data('aerials', average_stamina)
-            defender.plus_data('aerials', average_stamina)
+            attacker.plus_data("aerials", average_stamina)
+            defender.plus_data("aerials", average_stamina)
             win_player = utils.select_by_pro(
-                {attacker: attacker.get_capa('anticipation') + attacker.get_capa('strength'),
-                 defender: defender.get_capa('anticipation') + defender.get_capa('strength')})
+                {
+                    attacker: attacker.get_capa("anticipation") + attacker.get_capa("strength"),
+                    defender: defender.get_capa("anticipation") + defender.get_capa("strength"),
+                }
+            )
             if not win_player:
-                print(attacker.get_capa('anticipation') + attacker.get_capa('strength'))
-                print(defender.get_capa('anticipation') + defender.get_capa('strength'))
-                raise ValueError('win_player 不存在！')
-            win_player.plus_data('aerial_success')
+                print(attacker.get_capa("anticipation") + attacker.get_capa("strength"))
+                print(defender.get_capa("anticipation") + defender.get_capa("strength"))
+                raise ValueError("win_player 不存在！")
+            win_player.plus_data("aerial_success")
             if win_player == attacker:
                 defenders.remove(defender)
             else:
@@ -385,7 +400,7 @@ class BaseTeam:
             if not attackers:
                 return False, win_player
             elif not defenders:
-                self.add_script('{}抢到球权'.format(win_player.name), 'c')
+                self.add_script("{}抢到球权".format(win_player.name), "c")
                 return True, win_player
             else:
                 pass
@@ -398,19 +413,19 @@ class BaseTeam:
         :param is_long_pass: 是否为长传
         :return: 进攻是否成功
         """
-        average_stamina = self.get_rival_team().get_average_capability('stamina')
-        attacker.plus_data('passes', average_stamina)
+        average_stamina = self.get_rival_team().get_average_capability("stamina")
+        attacker.plus_data("passes", average_stamina)
         if is_long_pass:
             # 若是长传，成功率减半
             win_player = utils.select_by_pro(
-                {attacker: attacker.get_capa('passing') / 2,
-                 defender_average: defender_average / 2})
+                {attacker: attacker.get_capa("passing") / 2, defender_average: defender_average / 2}
+            )
         else:
             win_player = utils.select_by_pro(
-                {attacker: attacker.get_capa('passing'),
-                 defender_average: defender_average / 2})
+                {attacker: attacker.get_capa("passing"), defender_average: defender_average / 2}
+            )
         if win_player == attacker:
-            attacker.plus_data('pass_success')
+            attacker.plus_data("pass_success")
             return True
         else:
             return False
@@ -420,14 +435,14 @@ class BaseTeam:
         TODO 角球
         """
 
-    def wing_cross(self, rival_team: 'BaseTeam') -> bool:
+    def wing_cross(self, rival_team: "BaseTeam") -> bool:
         """
         下底传中
         :param rival_team: 防守队伍
         :return: 是否交换球权
         """
-        self.plus_data('wing_cross')
-        self.add_script('\n{}尝试下底传中'.format(self.name), 'd')
+        self.plus_data("wing_cross")
+        self.add_script("\n{}尝试下底传中".format(self.name), "d")
 
         # 边锋或边卫过边卫
         while True:
@@ -447,8 +462,8 @@ class BaseTeam:
         state, win_player = self.sprint_dribble_and_block(wings, wing_backs)  # 一对一或一对多
         if state:
             # 边锋/卫传中
-            self.add_script('{}一脚起球传中'.format(win_player.name), 'c')
-            state = self.pass_ball(win_player, rival_team.get_average_capability('passing'), is_long_pass=True)
+            self.add_script("{}一脚起球传中".format(win_player.name), "c")
+            state = self.pass_ball(win_player, rival_team.get_average_capability("passing"), is_long_pass=True)
             if state:
                 # 争顶
                 assister = win_player
@@ -463,31 +478,30 @@ class BaseTeam:
                     state = self.shot_and_save(win_player, goal_keeper, assister)
                     if state:
                         # 进球啦！
-                        self.plus_data('wing_cross_success')
+                        self.plus_data("wing_cross_success")
                 else:
                     # 防守球员解围
-                    self.add_script('{}将球解围'.format(win_player.name), 'c')
+                    self.add_script("{}将球解围".format(win_player.name), "c")
                     # 进行一次球权判定
-                    state = rival_team.pass_ball(win_player, self.get_average_capability('passing'),
-                                                 is_long_pass=True)
+                    state = rival_team.pass_ball(win_player, self.get_average_capability("passing"), is_long_pass=True)
                     if not state:
-                        self.add_script('进攻方仍然持球', 'c')
+                        self.add_script("进攻方仍然持球", "c")
                         return False
                     else:
-                        self.add_script('{}拿到球权'.format(rival_team.name), 'c')
+                        self.add_script("{}拿到球权".format(rival_team.name), "c")
             else:
-                self.add_script('{}抢到球权'.format(rival_team.name), 'c')
+                self.add_script("{}抢到球权".format(rival_team.name), "c")
 
         return True
 
-    def under_cutting(self, rival_team: 'BaseTeam') -> bool:
+    def under_cutting(self, rival_team: "BaseTeam") -> bool:
         """
         边路内切
         :param rival_team: 防守队伍
         :return: 是否交换球权
         """
-        self.plus_data('under_cutting')
-        self.add_script('\n{}尝试边路内切'.format(self.name), 'd')
+        self.plus_data("under_cutting")
+        self.add_script("\n{}尝试边路内切".format(self.name), "d")
         # 边锋过边卫
         wing = random.choice(self.get_location_players((game_configs.Location.LW, game_configs.Location.RW)))
         if wing.get_location() == game_configs.Location.LW:
@@ -495,12 +509,12 @@ class BaseTeam:
         elif wing.get_location() == game_configs.Location.RW:
             wing_backs = rival_team.get_location_players((game_configs.Location.LB,))
         else:
-            raise ValueError('边锋不存在！')  # 之前都判定过的，应该不会出现这种情况
-        self.add_script('{}拿球，尝试过人'.format(wing.name), 'c')
+            raise ValueError("边锋不存在！")  # 之前都判定过的，应该不会出现这种情况
+        self.add_script("{}拿球，尝试过人".format(wing.name), "c")
         state, win_player = self.sprint_dribble_and_block([wing], wing_backs)  # 一对一或一对多
         if state:
             # 边锋内切
-            self.add_script('{}尝试内切'.format(win_player.name), 'c')
+            self.add_script("{}尝试内切".format(win_player.name), "c")
             centre_backs = rival_team.get_location_players((game_configs.Location.CB,))
             while len(centre_backs) > 2:
                 # 使防守球员上限不超过2个
@@ -517,17 +531,17 @@ class BaseTeam:
                 goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]
                 state = self.shot_and_save(win_player, goal_keeper, None)
                 if state:
-                    self.plus_data('under_cutting_success')
+                    self.plus_data("under_cutting_success")
         return True
 
-    def pull_back(self, rival_team: 'BaseTeam') -> bool:
+    def pull_back(self, rival_team: "BaseTeam") -> bool:
         """
         倒三角
         :param rival_team: 防守队伍
         :return: 是否交换球权
         """
-        self.plus_data('pull_back')
-        self.add_script('\n{}尝试倒三角传球'.format(self.name), 'd')
+        self.plus_data("pull_back")
+        self.add_script("\n{}尝试倒三角传球".format(self.name), "d")
         # 边锋过边卫
         wing = random.choice(self.get_location_players((game_configs.Location.LW, game_configs.Location.RW)))
         if wing.get_location() == game_configs.Location.LW:
@@ -535,13 +549,13 @@ class BaseTeam:
         elif wing.get_location() == game_configs.Location.RW:
             wing_backs = rival_team.get_location_players((game_configs.Location.LB,))
         else:
-            raise ValueError('边锋不存在！')
-        self.add_script('{}拿球，尝试过人'.format(wing.name), 'c')
+            raise ValueError("边锋不存在！")
+        self.add_script("{}拿球，尝试过人".format(wing.name), "c")
         state, win_player = self.sprint_dribble_and_block([wing], wing_backs)  # 一对一或一对多
         if state:
             # 边锋内切
             assister = win_player
-            self.add_script('{}尝试内切'.format(win_player.name), 'c')
+            self.add_script("{}尝试内切".format(win_player.name), "c")
             # 随机选一个中卫
             centre_backs = rival_team.get_location_players((game_configs.Location.CB,))
             if not centre_backs:
@@ -551,8 +565,8 @@ class BaseTeam:
                 state = self.dribble_and_block(win_player, centre_back)  # 过一个中卫即可
             if state:
                 # 倒三角传球
-                self.add_script('{}倒三角传中'.format(win_player.name), 'c')
-                state = self.pass_ball(win_player, rival_team.get_average_capability('passing'))
+                self.add_script("{}倒三角传中".format(win_player.name), "c")
+                state = self.pass_ball(win_player, rival_team.get_average_capability("passing"))
                 if state:
                     shooters = self.get_location_players((game_configs.Location.ST, game_configs.Location.CM))
                     if not shooters:
@@ -561,31 +575,31 @@ class BaseTeam:
                     goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]
                     state = self.shot_and_save(shooter, goal_keeper, assister)
                     if state:
-                        self.plus_data('pull_back_success')
+                        self.plus_data("pull_back_success")
         return True
 
-    def middle_attack(self, rival_team: 'BaseTeam') -> bool:
+    def middle_attack(self, rival_team: "BaseTeam") -> bool:
         """
         中路渗透
         :param rival_team: 防守队伍
         :return: 是否交换球权
         """
-        self.plus_data('middle_attack')
-        self.add_script('\n{}尝试中路渗透'.format(self.name), 'd')
+        self.plus_data("middle_attack")
+        self.add_script("\n{}尝试中路渗透".format(self.name), "d")
         count_dict = {}
         for _ in range(10):
             # 10次循环，若其中有一次循环：所有中场球员传球均失败，即丢失球权，否则传球成功
             midfielders = self.get_location_players((game_configs.Location.CM,))
             while True:
                 player = random.choice(midfielders)
-                flag = self.pass_ball(player, rival_team.get_average_capability('passing'))
+                flag = self.pass_ball(player, rival_team.get_average_capability("passing"))
                 if flag:
                     # 若传球成功，进入下一次循环
                     count_dict[player] = count_dict.get(player, 0) + 1
                     break
                 midfielders.remove(player)
                 if not midfielders:
-                    self.add_script('{}丢失了球权'.format(self.name), 'c')
+                    self.add_script("{}丢失了球权".format(self.name), "c")
                     return True
         # 取成功数最多次的球员为助攻者
         assister = sorted(count_dict.items(), key=lambda x: x[1], reverse=True)[0][0]
@@ -601,11 +615,11 @@ class BaseTeam:
             goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]
             state = self.shot_and_save(win_player, goal_keeper, assister)
             if state:
-                self.plus_data('middle_attack_success')
+                self.plus_data("middle_attack_success")
         else:
             # 防守球员解围
-            self.add_script('{}将球解围'.format(win_player.name), 'c')
-            state = rival_team.pass_ball(win_player, self.get_average_capability('passing'), is_long_pass=True)
+            self.add_script("{}将球解围".format(win_player.name), "c")
+            state = rival_team.pass_ball(win_player, self.get_average_capability("passing"), is_long_pass=True)
             if state:
                 # 外围争顶
                 centre_backs = self.get_location_players((game_configs.Location.CB,))
@@ -620,31 +634,29 @@ class BaseTeam:
                     state, win_player = rival_team.drop_ball(strikers, centre_backs)
                 if state:
                     return True
-            self.add_script('进攻方仍然持球', 'c')
+            self.add_script("进攻方仍然持球", "c")
             return False
         return True
 
-    def counter_attack(self, rival_team: 'BaseTeam') -> bool:
+    def counter_attack(self, rival_team: "BaseTeam") -> bool:
         """
         防守反击
         :param rival_team: 防守队伍
         :return: 是否交换球权
         """
-        self.plus_data('counter_attack')
-        self.add_script('\n{}尝试防守反击'.format(self.name), 'd')
+        self.plus_data("counter_attack")
+        self.add_script("\n{}尝试防守反击".format(self.name), "d")
         # 随便选一个球员传球
-        passing_player = random.choice(
-            self.get_location_players(
-                (game_configs.Location.GK, game_configs.Location.CB)))
-        state = self.pass_ball(passing_player, rival_team.get_average_capability('passing'))
+        passing_player = random.choice(self.get_location_players((game_configs.Location.GK, game_configs.Location.CB)))
+        state = self.pass_ball(passing_player, rival_team.get_average_capability("passing"))
         if state:
             # 过人
-            self.add_script('{}一脚长传，直击腹地'.format(passing_player.name), 'c')
+            self.add_script("{}一脚长传，直击腹地".format(passing_player.name), "c")
             assister = passing_player
             strikers = self.get_location_players((game_configs.Location.ST,))
             centre_backs = rival_team.get_location_players((game_configs.Location.CB,))
             if not strikers:
-                self.add_script("很可惜，无锋阵容没有中锋进行接应，球权被{}夺去".format(rival_team.name), 'c')
+                self.add_script("很可惜，无锋阵容没有中锋进行接应，球权被{}夺去".format(rival_team.name), "c")
                 return True
             state, win_player = self.sprint_dribble_and_block(strikers, centre_backs)
             if state:
@@ -652,7 +664,7 @@ class BaseTeam:
                 goal_keeper = rival_team.get_location_players((game_configs.Location.GK,))[0]
                 state = self.shot_and_save(win_player, goal_keeper, assister)
                 if state:
-                    self.plus_data('counter_attack_success')
-        self.add_script('{}策动的长传被拦截'.format(passing_player.name), 'c')
-        self.add_script('{}持球'.format(rival_team.name), 'c')
+                    self.plus_data("counter_attack_success")
+        self.add_script("{}策动的长传被拦截".format(passing_player.name), "c")
+        self.add_script("{}持球".format(rival_team.name), "c")
         return True

@@ -18,36 +18,43 @@ async def show_protocol():
     return p
 
 
-@router.get('/clear-db')
+@router.get("/clear-db")
 def clear_db():
     """
     清空数据库中的所有内容
     """
     drop_all()
-    return 'successfully clear db'
+    return "successfully clear db"
 
 
-@router.get('/game-process-demo')
+@router.get("/game-process-demo")
 async def quick_game(fake_season=1, save_id=1, db: Session = Depends(get_db)):
     """
     展示一场 eve 比赛的过程，
     默认为曼城与曼联的英超比赛
     """
-    game_eve = game_app.GameEvE(db=db, club1_id=1, club2_id=2, date=str(Date(2021, 8, 30)), game_name='英超',
-                                game_type='league', season=int(fake_season), save_id=save_id)
+    game_eve = game_app.GameEvE(
+        db=db,
+        club1_id=1,
+        club2_id=2,
+        date=str(Date(2021, 8, 30)),
+        game_name="英超",
+        game_type="league",
+        season=int(fake_season),
+        save_id=save_id,
+    )
     game_eve.start()
-    query_str = "and_(models.Game.season=='{}', models.Game.type=='{}', models.Game.date=='{}')".format(fake_season,
-                                                                                                        'league',
-                                                                                                        Date(2021, 8,
-                                                                                                             30))
+    query_str = "and_(models.Game.season=='{}', models.Game.type=='{}', models.Game.date=='{}')".format(
+        fake_season, "league", Date(2021, 8, 30)
+    )
     game = crud.get_games_by_attri(db=db, query_str=query_str)
     process = game[-1].script
     temp_events = process.split("\n")
-    events = [i for i in temp_events if i != '']
+    events = [i for i in temp_events if i != ""]
     return events
 
 
-@router.get('/all-judge-on-sale2')
+@router.get("/all-judge-on-sale2")
 def all_try_sell(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -56,7 +63,7 @@ def all_try_sell(db: Session = Depends(get_db), save_model=Depends(utils.get_cur
         print(str(club.name) + "完成")
 
 
-@router.get('/all-adjust-finance1')
+@router.get("/all-adjust-finance1")
 def all_adjust_wage(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -65,7 +72,7 @@ def all_adjust_wage(db: Session = Depends(get_db), save_model=Depends(utils.get_
         print(str(club.name) + "完成")
 
 
-@router.get('/all-judge-buy3')
+@router.get("/all-judge-buy3")
 def all_judge_buy(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -74,7 +81,7 @@ def all_judge_buy(db: Session = Depends(get_db), save_model=Depends(utils.get_cu
         print(str(club.name) + "完成")
 
 
-@router.get('/all-make-offer6')
+@router.get("/all-make-offer6")
 def all_make_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -82,7 +89,8 @@ def all_make_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_c
         transfer_club.make_offer(save_id=save_model.id)
         print(str(club.name) + "完成")
 
-@router.get('/all-receive-offer5')
+
+@router.get("/all-receive-offer5")
 def all_receive_offer(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -92,7 +100,7 @@ def all_receive_offer(db: Session = Depends(get_db), save_model=Depends(utils.ge
             print(str(club.name) + "完成")
 
 
-@router.get('/all-improve-crew4')
+@router.get("/all-improve-crew4")
 def all_improve_crew(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     clubs = crud.get_clubs_by_save(db=db, save_id=save_model.id)
     for club in clubs:
@@ -101,14 +109,15 @@ def all_improve_crew(db: Session = Depends(get_db), save_model=Depends(utils.get
         print(str(club.name) + "完成")
 
 
-@router.get('/incoming-games-info')
-async def get_incoming_games_info(db: Session = Depends(get_db),
-                                  save_model=Depends(utils.get_current_save)):
+@router.get("/incoming-games-info")
+async def get_incoming_games_info(db: Session = Depends(get_db), save_model=Depends(utils.get_current_save)):
     """
     获取即将到来的比赛信息
     """
     computed_calendar = computed_data_app.ComputedCalendar(save_id=save_model.id, db=db, save_model=save_model)
     return computed_calendar.get_incoming_games(cur_date_str=save_model.date)
+
+
 #
 # def start_season_game(league_model: models.League, save_model: models.Save, db: Session):
 #     """

@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 
 class GamePvE(Base):
-    __tablename__ = 'game_pve'
+    __tablename__ = "game_pve"
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
     # 一些在比赛结束后保存的字段
@@ -14,9 +14,9 @@ class GamePvE(Base):
     date = Column(String(1000))
     season = Column(Integer)
 
-    save_id = Column(Integer, ForeignKey('save.id'))
-    player_club_id = Column(Integer, ForeignKey('club.id'))
-    computer_club_id = Column(Integer, ForeignKey('club.id'))
+    save_id = Column(Integer, ForeignKey("save.id"))
+    player_club_id = Column(Integer, ForeignKey("club.id"))
+    computer_club_id = Column(Integer, ForeignKey("club.id"))
 
     home_club_id = Column(Integer)
 
@@ -28,16 +28,16 @@ class GamePvE(Base):
     is_extra_time = Column(Boolean, default=False)
     goal_record = Column(String(1000))
 
-    teams = relationship("TeamPvE", backref="game_pve", cascade='all, delete-orphan')
+    teams = relationship("TeamPvE", backref="game_pve", cascade="all, delete-orphan")
 
 
 class TeamPvE(Base):
-    __tablename__ = 'team_pve'
+    __tablename__ = "team_pve"
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
     is_player = Column(Boolean, default=False)
 
-    club_id = Column(Integer, ForeignKey('club.id'))
+    club_id = Column(Integer, ForeignKey("club.id"))
     score = Column(Integer)
 
     attempts = Column(Integer)
@@ -57,12 +57,12 @@ class TeamPvE(Base):
     counter_attack = Column(Integer)
     counter_attack_success = Column(Integer)
 
-    game_pve_id = Column(Integer, ForeignKey('game_pve.id'))
-    players = relationship("PlayerPvE", backref="team_pve", cascade='all, delete-orphan')
+    game_pve_id = Column(Integer, ForeignKey("game_pve.id"))
+    players = relationship("PlayerPvE", backref="team_pve", cascade="all, delete-orphan")
 
 
 class PlayerPvE(Base):
-    __tablename__ = 'player_pve'
+    __tablename__ = "player_pve"
     id = Column(Integer, primary_key=True, index=True)
     created_time = Column(DateTime)
 
@@ -95,4 +95,4 @@ class PlayerPvE(Base):
     original_stamina = Column(Integer)
     final_stamina = Column(Integer)
 
-    team_pve_id = Column(Integer, ForeignKey('team_pve.id'))
+    team_pve_id = Column(Integer, ForeignKey("team_pve.id"))

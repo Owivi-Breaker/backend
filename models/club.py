@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 
 
 class Club(Base):
-    __tablename__ = 'club'
+    __tablename__ = "club"
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
@@ -18,8 +18,7 @@ class Club(Base):
     scout = Column(Integer)
     negotiator = Column(Integer)
 
-    league_id = Column(Integer, ForeignKey('league.id'))
+    league_id = Column(Integer, ForeignKey("league.id"))
     coach = relationship("Coach", uselist=False, backref="club")
-    players = relationship("Player", backref="club", lazy='select')
+    players = relationship("Player", backref="club", lazy="select")
     game_team_info = relationship("GameTeamInfo", backref="club")
-

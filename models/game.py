@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 
 # region 比赛输出数据
 class Game(Base):
-    __tablename__ = 'game'
+    __tablename__ = "game"
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
@@ -25,10 +25,10 @@ class Game(Base):
 
 
 class GameTeamInfo(Base):
-    __tablename__ = 'game_team_info'
+    __tablename__ = "game_team_info"
     id = Column(Integer, primary_key=True, index=True)
-    game_id = Column(Integer, ForeignKey('game.id'))  # 外键
-    club_id = Column(Integer, ForeignKey('club.id'))  # 与俱乐部类连接的外键
+    game_id = Column(Integer, ForeignKey("game.id"))  # 外键
+    club_id = Column(Integer, ForeignKey("club.id"))  # 与俱乐部类连接的外键
 
     season = Column(Integer)
     created_time = Column(DateTime)
@@ -38,9 +38,9 @@ class GameTeamInfo(Base):
 
 
 class GameTeamData(Base):
-    __tablename__ = 'game_team_data'
+    __tablename__ = "game_team_data"
     id = Column(Integer, primary_key=True, index=True)
-    game_team_info_id = Column(Integer, ForeignKey('game_team_info.id'))
+    game_team_info_id = Column(Integer, ForeignKey("game_team_info.id"))
 
     season = Column(Integer)
     created_time = Column(DateTime)
@@ -64,7 +64,7 @@ class GameTeamData(Base):
 
 class GamePlayerData(Base):
     # 球员的一场比赛数据
-    __tablename__ = 'game_player_data'
+    __tablename__ = "game_player_data"
     id = Column(Integer, primary_key=True, index=True)
 
     season = Column(Integer)
@@ -96,6 +96,8 @@ class GamePlayerData(Base):
     original_stamina = Column(Integer)
     final_stamina = Column(Integer)
 
-    game_team_info_id = Column(Integer, ForeignKey('game_team_info.id'))
-    player_id = Column('player_id', Integer, ForeignKey('player.id'), index=True)
+    game_team_info_id = Column(Integer, ForeignKey("game_team_info.id"))
+    player_id = Column("player_id", Integer, ForeignKey("player.id"), index=True)
+
+
 # endregion

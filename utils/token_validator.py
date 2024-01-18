@@ -20,6 +20,7 @@ class TokenData(BaseModel):
     """
     token中存储的信息
     """
+
     email: str = None
 
 
@@ -52,9 +53,7 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
     return encoded_jwt  # token
 
 
-async def get_current_user(
-        token: str = Depends(oauth2_scheme),
-        db: Session = Depends(get_db)) -> models.User:
+async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> models.User:
     """
     根据token获取相应的user_model
     """
@@ -77,8 +76,7 @@ async def get_current_user(
     return user_model
 
 
-def authenticate_user(
-        email: str, password: str, db: Session = Depends(get_db)) -> Optional[models.User]:
+def authenticate_user(email: str, password: str, db: Session = Depends(get_db)) -> Optional[models.User]:
     """
     根据账号和密码验证用户合法性
     :param email: 邮箱账号

@@ -10,7 +10,7 @@ class OfferCreate(BaseModel):
     target_club_id: int
     offer_price: int
     season: int
-    status: str = 'w'
+    status: str = "w"
     date: date
 
     class Config:

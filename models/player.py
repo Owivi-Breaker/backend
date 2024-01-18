@@ -4,8 +4,9 @@ from sqlalchemy.orm import relationship
 
 # region 球员数据
 
+
 class Player(Base):
-    __tablename__ = 'player'
+    __tablename__ = "player"
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
@@ -61,11 +62,12 @@ class Player(Base):
     stamina_limit = Column(Integer)
     goalkeeping_limit = Column(Integer)
 
-    club_id = Column(Integer, ForeignKey('club.id'))
+    club_id = Column(Integer, ForeignKey("club.id"))
     # 生涯数据
-    game_data = relationship('GamePlayerData', backref='player', lazy='select')
+    game_data = relationship("GamePlayerData", backref="player", lazy="select")
 
     on_sale = Column(Boolean, default=False)
-    values = Column(Float,default=10.0)
-# endregion
+    values = Column(Float, default=10.0)
 
+
+# endregion

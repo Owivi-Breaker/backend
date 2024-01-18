@@ -14,8 +14,7 @@ from utils import logger, utils
 
 
 class PlayerSelector:
-    def __init__(self, club_id: int, db: Session, season: int, date: str,
-                 club_model: Optional[models.Club] = None):
+    def __init__(self, club_id: int, db: Session, season: int, date: str, club_model: Optional[models.Club] = None):
         self.db = db
         self.club_id = club_id
         self.season = season
@@ -23,17 +22,16 @@ class PlayerSelector:
         self.club_model = club_model if club_model else crud.get_club_by_id(db=self.db, club_id=self.club_id)
 
     @staticmethod
-    def turn_lineup_from_id2models(
-            players_model: List[models.Player], lo_names: List[str]) -> Dict[int, str]:
+    def turn_lineup_from_id2models(players_model: List[models.Player], lo_names: List[str]) -> Dict[int, str]:
         """
         将选人结果的(List[models.Player], List[str])转换成id:lo_name键值对格式
         以便保存至save表中
         """
         return {player_model.id: lo_name for player_model, lo_name in zip(players_model, lo_names)}
 
-    def select_players(self,
-                       is_random: bool = True,
-                       is_save_mode=False) -> Union[Tuple[List[models.Player], List[str]], str]:
+    def select_players(
+        self, is_random: bool = True, is_save_mode=False
+    ) -> Union[Tuple[List[models.Player], List[str]], str]:
         """
         选人
         :param is_random: 是否随机选择算人算法
@@ -43,16 +41,20 @@ class PlayerSelector:
         if is_random:
             a = random.choice([1, 2])
             if a == 1:
-                players_model, locations_list = self.select_players1(self.club_model.players,
-                                                                     self.club_model.coach.formation)
+                players_model, locations_list = self.select_players1(
+                    self.club_model.players, self.club_model.coach.formation
+                )
             else:
-                players_model, locations_list = self.select_players2(self.club_model.players,
-                                                                     self.club_model.coach.formation)
+                players_model, locations_list = self.select_players2(
+                    self.club_model.players, self.club_model.coach.formation
+                )
         else:
-            players_model1, locations_list1 = self.select_players1(self.club_model.players,
-                                                                   self.club_model.coach.formation)
-            players_model2, locations_list2 = self.select_players2(self.club_model.players,
-                                                                   self.club_model.coach.formation)
+            players_model1, locations_list1 = self.select_players1(
+                self.club_model.players, self.club_model.coach.formation
+            )
+            players_model2, locations_list2 = self.select_players2(
+                self.club_model.players, self.club_model.coach.formation
+            )
 
             capa1 = self.get_total_capa(players_model1, locations_list1)
             capa2 = self.get_total_capa(players_model2, locations_list2)
@@ -77,7 +79,8 @@ class PlayerSelector:
         location_dict: Dict[str, float] = game_configs.formations[formation].copy()  # 这里一定要copy()！因为涉及变量的改变
         # 生成筛选后的、每个球员的位置能力倒序字典，作为待选区
         players_lo_capa_dict: Dict[models.Player, List[List[str, float]]] = {
-            player: self.filter_formation_capa(player, formation) for player in players}
+            player: self.filter_formation_capa(player, formation) for player in players
+        }
         while True:
             # 选择队伍中拥有（某位置上）最高能力值的球员及位置名
             player, lo_name = self.get_highest_capa_player(players_lo_capa_dict)
@@ -115,8 +118,9 @@ class PlayerSelector:
         location_dict: Dict[str, int] = game_configs.formations[formation]  # 记录阵型中各个位置人数
         location_list: List[str] = [name for name in location_dict.keys()]  # 拿到阵型包含的位置列表
 
-        computed_player = ComputedPlayer(player_id=player.id, db=self.db, player_model=player,
-                                         season=self.season, date=self.date)
+        computed_player = ComputedPlayer(
+            player_id=player.id, db=self.db, player_model=player, season=self.season, date=self.date
+        )
         sorted_location_capa_list = computed_player.get_sorted_location_capa()
         sorted_location_capa_list_filter_by_formation = []  # 筛选后的位置综合能力值列表
         for x in sorted_location_capa_list:
@@ -126,12 +130,12 @@ class PlayerSelector:
         # 考虑体力的影响
         real_stamina = computed_player.get_real_stamina()
         sorted_location_capa_list_filter_by_formation = [
-            [x[0], x[1] * (real_stamina / 100)] for x in sorted_location_capa_list_filter_by_formation]
+            [x[0], x[1] * (real_stamina / 100)] for x in sorted_location_capa_list_filter_by_formation
+        ]
         return sorted_location_capa_list_filter_by_formation
 
     @staticmethod
-    def get_highest_capa_player(players_location_capa_dict: Dict[models.Player, List[List]]) -> (
-            models.Player, str):
+    def get_highest_capa_player(players_location_capa_dict: Dict[models.Player, List[List]]) -> (models.Player, str):
         """
         获取队伍中拥有最高位置综合值的球员实例及其位置
         :param players_location_capa_dict: 所有球员各项位置综合能力表
@@ -141,7 +145,7 @@ class PlayerSelector:
         best_lo_capa_list = []
         for player, lo_capa_list in players_location_capa_dict.items():
             if not lo_capa_list:
-                logger.error('球员能力列表为空！')
+                logger.error("球员能力列表为空！")
                 continue
             if not best_player or lo_capa_list[0][1] > best_lo_capa_list[0][1]:
                 best_player = player
@@ -182,13 +186,13 @@ class PlayerSelector:
             lo_rank = {x: dict() for x in locations}  # 每个位置倒序排序的球员综合能力
             # 构建lo_rank
             for player in selecting_players:
-                computed_player = ComputedPlayer(player_id=player.id, db=self.db, player_model=player,
-                                                 season=self.season, date=self.date)
+                computed_player = ComputedPlayer(
+                    player_id=player.id, db=self.db, player_model=player, season=self.season, date=self.date
+                )
                 sorted_location_capa = computed_player.get_sorted_location_capa()
                 # 考虑体力的影响
                 real_stamina = computed_player.get_real_stamina()
-                sorted_location_capa = [
-                    [x[0], x[1] * (real_stamina / 100)] for x in sorted_location_capa]
+                sorted_location_capa = [[x[0], x[1] * (real_stamina / 100)] for x in sorted_location_capa]
 
                 for x in sorted_location_capa:
                     if x[0] in locations:
@@ -232,7 +236,8 @@ class PlayerSelector:
         """
         result = 0
         for x in zip(players, locations):
-            computed_player = ComputedPlayer(player_id=x[0].id, db=self.db, player_model=x[0],
-                                             season=self.season, date=self.date)
+            computed_player = ComputedPlayer(
+                player_id=x[0].id, db=self.db, player_model=x[0], season=self.season, date=self.date
+            )
             result += computed_player.get_location_capa(lo_name=x[1])
         return result

@@ -12,9 +12,7 @@ class ComputedCalendar:
     def __init__(self, save_id: int, db: Session, save_model: models.Save):
         self.db = db
         self.save_id = save_id
-        self.save_model = save_model \
-            if save_model \
-            else crud.get_save_by_id(db=self.db, save_id=self.save_id)
+        self.save_model = save_model if save_model else crud.get_save_by_id(db=self.db, save_id=self.save_id)
         query_str = "models.Calendar.save_id=='{}'".format(self.save_id)
         self.calendars: List[models.Calendar] = crud.get_calendar_by_save_id(db=self.db, save_id=self.save_id)
 
@@ -54,15 +52,15 @@ class ComputedCalendar:
         games_info = []
         for calendar in self.calendars:
             event = json.loads(calendar.event_str)
-            if 'pve' in event.keys() and event["pve"]:
+            if "pve" in event.keys() and event["pve"]:
                 game_info_dict = event["pve"][0]
                 game_info = {
                     "date": calendar.date,
                     "game_name": self.translate_game_type(
-                        game_type=game_info_dict['game_type'],
-                        game_name=game_info_dict['game_name']),
-                    "club1_name": crud.get_club_by_id(self.db, game_info_dict["club_id"].split(',')[0]).name,
-                    "club2_name": crud.get_club_by_id(self.db, game_info_dict["club_id"].split(',')[1]).name
+                        game_type=game_info_dict["game_type"], game_name=game_info_dict["game_name"]
+                    ),
+                    "club1_name": crud.get_club_by_id(self.db, game_info_dict["club_id"].split(",")[0]).name,
+                    "club2_name": crud.get_club_by_id(self.db, game_info_dict["club_id"].split(",")[1]).name,
                 }
                 games_info.append(game_info)
         return games_info

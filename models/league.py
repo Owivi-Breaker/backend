@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 # region 联赛数据
 class League(Base):
-    __tablename__ = 'league'
+    __tablename__ = "league"
     id = Column(Integer, primary_key=True, index=True)
 
     created_time = Column(DateTime)
@@ -16,7 +16,8 @@ class League(Base):
     upper_league = Column(Integer)
     lower_league = Column(Integer)
 
-    save_id = Column(Integer, ForeignKey('save.id'))
-    clubs = relationship("Club", backref='league', lazy='select')
+    save_id = Column(Integer, ForeignKey("save.id"))
+    clubs = relationship("Club", backref="league", lazy="select")
+
 
 # endregion

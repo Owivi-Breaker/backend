@@ -12,8 +12,7 @@ from utils import logger, utils
 
 
 class Club:
-    def __init__(self, db: Session, club_id: int, season: int, date: str,
-                 club_model: models.Club = None):
+    def __init__(self, db: Session, club_id: int, season: int, date: str, club_model: models.Club = None):
         self.db = db
         self.club_id = club_id
         self.season = season
@@ -31,9 +30,9 @@ class Club:
         for player_model in self.team_model.players:
             self.players.append(
                 transfer_app.Player(
-                    db=self.db, player_id=player_model.id,
-                    player_model=player_model, season=self.season,
-                    date=self.date))
+                    db=self.db, player_id=player_model.id, player_model=player_model, season=self.season, date=self.date
+                )
+            )
 
     def adjust_finance(self):
         """
@@ -131,8 +130,9 @@ class Club:
         # 寻找目标球队
         target_club_list = []  # 范围内的球队
         for club in crud.get_clubs_by_save(db=self.db, save_id=save_id):
-            if self.team_model.reputation - 15 < club.reputation < self.team_model.reputation + 15 \
-                    and int(club.id) != int(self.club_id):
+            if self.team_model.reputation - 15 < club.reputation < self.team_model.reputation + 15 and int(
+                club.id
+            ) != int(self.club_id):
                 target_club_list.append(club)
         if len(target_club_list) > 5:
             target_club_list = random.sample(target_club_list, 5)  # 少挑几只队
@@ -141,12 +141,15 @@ class Club:
         target_players: List[transfer_app.Player] = []  # 目标球员,临时列表
         for club in target_club_list:
             for player in club.players:
-                transfer_player = transfer_app.Player(db=self.db, player_id=player.id, season=self.season,
-                                                      date=self.date, player_model=player)
+                transfer_player = transfer_app.Player(
+                    db=self.db, player_id=player.id, season=self.season, date=self.date, player_model=player
+                )
                 top_lo, top_capa = transfer_player.computed_player.get_top_lo_n_capa()
-                if top_lo in lo_list \
-                        and transfer_player.computed_player.get_values() < finance and \
-                        top_capa >= self.best_cap_in_team(top_lo) - 2:
+                if (
+                    top_lo in lo_list
+                    and transfer_player.computed_player.get_values() < finance
+                    and top_capa >= self.best_cap_in_team(top_lo) - 2
+                ):
                     target_players.append(transfer_player)  # 满足筛选条件的球员
 
         # 将对多三个球员作为转会目标
@@ -169,60 +172,59 @@ class Club:
 
         for export_player in self.target_players:
             crud.create_target_player(
-                self.db,
-                self.exported_target_player_schemas(player=export_player, save_id=save_id))
+                self.db, self.exported_target_player_schemas(player=export_player, save_id=save_id)
+            )
         # self.db.commit()
 
-    def exported_target_player_schemas(
-            self, save_id, player: transfer_app.Player) -> schemas.TargetPlayerCreate:
+    def exported_target_player_schemas(self, save_id, player: transfer_app.Player) -> schemas.TargetPlayerCreate:
         """
         导出目标球员 schemas
         """
         data = {
-            'buyer_id': self.club_id,
-            'target_id': player.player_model.id,
-            'season': self.season,
-            'save_id': save_id
+            "buyer_id": self.club_id,
+            "target_id": player.player_model.id,
+            "season": self.season,
+            "save_id": save_id,
         }
         target_data = schemas.TargetPlayerCreate(**data)
         return target_data
 
-    def exported_offer_player_schemas(
-            self, save_id, offer_price, player: transfer_app.Player) -> schemas.OfferCreate:
+    def exported_offer_player_schemas(self, save_id, offer_price, player: transfer_app.Player) -> schemas.OfferCreate:
         """
         导出报价 schemas
         """
-        year, month, day = self.date.split('-')
+        year, month, day = self.date.split("-")
         offer_date = datetime.date(int(year), int(month), int(day))
         data = {
-            'buyer_id': self.club_id,
-            'target_id': player.player_model.id,
-            'target_club_id': player.player_model.club_id,
-            'offer_price': offer_price,
-            'season': self.season,
-            'save_id': save_id,
-            'status': 'w',
-            'date': offer_date
+            "buyer_id": self.club_id,
+            "target_id": player.player_model.id,
+            "target_club_id": player.player_model.club_id,
+            "offer_price": offer_price,
+            "season": self.season,
+            "save_id": save_id,
+            "status": "w",
+            "date": offer_date,
         }
         offer_data = schemas.OfferCreate(**data)
         return offer_data
 
     def exported_offer_player_schemas_for_user(
-            self, save_id, offer_price, player: transfer_app.Player) -> schemas.OfferCreate:
+        self, save_id, offer_price, player: transfer_app.Player
+    ) -> schemas.OfferCreate:
         """
         导出专用于玩家的报价 schemas
         """
-        year, month, day = self.date.split('-')
+        year, month, day = self.date.split("-")
         offer_date = datetime.date(int(year), int(month), int(day))
         data = {
-            'buyer_id': self.club_id,
-            'target_id': player.player_model.id,
-            'target_club_id': player.player_model.club_id,
-            'offer_price': offer_price,
-            'season': self.season,
-            'save_id': save_id,
-            'status': 'u',
-            'date': offer_date
+            "buyer_id": self.club_id,
+            "target_id": player.player_model.id,
+            "target_club_id": player.player_model.club_id,
+            "offer_price": offer_price,
+            "season": self.season,
+            "save_id": save_id,
+            "status": "u",
+            "date": offer_date,
         }
         offer_data = schemas.OfferCreate(**data)
         return offer_data
@@ -232,74 +234,70 @@ class Club:
         挑选目标发出报价，存至报价表
         """
         # 获取目标球员列表
-        target_list = crud.get_targets_by_club(
-            db=self.db, save_id=save_id, club_id=self.club_id, season=self.season)
+        target_list = crud.get_targets_by_club(db=self.db, save_id=save_id, club_id=self.club_id, season=self.season)
         now_date = utils.Date(self.date)
         # 剔除拒绝时间小于7天的目标球员
         target_list: List[models.TargetPlayer] = [
-            t for t in target_list if
-            not t.rejected_date or utils.Date(t.rejected_date).date + datetime.timedelta(days=7) < now_date.date
+            t
+            for t in target_list
+            if not t.rejected_date or utils.Date(t.rejected_date).date + datetime.timedelta(days=7) < now_date.date
         ]
 
         if len(target_list) > 0:  # 有目标球员
             # 查找本赛季的有效报价
             offer_list: List[models.Offer] = crud.get_active_offers_by_club(
-                db=self.db, save_id=save_id, buyer_id=self.club_id, season=self.season)
+                db=self.db, save_id=save_id, buyer_id=self.club_id, season=self.season
+            )
 
             if len(offer_list) == 0:
                 # 还没做过报价
                 offer_player = transfer_app.Player(
-                    db=self.db,
-                    player_id=target_list[0].target_id,
-                    season=self.season,
-                    date=self.date)
+                    db=self.db, player_id=target_list[0].target_id, season=self.season, date=self.date
+                )
                 offer_price = offer_player.get_offer_price(self.club_id)
                 crud.create_offer(
                     self.db,
-                    self.exported_offer_player_schemas(
-                        save_id=save_id,
-                        player=offer_player,
-                        offer_price=offer_price))  # 发出报价
+                    self.exported_offer_player_schemas(save_id=save_id, player=offer_player, offer_price=offer_price),
+                )  # 发出报价
                 logger.info(str(self.name) + "报价" + str(offer_player.player_model.name) + " " + str(offer_price) + "w")
             else:
                 for offer in offer_list:
-                    if offer.status == 'r':
+                    if offer.status == "r":
                         target_player: models.TargetPlayer = crud.get_target_by_player_id_n_buyer_id(
-                            db=self.db, target_id=offer.target_id, buyer_id=self.club_id)
+                            db=self.db, target_id=offer.target_id, buyer_id=self.club_id
+                        )
                         if target_player in target_list:
                             # 被拒绝 且可以报价
                             crud.delete_offer_by_id(db=self.db, offer_id=offer.id)  # 删掉上一次的报价
                             if offer.offer_price * 1.2 < self.team_model.finance * 0.75:
                                 # 重新报价
                                 offer_player = transfer_app.Player(
-                                    db=self.db,
-                                    player_id=offer.target_id,
-                                    season=self.season,
-                                    date=self.date)
+                                    db=self.db, player_id=offer.target_id, season=self.season, date=self.date
+                                )
                                 crud.create_offer(
                                     self.db,
                                     self.exported_offer_player_schemas(
-                                        save_id=save_id,
-                                        player=offer_player,
-                                        offer_price=offer.offer_price * 1.2))  # 发出报价
-                                logger.info(str(self.name) + "再次报价" + str(offer_player.player_model.name) + " " + str(
-                                    offer.offer_price * 1.2) + "w")
+                                        save_id=save_id, player=offer_player, offer_price=offer.offer_price * 1.2
+                                    ),
+                                )  # 发出报价
+                                logger.info(
+                                    str(self.name)
+                                    + "再次报价"
+                                    + str(offer_player.player_model.name)
+                                    + " "
+                                    + str(offer.offer_price * 1.2)
+                                    + "w"
+                                )
 
     def make_offer_by_user(self, save_id: int, target_player_id: int, offer_price: int):
         """
         玩家向特定球员发出报价，存至报价表
         """
-        target_player = transfer_app.Player(
-            db=self.db,
-            player_id=target_player_id,
-            season=self.season,
-            date=self.date)
+        target_player = transfer_app.Player(db=self.db, player_id=target_player_id, season=self.season, date=self.date)
         crud.create_offer(
             self.db,
-            self.exported_offer_player_schemas_for_user(
-                save_id=save_id,
-                player=target_player,
-                offer_price=offer_price))  # 发出报价
+            self.exported_offer_player_schemas_for_user(save_id=save_id, player=target_player, offer_price=offer_price),
+        )  # 发出报价
         logger.info(str(self.name) + "报价" + str(target_player.player_model.name) + " " + str(offer_price) + "u")
 
     def receive_offer(self, save_id):
@@ -311,18 +309,19 @@ class Club:
 
         # 查找本赛季收到的offer
         offer_list: List[models.Offer] = crud.get_offers_by_target_club(
-            db=self.db, save_id=save_id, target_club_id=self.club_id, season=self.season)
+            db=self.db, save_id=save_id, target_club_id=self.club_id, season=self.season
+        )
         for offer in offer_list:
-            if offer.status == 's':
+            if offer.status == "s":
                 pass
-            elif offer.status == 'r':
+            elif offer.status == "r":
                 pass
-            elif offer.status == 'w' or offer.status == 'u':  # w:待处理的offer，u:玩家的offer
+            elif offer.status == "w" or offer.status == "u":  # w:待处理的offer，u:玩家的offer
                 waiting_offer.append(offer)
                 # 根据身价判断是否接受报价
                 player = computed_data_app.ComputedPlayer(
-                    player_id=offer.target_id, db=self.db,
-                    season=self.season, date=self.date)
+                    player_id=offer.target_id, db=self.db, season=self.season, date=self.date
+                )
                 values = player.get_values()
                 if offer.offer_price >= np.random.normal(values * 1.1, values // 10):
                     # 接受报价
@@ -345,46 +344,54 @@ class Club:
             if offer not in offer_dict.values():
                 print(str(offer.id) + str(offer.status))
                 # 拒绝报价
-                if offer.status == 'w':
+                if offer.status == "w":
                     target_player: models.TargetPlayer = crud.get_target_by_player_id_n_buyer_id(
-                        db=self.db, target_id=offer.target_id, buyer_id=offer.buyer_id)
+                        db=self.db, target_id=offer.target_id, buyer_id=offer.buyer_id
+                    )
                     target_player.rejected_date = str(self.date)  # 设置买方目标球员的拒绝时间
-                offer.status = 'r'
+                offer.status = "r"
 
-                logger.info("{}拒绝了{}对{}的报价".format(
-                    str(crud.get_club_by_id(db=self.db, club_id=offer.target_club_id).name),
-                    str(crud.get_club_by_id(db=self.db, club_id=offer.buyer_id).name),
-                    str(crud.get_player_by_id(player_id=offer.target_id, db=self.db).name)
-                ))
+                logger.info(
+                    "{}拒绝了{}对{}的报价".format(
+                        str(crud.get_club_by_id(db=self.db, club_id=offer.target_club_id).name),
+                        str(crud.get_club_by_id(db=self.db, club_id=offer.buyer_id).name),
+                        str(crud.get_player_by_id(player_id=offer.target_id, db=self.db).name),
+                    )
+                )
             else:
                 # 接受电脑球员报价
                 # 修改球员状态
-                if offer.status == 'w':  # 买方俱乐部不是玩家
+                if offer.status == "w":  # 买方俱乐部不是玩家
                     crud.update_player(
-                        db=self.db, player_id=offer.target_id,
-                        attri={"club_id": offer.buyer_id,
-                               "on_sale": False})  # 修改球员所属俱乐部
+                        db=self.db, player_id=offer.target_id, attri={"club_id": offer.buyer_id, "on_sale": False}
+                    )  # 修改球员所属俱乐部
                     crud.delete_target_by_player_id_n_buyer_id(
-                        db=self.db, target_id=offer.target_id, buyer_id=offer.buyer_id)  # 从target表中删除
-                    logger.info(str(crud.get_player_by_id(player_id=offer.target_id, db=self.db).name) +
-                                " 从 " + str(self.name) + " 转会至 " +
-                                str(crud.get_club_by_id(db=self.db, club_id=offer.buyer_id).name) +
-                                " " + str(offer.offer_price) + "w!")
+                        db=self.db, target_id=offer.target_id, buyer_id=offer.buyer_id
+                    )  # 从target表中删除
+                    logger.info(
+                        str(crud.get_player_by_id(player_id=offer.target_id, db=self.db).name)
+                        + " 从 "
+                        + str(self.name)
+                        + " 转会至 "
+                        + str(crud.get_club_by_id(db=self.db, club_id=offer.buyer_id).name)
+                        + " "
+                        + str(offer.offer_price)
+                        + "w!"
+                    )
                     self.team_model.finance += offer.offer_price
                     buyer = crud.get_club_by_id(db=self.db, club_id=offer.buyer_id)
                     buyer.finance -= offer.offer_price
-                    p = transfer_app.Player(
-                        db=self.db, player_id=offer.target_id, season=self.season, date=self.date)
+                    p = transfer_app.Player(db=self.db, player_id=offer.target_id, season=self.season, date=self.date)
                     wage = round(np.random.normal(p.wanna_wage(), 2), 3)
                     if wage < 0:
                         wage = p.wanna_wage()
                     p.adjust_wage(wage)  # 调整球员工资
-                    year, month, day = self.date.split('-')
+                    year, month, day = self.date.split("-")
                     success_date = datetime.date(int(year), int(month), int(day))
                     offer.date = success_date  # 记录交易成功日期
-                    offer.status = 's'  # 交易完成
-                elif offer.status == 'u':  # 买方俱乐部是玩家
-                    offer.status = 'n'  # 转到球员处工资谈判
+                    offer.status = "s"  # 交易完成
+                elif offer.status == "u":  # 买方俱乐部是玩家
+                    offer.status = "n"  # 转到球员处工资谈判
 
     def improve_crew(self):
         """
@@ -392,10 +399,12 @@ class Club:
         """
         willingness = random.randint(0, 1)  # 随机一个是否愿意升级
         if self.team_model.finance > 5000 and willingness == 1:  # TODO 具体升级要求再议
-            crew = {'a': self.team_model.assistant,
-                    'd': self.team_model.doctor,
-                    's': self.team_model.scout,
-                    'n': self.team_model.negotiator}
+            crew = {
+                "a": self.team_model.assistant,
+                "d": self.team_model.doctor,
+                "s": self.team_model.scout,
+                "n": self.team_model.negotiator,
+            }
             sorted_crew = sorted(crew.items(), key=lambda kv: (kv[1], kv[0]))
             num = 1
             for i in range(len(sorted_crew)):
@@ -406,11 +415,11 @@ class Club:
             else:  # 随机挑选最低的
                 target_num = random.randint(0, num - 1)
                 target = sorted_crew[target_num][0]
-            if target == 'a':
+            if target == "a":
                 self.team_model.assistant += 1
-            elif target == 'd':
+            elif target == "d":
                 self.team_model.doctor += 1
-            elif target == 's':
+            elif target == "s":
                 self.team_model.scout += 1
-            elif target == 'n':
+            elif target == "n":
                 self.team_model.negotiator += 1

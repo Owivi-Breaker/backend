@@ -59,15 +59,12 @@ def create_game_player_data_bulk(game_player_data: List[schemas.GamePlayerDataCr
 
     def add_game_team_info_id(p):
         p = p.dict()
-        p['game_team_info_id'] = game_team_info_id
+        p["game_team_info_id"] = game_team_info_id
         return p
 
     game_player_data = list(map(add_game_team_info_id, game_player_data))
 
-    engine.execute(
-        models.GamePlayerData.__table__.insert(),
-        game_player_data
-    )
+    engine.execute(models.GamePlayerData.__table__.insert(), game_player_data)
 
 
 def get_game_player_data_by_attri(db: Session, attri: str, only_one: bool = False):
@@ -88,8 +85,11 @@ def update_game_team_info(db: Session, game_team_info_id: int, attri: dict) -> m
 
 
 def get_game_team_info_by_club(db: Session, club_id: int, season: int) -> list[models.GameTeamInfo]:
-    db_game_team_info = db.query(models.GameTeamInfo).filter(models.GameTeamInfo.club_id == club_id
-                                                             and models.GameTeamInfo.season == season).all()
+    db_game_team_info = (
+        db.query(models.GameTeamInfo)
+        .filter(models.GameTeamInfo.club_id == club_id and models.GameTeamInfo.season == season)
+        .all()
+    )
     return db_game_team_info
 
 
@@ -102,8 +102,9 @@ def update_game_team_data(db: Session, game_team_data_id: int, attri: dict) -> m
 
 
 def update_game_player_data(db: Session, game_player_data_id: int, attri: dict) -> models.GamePlayerData:
-    db_game_player_data = db.query(models.GamePlayerData).filter(
-        models.GamePlayerData.id == game_player_data_id).first()
+    db_game_player_data = (
+        db.query(models.GamePlayerData).filter(models.GamePlayerData.id == game_player_data_id).first()
+    )
     for key, value in attri.items():
         setattr(db_game_player_data, key, value)
     db.commit()
@@ -127,16 +128,21 @@ def get_game_by_id(db: Session, game_id: int) -> models.Game:
 def delete_game_by_attri(db: Session, query_str: str):
     db_games = db.query(models.Game).filter(eval(query_str)).all()
     if not db_games:
-        logger.info('无比赛表可删！')
+        logger.info("无比赛表可删！")
     for db_game in db_games:
-        db_game_teams_info = db.query(models.GameTeamInfo).filter(
-            models.GameTeamInfo.game_id == db_game.id).all()
+        db_game_teams_info = db.query(models.GameTeamInfo).filter(models.GameTeamInfo.game_id == db_game.id).all()
         for db_game_team_info in db_game_teams_info:
-            db_game_team_data = db.query(models.GameTeamData).filter(
-                models.GameTeamData.game_team_info_id == db_game_team_info.id).first()
+            db_game_team_data = (
+                db.query(models.GameTeamData)
+                .filter(models.GameTeamData.game_team_info_id == db_game_team_info.id)
+                .first()
+            )
             db.delete(db_game_team_data)
-            db_game_players_data = db.query(models.GamePlayerData).filter(
-                models.GamePlayerData.game_team_info_id == db_game_team_info.id).all()
+            db_game_players_data = (
+                db.query(models.GamePlayerData)
+                .filter(models.GamePlayerData.game_team_info_id == db_game_team_info.id)
+                .all()
+            )
             for db_game_player_data in db_game_players_data:
                 db.delete(db_game_player_data)
             db.delete(db_game_team_info)

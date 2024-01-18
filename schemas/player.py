@@ -18,7 +18,7 @@ class PlayerCreate(BaseModel):
     wages: float  # 周薪
 
     avatar: str  # 头像 json格式字符串
-    last_game_date: str = ''
+    last_game_date: str = ""
     real_stamina: float = 100  # 实时体力
     # Location num
     ST_num: int = 0
@@ -57,7 +57,7 @@ class PlayerCreate(BaseModel):
     free_kick_limit: int
     stamina_limit: int
     goalkeeping_limit: int
-    values:float
+    values: float
 
     class Config:
         orm_mode = True
@@ -103,6 +103,7 @@ class PlayerShow(BaseModel):
     """
     返回给前端的球员数据
     """
+
     id: int
     club_id: int
     club_name: str  # 俱乐部名
@@ -130,4 +131,4 @@ class PlayerShow(BaseModel):
     style_tag: List[str]  # 风格标签
     talent_tag: List[str]  # 天赋标签
     recent_ratings: List[float]  # 近五场比赛的评分
-    on_sale: bool # 是否挂牌
+    on_sale: bool  # 是否挂牌

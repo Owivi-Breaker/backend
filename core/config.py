@@ -5,7 +5,7 @@ from typing import List
 
 from pydantic import AnyHttpUrl
 
-with open('./env.json') as f:
+with open("./env.json") as f:
     data = json.load(f)
 
 
@@ -20,10 +20,9 @@ class Settings:
     # token过期时间
     # ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60
     # 跨域白名单
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:8080"]
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:8080"]
     # db配置
-    DB_URL = data['DB_URL']
+    DB_URL = data["DB_URL"]
     # 启动端口配置
     PORT = 8080
     # 是否热加载

@@ -11,4 +11,4 @@ class User(Base):
     hashed_password = Column(String(1000))
     is_active = Column(Boolean, default=True)
 
-    saves = relationship("Save", backref="user",lazy="select")
+    saves = relationship("Save", backref="user", lazy="select")

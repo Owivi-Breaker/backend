@@ -23,9 +23,9 @@ class ComputedLeague:
         :return: schemas.LeagueShow
         """
         data = dict()
-        data['id'] = self.league_model.id
-        data['name'] = self.league_model.name
-        data['cup'] = self.league_model.cup
-        data['points'] = self.league_model.points
+        data["id"] = self.league_model.id
+        data["name"] = self.league_model.name
+        data["cup"] = self.league_model.cup
+        data["points"] = self.league_model.points
 
         return schemas.LeagueShow(**data)

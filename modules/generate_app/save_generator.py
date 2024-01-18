@@ -33,26 +33,27 @@ class SaveGenerator:
         # 生成联赛
         league_list = eval("game_configs.{}".format(gen_type))
         for league in league_list:
-            league_create_schemas = schemas.LeagueCreate(created_time=datetime.datetime.now(),
-                                                         name=league['name'],
-                                                         points=league['points'],
-                                                         cup=league['cup'])
+            league_create_schemas = schemas.LeagueCreate(
+                created_time=datetime.datetime.now(), name=league["name"], points=league["points"], cup=league["cup"]
+            )
             league_model = league_generator.generate(league_create_schemas)
             crud.update_league(db=self.db, league_id=league_model.id, attri={"save_id": save_model.id})
-            league['id'] = league_model.id
-            logger.info("联赛{}生成".format(league['name']))
+            league["id"] = league_model.id
+            logger.info("联赛{}生成".format(league["name"]))
 
             for club in league["clubs"]:
                 # 生成俱乐部
-                club_create_schemas = schemas.ClubCreate(created_time=datetime.datetime.now(),
-                                                         name=club['name'],
-                                                         finance=club['finance'],
-                                                         reputation=club['reputation'])
+                club_create_schemas = schemas.ClubCreate(
+                    created_time=datetime.datetime.now(),
+                    name=club["name"],
+                    finance=club["finance"],
+                    reputation=club["reputation"],
+                )
                 club_model = club_generator.generate(club_create_schemas)
                 # 为新增的联赛记录更新save_id字段
                 # TODO 创建和添加字段其实可以一气呵成，下同
                 crud.update_club(db=self.db, club_id=club_model.id, attri={"league_id": league_model.id})
-                logger.info("俱乐部{}生成".format(club['name']))
+                logger.info("俱乐部{}生成".format(club["name"]))
 
                 # 随机生成教练
                 coach_model = coach_generator.generate()
@@ -65,17 +66,20 @@ class SaveGenerator:
                 for lo, num in formation_dict.items():
                     for i in range(num):
                         player_create_schemas: schemas.PlayerCreate = player_generator.generate(
-                            ori_mean_capa=club['ori_mean_capa'],
+                            ori_mean_capa=club["ori_mean_capa"],
                             ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                            average_age=27, location=lo)
+                            average_age=27,
+                            location=lo,
+                        )
                         players_create_schemas.append(player_create_schemas)
 
                 for _ in range(7):
                     # 随机生成7名任意位置成年球员
                     player_create_schemas: schemas.PlayerCreate = player_generator.generate(
-                        ori_mean_capa=club['ori_mean_capa'],
+                        ori_mean_capa=club["ori_mean_capa"],
                         ori_mean_potential_capa=game_configs.ori_mean_potential_capa,
-                        average_age=26)
+                        average_age=26,
+                    )
                     players_create_schemas.append(player_create_schemas)
 
                 for _ in range(6):
@@ -88,16 +92,18 @@ class SaveGenerator:
 
         for league in league_list:
             # 标记上下游联赛关系
-            if league['upper_league']:
+            if league["upper_league"]:
                 for target_league in league_list:
-                    if target_league['name'] == league['upper_league']:
-                        crud.update_league(db=self.db, league_id=league['id'],
-                                           attri={"upper_league": target_league['id']})
-            if league['lower_league']:
+                    if target_league["name"] == league["upper_league"]:
+                        crud.update_league(
+                            db=self.db, league_id=league["id"], attri={"upper_league": target_league["id"]}
+                        )
+            if league["lower_league"]:
                 for target_league in league_list:
-                    if target_league['name'] == league['lower_league']:
-                        crud.update_league(db=self.db, league_id=league['id'],
-                                           attri={"lower_league": target_league['id']})
+                    if target_league["name"] == league["lower_league"]:
+                        crud.update_league(
+                            db=self.db, league_id=league["id"], attri={"lower_league": target_league["id"]}
+                        )
         logger.info("联赛上下游关系标记完成")
         self.data = dict()  # 清空数据
         return save_model

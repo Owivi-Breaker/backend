@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 
 
 class PlayerPvE(game_eve_app.Player):
-    def __init__(self, db: Session, player_pve_model: models.PlayerPvE, season: int, date: str,
-                 is_first_turn: bool = False):
+    def __init__(
+        self, db: Session, player_pve_model: models.PlayerPvE, season: int, date: str, is_first_turn: bool = False
+    ):
         """
         :param is_first_turn: 是否为第一回合 关乎体力的初始化操作
         """
@@ -18,8 +19,12 @@ class PlayerPvE(game_eve_app.Player):
         self.date = date
         self.player_model = crud.get_player_by_id(db=self.db, player_id=player_pve_model.player_id)
         self.computed_player = computed_data_app.ComputedPlayer(
-            player_id=self.player_model.id, db=self.db,
-            player_model=self.player_model, season=self.season, date=self.date)
+            player_id=self.player_model.id,
+            db=self.db,
+            player_model=self.player_model,
+            season=self.season,
+            date=self.date,
+        )
 
         self.name = self.player_model.translated_name  # 解说用
         self.ori_location = self.player_pve_model.ori_location  # 原本位置，不会变
@@ -60,27 +65,27 @@ class PlayerPvE(game_eve_app.Player):
             "aerial_success": self.player_pve_model.aerial_success,
             "saves": self.player_pve_model.saves,
             "save_success": self.player_pve_model.save_success,
-            'final_rating': 6.0,  # 每次评分重置为默认值
-            'real_rating': 6.0
+            "final_rating": 6.0,  # 每次评分重置为默认值
+            "real_rating": 6.0,
         }
 
     def save_temporary_table(self):
-        self.player_pve_model.actions = self.data['actions']
-        self.player_pve_model.goals = self.data['goals']
-        self.player_pve_model.assists = self.data['assists']
-        self.player_pve_model.shots = self.data['shots']
-        self.player_pve_model.dribbles = self.data['dribbles']
-        self.player_pve_model.dribble_success = self.data['dribble_success']
-        self.player_pve_model.passes = self.data['passes']
-        self.player_pve_model.pass_success = self.data['pass_success']
-        self.player_pve_model.tackles = self.data['tackles']
-        self.player_pve_model.tackle_success = self.data['tackle_success']
-        self.player_pve_model.aerials = self.data['aerials']
-        self.player_pve_model.aerial_success = self.data['aerial_success']
-        self.player_pve_model.saves = self.data['saves']
-        self.player_pve_model.save_success = self.data['save_success']
-        self.player_pve_model.final_rating = self.data['final_rating']
-        self.player_pve_model.real_rating = self.data['real_rating']
+        self.player_pve_model.actions = self.data["actions"]
+        self.player_pve_model.goals = self.data["goals"]
+        self.player_pve_model.assists = self.data["assists"]
+        self.player_pve_model.shots = self.data["shots"]
+        self.player_pve_model.dribbles = self.data["dribbles"]
+        self.player_pve_model.dribble_success = self.data["dribble_success"]
+        self.player_pve_model.passes = self.data["passes"]
+        self.player_pve_model.pass_success = self.data["pass_success"]
+        self.player_pve_model.tackles = self.data["tackles"]
+        self.player_pve_model.tackle_success = self.data["tackle_success"]
+        self.player_pve_model.aerials = self.data["aerials"]
+        self.player_pve_model.aerial_success = self.data["aerial_success"]
+        self.player_pve_model.saves = self.data["saves"]
+        self.player_pve_model.save_success = self.data["save_success"]
+        self.player_pve_model.final_rating = self.data["final_rating"]
+        self.player_pve_model.real_rating = self.data["real_rating"]
 
         self.player_pve_model.real_location = self.real_location
         self.player_pve_model.final_stamina = self.stamina
