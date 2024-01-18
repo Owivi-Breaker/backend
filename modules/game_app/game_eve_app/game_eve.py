@@ -1,7 +1,6 @@
 import json
-from functools import reduce
 
-from utils import Date, utils, logger
+from utils import utils, logger
 import game_configs
 import crud
 import models
@@ -9,10 +8,9 @@ import schemas
 from modules.game_app import game_eve_app
 
 import random
-from typing import Dict, List, Sequence, Set, Tuple, Optional
+from typing import Dict, List, Tuple
 import datetime
 from sqlalchemy.orm import Session
-import time
 
 
 class GameEvE:

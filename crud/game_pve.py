@@ -1,11 +1,8 @@
-from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_
 
 import models
 import schemas
 from utils import logger
-from core.db import engine
 
 
 def create_game_pve(db: Session, game_pve: schemas.GamePvECreate) -> models.GamePvE:

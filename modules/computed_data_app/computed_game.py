@@ -4,10 +4,9 @@ import schemas
 from utils import utils, logger
 
 from core.db import engine
-from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session, joinedload
 import pandas as pd
-from typing import List, Optional, Union
+from typing import List, Union
 import json
 
 

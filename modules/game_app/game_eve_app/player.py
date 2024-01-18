@@ -1,10 +1,10 @@
-from utils import utils, logger
+from utils import utils
 import models
 import schemas
 import game_configs
 from modules import computed_data_app
 
-from typing import Dict, List, Sequence, Set, Tuple, Optional
+from typing import Optional
 import datetime
 from sqlalchemy.orm import Session
 

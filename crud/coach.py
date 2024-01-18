@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 import models
 import schemas
-from utils import logger
 
 
 def create_coach(db: Session, coach: schemas.CoachCreate):

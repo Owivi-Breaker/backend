@@ -6,7 +6,7 @@ from utils import Date, logger, utils
 
 from sqlalchemy.orm import Session
 import random
-from typing import List, Tuple
+from typing import List
 import json
 import datetime
 

@@ -1,14 +1,9 @@
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
-from core.db import engine, get_db, drop_all
-from pydantic import BaseModel
+from core.db import get_db
 
-import schemas
-import models
-import crud
-import game_configs
-from modules import generate_app, game_app, computed_data_app, next_turn_app
-from utils import logger, Date
+from modules import next_turn_app
+from utils import logger
 
 router = APIRouter()
 

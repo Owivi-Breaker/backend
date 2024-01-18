@@ -1,14 +1,14 @@
-from typing import List, Dict, Union, Optional
+from typing import Dict, Optional
 from fastapi import APIRouter, Body
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 import schemas
 import models
 import crud
 import utils
-from core.db import engine, get_db
+from core.db import get_db
 from modules import game_app, generate_app, computed_data_app
 
 

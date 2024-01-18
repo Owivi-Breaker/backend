@@ -1,5 +1,5 @@
 import models
-from utils import utils, logger
+from utils import utils
 import game_configs
 import crud
 import schemas

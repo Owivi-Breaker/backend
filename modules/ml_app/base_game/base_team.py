@@ -1,10 +1,7 @@
 from utils import utils, logger
 import game_configs
-import crud
 import schemas
 from modules.ml_app.base_game.base_player import BasePlayer
-from modules.game_app.player_selector import PlayerSelector
-import models
 
 import random
 from typing import List, Tuple, Optional, Dict
@@ -107,7 +104,6 @@ class BaseTeam:
         添加解说
         :param text: 解说词
         """
-        pass
 
     def set_capa(self, capa_name: str, num):
         """
@@ -423,7 +419,6 @@ class BaseTeam:
         """
         TODO 角球
         """
-        pass
 
     def wing_cross(self, rival_team: 'BaseTeam') -> bool:
         """

@@ -9,7 +9,6 @@ import schemas
 import models
 import crud
 import utils
-from utils import logger
 
 router = APIRouter()
 

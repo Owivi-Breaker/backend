@@ -1,17 +1,11 @@
-import json
 
-from utils import utils, logger
-import game_configs
-import crud
-import models
+from utils import logger
 import schemas
 from modules.ml_app.base_game import BaseTeam
 
 import random
 from typing import Dict, List, Tuple
-import datetime
 from sqlalchemy.orm import Session
-import time
 
 
 class BaseGame:

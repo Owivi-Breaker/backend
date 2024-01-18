@@ -2,13 +2,12 @@ from random import randint
 
 import numpy as np
 
-from utils import utils, logger
+from utils import logger
 import models
 import schemas
-import game_configs
 from modules import computed_data_app
 import crud
-from typing import Dict, List, Sequence, Set, Tuple, Optional
+from typing import List
 import datetime
 from sqlalchemy.orm import Session
 

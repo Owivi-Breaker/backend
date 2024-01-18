@@ -1,19 +1,16 @@
-import time
 from typing import List
 from fastapi import APIRouter, status, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
 import datetime
 
 from modules import generate_app
-from core.db import engine, get_db
+from core.db import get_db
 import schemas
 import models
 import crud
 import utils
 from utils import logger
-import game_configs
 
 router = APIRouter()
 

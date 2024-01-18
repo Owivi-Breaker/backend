@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 
-import schemas
 from game_configs.game_config import Location
 
 

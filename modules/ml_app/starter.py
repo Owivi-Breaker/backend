@@ -1,11 +1,8 @@
-from modules import generate_app
 from sqlalchemy.orm import Session
-import schemas
 from game_configs import formations
 import random
 from modules.ml_app.base_game.base_game import BaseGame
-from typing import Dict, List, Optional
-import numpy as np
+from typing import Dict
 import pandas as pd
 import os
 from core.db import get_session

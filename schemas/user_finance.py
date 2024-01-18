@@ -1,8 +1,5 @@
-import string
 from datetime import date
-from typing import List
 from pydantic import BaseModel
-import schemas
 
 
 class UserFinanceCreate(BaseModel):

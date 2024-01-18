@@ -7,7 +7,7 @@ from modules.game_app.player_selector import PlayerSelector
 import models
 
 import random
-from typing import Dict, List, Sequence, Set, Tuple, Optional
+from typing import List, Tuple, Optional
 import datetime
 from sqlalchemy.orm import Session
 
@@ -445,7 +445,6 @@ class Team:
         """
         TODO 角球
         """
-        pass
 
     def wing_cross(self, rival_team: 'Team') -> bool:
         """

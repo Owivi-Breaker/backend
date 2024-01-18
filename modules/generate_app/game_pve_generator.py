@@ -1,6 +1,5 @@
 import models
-from utils import utils, logger
-import game_configs
+from utils import logger
 import crud
 import schemas
 from modules import game_app
@@ -9,7 +8,7 @@ from modules.game_app.player_selector import PlayerSelector
 import random
 import json
 import datetime
-from typing import Tuple, List, Dict
+from typing import List, Dict
 from sqlalchemy.orm import Session
 
 

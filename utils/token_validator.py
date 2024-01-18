@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import Optional
 import datetime
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -10,7 +10,6 @@ import game_configs
 
 from core.db import get_db
 import models
-import schemas
 import crud
 
 # 加密格式, 参数tokenUrl只是为了方便fastapi的文档网页的认证使用, 在前后端实际项目中并不会起到作用

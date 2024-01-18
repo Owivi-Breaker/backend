@@ -1,11 +1,9 @@
-from typing import List, Union
+from typing import List
 from fastapi import APIRouter
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
 
-from utils import logger
-from core.db import engine, get_db
+from core.db import get_db
 from modules import computed_data_app
 import schemas
 import models

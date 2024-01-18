@@ -1,8 +1,4 @@
-import time
-from modules import next_turn_app, transfer_app
 from core.db import get_session
-from utils import logger
-import crud
 from modules.ml_app.starter import Starter
 
 if __name__ == '__main__':

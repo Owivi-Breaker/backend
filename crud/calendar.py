@@ -1,10 +1,8 @@
-from sqlalchemy import or_, and_
 from sqlalchemy.orm import Session
 from typing import List
 
 import models
 import schemas
-from utils import logger
 
 
 def create_calendar(db: Session, calendar: schemas.CalendarCreate):

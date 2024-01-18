@@ -1,10 +1,8 @@
-from fastapi import Header, Depends, HTTPException, status
+from fastapi import Depends
 from sqlalchemy.orm import Session
-from jose import JWTError, jwt
 
 from core.db import get_db
-from utils import get_current_user, TokenData, oauth2_scheme, logger
-import game_configs
+from utils import get_current_user, oauth2_scheme
 import crud
 import models
 

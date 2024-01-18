@@ -1,7 +1,6 @@
 # 日期处理类
 import datetime
 
-from utils import logger
 
 
 class Date:

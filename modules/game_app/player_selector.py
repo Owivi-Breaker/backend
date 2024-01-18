@@ -10,8 +10,6 @@ from utils import logger, utils
 from modules.computed_data_app import ComputedPlayer
 
 from typing import List, Dict, Optional, Union, Tuple
-from fastapi import Depends
-from core.db import get_db
 from sqlalchemy.orm import Session
 import random
 

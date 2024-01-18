@@ -1,13 +1,9 @@
-import game_configs
 import schemas
-from utils import logger
 import models
 import crud
 
 from sqlalchemy.orm import Session
-from fastapi import Depends
-from core.db import get_db
-from typing import Dict, List, Tuple, Optional
+from typing import Optional
 
 
 class ComputedLeague:

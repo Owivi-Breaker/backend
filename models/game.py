@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, Index, TEXT
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Enum, Float, TEXT
 from sqlalchemy.orm import relationship
 from models.base import Base
 from game_configs.game_config import Location
