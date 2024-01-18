@@ -13,3 +13,4 @@ bcrypt
 pymysql
 numpy
 SQLAlchemy-Utils
+autoflake
